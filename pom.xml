@@ -16,7 +16,7 @@
 
     <groupId>com.github.psi-probe</groupId>
     <artifactId>psi-probe</artifactId>
-    <version>3.5.4-SNAPSHOT</version>
+    <version>3.5.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>psi-probe</name>
@@ -145,111 +145,114 @@
 
         <!-- Dependency Versions -->
         <activation.version>1.2.2</activation.version>
-        <animal-sniffer.version>1.19</animal-sniffer.version>
-        <assertj.version>3.18.1</assertj.version>
+        <animal-sniffer.version>1.20</animal-sniffer.version>
+        <assertj.version>3.20.2</assertj.version>
         <beanutils.version>1.9.4</beanutils.version>
         <bonecp.version>0.8.0.RELEASE</bonecp.version>
         <c3p0.version>0.9.5.5</c3p0.version>
-        <checker.version>3.9.0</checker.version>
+        <checker.version>3.16.0</checker.version>
         <collections.version>3.2.2</collections.version>
         <dbcp.version>1.4</dbcp.version>
         <dbcp2.version>2.8.0</dbcp2.version>
         <displaytag.version>2.4.0</displaytag.version>
         <el-api.version>3.0.3</el-api.version>
-        <error-prone.version>2.4.0</error-prone.version>
+        <error-prone.version>2.7.1</error-prone.version>
         <geoip2.version>2.15.0</geoip2.version>
-        <guava.version>30.1-jre</guava.version>
-        <hateoas.version>1.2.2</hateoas.version>
-        <hikaricp.version>3.4.5</hikaricp.version>
+        <guava.version>30.1.1-jre</guava.version>
+        <hateoas.version>1.3.3</hateoas.version>
+        <hikaricp.version>4.0.3</hikaricp.version>
         <inject.version>1.0.3</inject.version>
-        <io.version>2.8.0</io.version>
+        <io.version>2.11.0</io.version>
         <j2objc.version>1.3</j2objc.version>
-        <jackson.version>2.12.0</jackson.version>
-        <javabean-tester.version>2.3.1</javabean-tester.version>
-        <jfreechart.version>1.5.2</jfreechart.version>
+        <jackson.version>2.12.4</jackson.version>
+        <javabean-tester.version>2.4.0</javabean-tester.version>
+        <jfreechart.version>1.5.3</jfreechart.version>
         <jhighlight.version>1.0.3</jhighlight.version>
         <jmockit.version>1.49.1</jmockit.version>
-        <jna.version>5.6.0</jna.version>
+        <jna.version>5.8.0</jna.version>
         <jsp-api.version>2.3.6</jsp-api.version>
         <jsr305.version>3.0.2</jsr305.version>
         <jstl-api.version>1.2.7</jstl-api.version>
         <jstl.version>1.2.6</jstl.version>
-        <junit.version>5.7.0</junit.version>
-        <lang3.version>3.11</lang3.version>
+        <junit.version>5.7.2</junit.version>
+        <lang3.version>3.12.0</lang3.version>
         <logback.version>1.2.3</logback.version>
-        <mail.version>1.6.5</mail.version>
-        <oshi.version>5.3.7</oshi.version>
+        <mail.version>1.6.7</mail.version>
+        <oshi.version>5.7.5</oshi.version>
         <openejb.version>4.7.5</openejb.version>
         <persistence.version>2.2.3</persistence.version>
         <pool.version>1.6</pool.version>
-        <probe-ojdbc.version>3.1.3</probe-ojdbc.version>
+        <probe-ojdbc.version>3.1.4</probe-ojdbc.version>
         <quartz.version>2.3.2</quartz.version>
         <servlet-api.version>4.0.4</servlet-api.version>
         <sitemesh.version>2.4.2</sitemesh.version>
-        <slf4j.version>1.7.30</slf4j.version>
-        <spring.version>5.3.2</spring.version>
-        <spring-security.version>5.4.2</spring-security.version>
+        <slf4j.version>1.7.31</slf4j.version>
+        <spring.version>5.3.9</spring.version>
+        <spring-security.version>5.5.1</spring-security.version>
         <text.version>1.9</text.version>
         <transaction-api.version>1.3.3</transaction-api.version>
-        <tomcat.version>9.0.41</tomcat.version>
+        <tomcat.version>9.0.50</tomcat.version>
         <wrapper.version>3.2.3</wrapper.version>
         <xpp3_min.version>1.1.4c</xpp3_min.version>
-        <xstream.version>1.4.15</xstream.version>
+        <xstream.version>1.4.17</xstream.version>
         <vibur-dbcp.version>25.0</vibur-dbcp.version>
 
         <!-- Plugin Versions -->
         <antrun.plugin>3.0.0</antrun.plugin>
         <assembly.plugin>3.3.0</assembly.plugin>
         <build-helper.plugin>3.2.0</build-helper.plugin>
-        <checkstyle.plugin>3.1.1</checkstyle.plugin>
+        <checkstyle.plugin>3.1.2</checkstyle.plugin>
         <changelog.plugin>2.3</changelog.plugin>
         <clean.plugin>3.1.0</clean.plugin>
         <compiler.plugin>3.8.1</compiler.plugin>
         <coveralls.plugin>4.3.0</coveralls.plugin>
-        <dependency.plugin>3.1.2</dependency.plugin>
-        <dependency-check.plugin>6.0.4</dependency-check.plugin>
+        <dependency.plugin>3.2.0</dependency.plugin>
+        <dependency-check.plugin>6.2.2</dependency-check.plugin>
         <deploy.plugin>3.0.0-M1</deploy.plugin>
-        <formatter.plugin>2.13.0</formatter.plugin>
-        <git-commit.plugin>4.0.3</git-commit.plugin>
-        <gpg.plugin>1.6</gpg.plugin>
-        <impsort.plugin>1.4.1</impsort.plugin>
+        <formatter.plugin>2.16.0</formatter.plugin>
+        <git-commit.plugin>4.0.5</git-commit.plugin>
+        <gpg.plugin>3.0.1</gpg.plugin>
+        <impsort.plugin>1.6.2</impsort.plugin>
         <install.plugin>3.0.0-M1</install.plugin>
-        <jacoco.plugin>0.8.6</jacoco.plugin>
+        <jacoco.plugin>0.8.7</jacoco.plugin>
         <jar.plugin>3.2.0</jar.plugin>
-        <javadoc.plugin>3.2.0</javadoc.plugin>
+        <javadoc.plugin>3.3.0</javadoc.plugin>
         <jdeps.plugin>3.1.2</jdeps.plugin>
-        <jspc.plugin>9.4.35.v20201120</jspc.plugin>
-        <jxr.plugin>3.0.0</jxr.plugin>
+        <jspc.plugin>9.4.43.v20210629</jspc.plugin>
+        <jxr.plugin>3.1.1</jxr.plugin>
         <l10n.plugin>1.8</l10n.plugin>
-        <license.plugin>3.0</license.plugin>
+        <license.plugin>4.1</license.plugin>
         <lifecycle-mapping.plugin>1.0.0</lifecycle-mapping.plugin>
-        <modernizer.plugin>2.1.0</modernizer.plugin>
+        <modernizer.plugin>2.2.0</modernizer.plugin>
         <pmd.plugin>3.14.0</pmd.plugin>
-        <project-info.plugin>3.1.1</project-info.plugin>
-        <release.plugin>2.5.3</release.plugin>
+        <project-info.plugin>3.1.2</project-info.plugin>
+        <release.plugin>3.0.0-M4</release.plugin>
         <resources.plugin>3.2.0</resources.plugin>
         <site.plugin>3.9.1</site.plugin>
-        <sonar.plugin>3.7.0.1746</sonar.plugin>
+        <sonar.plugin>3.9.0.2155</sonar.plugin>
         <source.plugin>3.2.1</source.plugin>
-        <spotbugs.plugin>4.2.0</spotbugs.plugin>
+        <spotbugs.plugin>4.3.0</spotbugs.plugin>
         <surefire.plugin>3.0.0-M5</surefire.plugin>
         <tidy.plugin>1.1.0</tidy.plugin>
         <versions.plugin>2.8.1</versions.plugin>
         <war.plugin>3.3.1</war.plugin>
 
         <!-- Plugin Dependency Versions -->
-        <build-tools.version>1.2.5</build-tools.version>
+        <build-tools.version>1.2.6</build-tools.version>
         <bugpattern.version>1.5.0</bugpattern.version>
-        <checkstyle.version>8.39</checkstyle.version>
-        <doxia.version>1.9.1</doxia.version>
-        <ecj.version>3.24.0</ecj.version>
+        <checkstyle.version>8.44</checkstyle.version>
+        <doxia.version>1.10</doxia.version>
+        <ecj.version>3.26.0</ecj.version>
         <sb-contrib.version>7.4.7</sb-contrib.version>
         <findsecbugs.version>1.11.0</findsecbugs.version>
         <javac.version>9+181-r4173-1</javac.version>
         <wagon-git.version note="Do not use 2.0.4 as it does not work with ssh">2.0.3</wagon-git.version>
 
         <!-- Plugin Extensions -->
-        <wagon-ssh.version>3.4.2</wagon-ssh.version>
+        <wagon-ssh.version>3.4.3</wagon-ssh.version>
+
+        <!-- Verification Checks -->
+        <error-prone.failOnViolations>-XepAllErrorsAsWarnings</error-prone.failOnViolations>
     </properties>
 
     <dependencyManagement>
@@ -866,6 +869,19 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${compiler.plugin}</version>
                     <configuration>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>com.google.errorprone</groupId>
+                                <artifactId>error_prone_core</artifactId>
+                                <version>${error-prone.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+
+                        <compilerArgs>
+                            <arg>-XDcompilePolicy=simple</arg>
+                            <arg>-Xplugin:ErrorProne ${error-prone.failOnViolations}</arg>
+                        </compilerArgs>
+
                         <showDeprecation>true</showDeprecation>
                         <showWarnings>true</showWarnings>
 
@@ -1374,6 +1390,14 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <!-- Skip license plugin during release as maven release is now shallow cloned -->
+                    <plugin>
+                        <groupId>com.mycila</groupId>
+                        <artifactId>license-maven-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -1412,37 +1436,6 @@
         </profile>
 
         <profile>
-            <id>error-prone</id>
-            <activation>
-                <jdk>[1.8,12)</jdk>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <annotationProcessorPaths>
-                                    <path>
-                                        <groupId>com.google.errorprone</groupId>
-                                        <artifactId>error_prone_core</artifactId>
-                                        <version>${error-prone.version}</version>
-                                    </path>
-                                </annotationProcessorPaths>
-
-                                <compilerArgs>
-                                    <arg>-XDcompilePolicy=simple</arg>
-                                    <arg>-Xplugin:ErrorProne -Xep:Finally:OFF</arg>
-                                </compilerArgs>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-
-        <profile>
             <id>jdk8</id>
             <activation>
                 <jdk>1.8</jdk>
@@ -1473,9 +1466,6 @@
             <properties>
                 <maven.compiler.release>${java.release.version}</maven.compiler.release>
                 <maven.compiler.testRelease>${java.test.release.version}</maven.compiler.testRelease>
-
-                <!-- Downgrade until jmockit fixes bug with jacoco 0.8.4+ support -->
-                <jacoco.plugin>0.8.3</jacoco.plugin>
             </properties>
             <build>
                 <pluginManagement>
@@ -1534,6 +1524,39 @@
                                         <X-Compile-Release-JDK>${maven.compiler.release}</X-Compile-Release-JDK>
                                     </manifestEntries>
                                 </archive>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <profile>
+            <id>jdk16on</id>
+            <activation>
+                <jdk>[16,)</jdk>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <fork>true</fork>
+                                <compilerArgs combine.children="append">
+                                    <!-- Error Prone Needs -->
+                                    <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
+                                    <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                                    <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                                    <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
+                                    <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>
+                                    <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>
+                                    <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>
+                                    <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                                    <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                                </compilerArgs>
                             </configuration>
                         </plugin>
                     </plugins>
