@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -14,7 +14,7 @@ package psiprobe.tools;
  * Wraps an object that may have overridden the {@link Object#equals(Object) equals()} and
  * {@link Object#hashCode() hashCode()} methods so it reverts to the default behavior for
  * {@link Object} instead.
- * 
+ *
  * <p>
  * This allows us to (1) use {@link java.util.Collection#contains(Object)} to filter out unique
  * instances when calculating object sizes and (2) call {@link Object#hashCode() hashCode()} without
@@ -47,10 +47,10 @@ class ObjectWrapper {
     }
     ObjectWrapper ow = (ObjectWrapper) o1;
     /*
-     * I know, this condition may seem strange, but if "equals" is left out, sizeOf() may run into
-     * an infinite loop on some objects
+     * I know, this condition may seem strange, but if "equals" is left in, sizeOf() may run into an
+     * infinite loop on some objects
      */
-    return ow.wrappedObject == wrappedObject;// || o.equals(ow.o);
+    return ow.wrappedObject == wrappedObject; // || o.equals(ow.o);
   }
 
   @Override

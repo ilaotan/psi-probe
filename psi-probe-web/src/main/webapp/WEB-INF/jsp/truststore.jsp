@@ -11,38 +11,40 @@
 
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="false"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 <%@ taglib uri="http://displaytag.sf.net" prefix="display" %>
 
-<html>
-	<head>
-		<title><spring:message code="probe.jsp.sysinfo.truststore.title"/></title>
-	</head>
+<!DOCTYPE html>
+<html lang="${lang}">
+    <head>
+        <title><spring:message code="probe.jsp.sysinfo.truststore.title"/></title>
+        <script src="<c:url value='/js/prototype.js'/>"></script>
+    </head>
 
-	<c:set var="navTabSystem" value="active" scope="request"/>
-	<c:set var="systemTabTrustStore" value="active" scope="request"/>
-	<c:set var="use_decorator" value="system" scope="request"/>
+    <c:set var="navTabSystem" value="active" scope="request"/>
+    <c:set var="systemTabTrustStore" value="active" scope="request"/>
+    <c:set var="use_decorator" value="system" scope="request"/>
 
-	<body>
-		<c:choose>
-			<c:when test="${ empty certificates}">
-				<div class="errorMessage">
-					<p>
-						<spring:message code="probe.jsp.sysinfo.truststore.notAvailable"/>
-					</p>
-				</div>
-			</c:when>
-			<c:otherwise>
-				<div id="systemProperties">
-					<display:table name="certificates" class="genericTbl" cellspacing="0"
-							requestURI="" defaultsort="2" defaultorder="ascending">
-						<display:column property="alias" titleKey="probe.jsp.sysinfo.truststore.alias" sortable="true" class="leftmost"/>
-						<display:column property="cn" titleKey="probe.jsp.sysinfo.truststore.cn" sortable="true" class="leftmost"/>
-						<display:column property="expirationDate" titleKey="probe.jsp.sysinfo.truststore.expirationDate" sortable="true"/>
-					</display:table>
-				</div>
-			</c:otherwise>
-		</c:choose>
-	</body>
+    <body>
+        <c:choose>
+            <c:when test="${ empty certificates}">
+                <div class="errorMessage">
+                    <p>
+                        <spring:message code="probe.jsp.sysinfo.truststore.notAvailable"/>
+                    </p>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div id="systemProperties">
+                    <display:table name="certificates" class="genericTbl" cellspacing="0"
+                            requestURI="" defaultsort="2" defaultorder="ascending">
+                        <display:column property="alias" titleKey="probe.jsp.sysinfo.truststore.alias" sortable="true" class="leftmost"/>
+                        <display:column property="cn" titleKey="probe.jsp.sysinfo.truststore.cn" sortable="true" class="leftmost"/>
+                        <display:column property="expirationDate" titleKey="probe.jsp.sysinfo.truststore.expirationDate" sortable="true"/>
+                    </display:table>
+                </div>
+            </c:otherwise>
+        </c:choose>
+    </body>
 </html>

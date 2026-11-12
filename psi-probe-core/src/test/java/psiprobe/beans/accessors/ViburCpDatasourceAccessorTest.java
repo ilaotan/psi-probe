@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,31 +10,35 @@
  */
 package psiprobe.beans.accessors;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 
-import mockit.Expectations;
-import mockit.Mocked;
+import java.sql.SQLException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.vibur.dbcp.ViburDBCPDataSource;
+import org.vibur.objectpool.PoolService;
 
 /**
  * The Class ViburCpDatasourceAccessorTest.
  */
+@ExtendWith(MockitoExtension.class)
 class ViburCpDatasourceAccessorTest {
 
   /** The accessor. */
   ViburCpDatasourceAccessor accessor;
 
   /** The source. */
-  @Mocked
+  @Mock
   ViburDBCPDataSource source;
 
   /** The bad source. */
-  ComboPooledDataSource badSource;
+  HikariDataSource badSource;
 
   /**
    * Before.
@@ -42,7 +46,7 @@ class ViburCpDatasourceAccessorTest {
   @BeforeEach
   void before() {
     accessor = new ViburCpDatasourceAccessor();
-    badSource = new ComboPooledDataSource();
+    badSource = new HikariDataSource();
   }
 
   /**
@@ -64,18 +68,17 @@ class ViburCpDatasourceAccessorTest {
   /**
    * Gets the info test.
    *
-   * @throws Exception the exception
+   * @throws SQLException the sql exception
    */
-  @Disabled
+  @SuppressWarnings("unchecked")
   @Test
-  void getInfoTest() throws Exception {
-    new Expectations() {
-      {
-        source.getJmxName();
-        result = "viburJmx";
-      }
-    };
-    accessor.getInfo(source);
+  void getInfoTest() throws SQLException {
+    var poolService = Mockito.mock(PoolService.class);
+    Mockito.when(source.getPool()).thenReturn(poolService);
+    Mockito.when(poolService.taken()).thenReturn(1);
+    Mockito.when(poolService.remainingCreated()).thenReturn(1);
+
+    Assertions.assertNotNull(accessor.getInfo(source));
   }
 
 }

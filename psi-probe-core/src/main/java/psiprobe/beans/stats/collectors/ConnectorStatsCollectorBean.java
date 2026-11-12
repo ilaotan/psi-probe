@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,7 +10,7 @@
  */
 package psiprobe.beans.stats.collectors;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Value;
 
@@ -26,24 +26,6 @@ public class ConnectorStatsCollectorBean extends AbstractStatsCollectorBean {
   /** The listener bean. */
   @Inject
   private ContainerListenerBean listenerBean;
-
-  /**
-   * Gets the listener bean.
-   *
-   * @return the listener bean
-   */
-  public ContainerListenerBean getListenerBean() {
-    return listenerBean;
-  }
-
-  /**
-   * Sets the listener bean.
-   *
-   * @param listenerBean the new listener bean
-   */
-  public void setListenerBean(ContainerListenerBean listenerBean) {
-    this.listenerBean = listenerBean;
-  }
 
   @Override
   public void collect() throws Exception {
@@ -89,8 +71,8 @@ public class ConnectorStatsCollectorBean extends AbstractStatsCollectorBean {
    * @param span the span
    */
   public void setMaxSeries(
-      @Value("${psiprobe.beans.stats.collectors.connector.period}") long period,
-      @Value("${psiprobe.beans.stats.collectors.connector.span}") long span) {
+      @Value("${psiprobe.beans.stats.collectors.connector.period}") String period,
+      @Value("${psiprobe.beans.stats.collectors.connector.span}") String span) {
     super.setMaxSeries((int) TimeExpression.dataPoints(period, span));
   }
 

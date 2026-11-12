@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -14,8 +14,12 @@ import java.io.File;
 
 import psiprobe.tools.Instruments;
 
+/**
+ * JDK 1.4 Logging File Handler Accessor Class.
+ */
 public class Jdk14FileHandlerAccessor extends Jdk14HandlerAccessor {
 
+  /** The Constant LATEST_FILE_INDEX. */
   private static final int LATEST_FILE_INDEX = 0;
 
   /**

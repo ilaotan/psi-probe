@@ -11,11 +11,11 @@
 
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="false"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 
 <c:if test="${! empty connector}">
-	<span class="name"><spring:message code="probe.jsp.connectors.processor.requestCount"/></span>&#160;${connector.requestCount}
-	&#160;
-	<span class="name"><spring:message code="probe.jsp.connectors.processor.errorCount"/></span>&#160;${connector.errorCount}
+    <span class="name"><spring:message code="probe.jsp.connectors.processor.requestCount"/></span>&#160;${connector.requestCount}
+    &#160;
+    <span class="name"><spring:message code="probe.jsp.connectors.processor.errorCount"/></span>&#160;${connector.errorCount}
 </c:if>

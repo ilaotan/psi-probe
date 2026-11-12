@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -30,6 +30,7 @@ public class BackwardsFileStream extends InputStream {
    * Instantiates a new backwards file stream.
    *
    * @param file the file
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public BackwardsFileStream(File file) throws IOException {
@@ -42,6 +43,7 @@ public class BackwardsFileStream extends InputStream {
    *
    * @param file the file
    * @param pos the pos
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public BackwardsFileStream(File file, long pos) throws IOException {

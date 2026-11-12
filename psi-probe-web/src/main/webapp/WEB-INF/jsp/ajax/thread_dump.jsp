@@ -11,18 +11,18 @@
 
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="false" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 
 <c:choose>
-	<c:when test="${done}">
-		<div class="warningMessage">
-			<p><spring:message code="probe.jsp.wrapper.jvm.thread_dump"/></p>
-		</div>
-	</c:when>
-	<c:otherwise>
-		<div class="errorMessage">
-			<p><spring:message code="probe.jsp.wrapper.not_available"/></p>
-		</div>
-	</c:otherwise>
+    <c:when test="${done}">
+        <div class="warningMessage">
+            <p><spring:message code="probe.jsp.wrapper.jvm.thread_dump"/></p>
+        </div>
+    </c:when>
+    <c:otherwise>
+        <div class="errorMessage">
+            <p><spring:message code="probe.jsp.wrapper.not_available"/></p>
+        </div>
+    </c:otherwise>
 </c:choose>

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,9 +10,9 @@
  */
 package psiprobe.beans.stats.collectors;
 
-import java.util.List;
+import jakarta.inject.Inject;
 
-import javax.inject.Inject;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,24 +31,6 @@ public class JvmMemoryStatsCollectorBean extends AbstractStatsCollectorBean {
   @Inject
   private JvmMemoryInfoAccessorBean jvmMemoryInfoAccessor;
 
-  /**
-   * Gets the jvm memory info accessor.
-   *
-   * @return the jvm memory info accessor
-   */
-  public JvmMemoryInfoAccessorBean getJvmMemoryInfoAccessor() {
-    return jvmMemoryInfoAccessor;
-  }
-
-  /**
-   * Sets the jvm memory info accessor.
-   *
-   * @param jvmMemoryInfoAccessor the new jvm memory info accessor
-   */
-  public void setJvmMemoryInfoAccessor(JvmMemoryInfoAccessorBean jvmMemoryInfoAccessor) {
-    this.jvmMemoryInfoAccessor = jvmMemoryInfoAccessor;
-  }
-
   @Override
   public void collect() throws Exception {
     List<MemoryPool> pools = jvmMemoryInfoAccessor.getPools();
@@ -64,8 +46,8 @@ public class JvmMemoryStatsCollectorBean extends AbstractStatsCollectorBean {
    * @param period the period
    * @param span the span
    */
-  public void setMaxSeries(@Value("${psiprobe.beans.stats.collectors.memory.period}") long period,
-      @Value("${psiprobe.beans.stats.collectors.memory.span}") long span) {
+  public void setMaxSeries(@Value("${psiprobe.beans.stats.collectors.memory.period}") String period,
+      @Value("${psiprobe.beans.stats.collectors.memory.span}") String span) {
     super.setMaxSeries((int) TimeExpression.dataPoints(period, span));
   }
 

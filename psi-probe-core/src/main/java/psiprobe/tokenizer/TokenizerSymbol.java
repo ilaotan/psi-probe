@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -15,9 +15,6 @@ import java.util.Objects;
 /**
  * The Class TokenizerSymbol.
  */
-// Keep 'supressWarnings' due to error-prone violation that is covered, see
-// https://errorprone.info/bugpattern/ComparableType
-@SuppressWarnings("ComparableType")
 public class TokenizerSymbol implements Comparable<Object> {
 
   /** The name. */
@@ -66,8 +63,8 @@ public class TokenizerSymbol implements Comparable<Object> {
 
   @Override
   public int compareTo(Object obj) {
-    if (obj instanceof Character) {
-      return compareTo((Character) obj);
+    if (obj instanceof Character charactor) {
+      return compareTo(charactor);
     }
     return compareTo((TokenizerSymbol) obj);
   }
@@ -76,6 +73,7 @@ public class TokenizerSymbol implements Comparable<Object> {
    * Compare to.
    *
    * @param chr the chr
+   *
    * @return the int
    */
   public int compareTo(Character chr) {
@@ -86,6 +84,7 @@ public class TokenizerSymbol implements Comparable<Object> {
    * Compare to.
    *
    * @param symbol the symbol
+   *
    * @return the int
    */
   public int compareTo(TokenizerSymbol symbol) {
@@ -100,19 +99,14 @@ public class TokenizerSymbol implements Comparable<Object> {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
+    if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
     final TokenizerSymbol other = (TokenizerSymbol) obj;
     return Objects.equals(this.name, other.name) && Objects.equals(this.startText, other.startText)
-        && Objects.equals(this.tailText, other.tailText)
-        && Objects.equals(this.hidden, other.hidden)
-        && Objects.equals(this.decodePaired, other.decodePaired)
-        && Objects.equals(this.enabled, other.enabled)
-        && Objects.equals(this.canBeNested, other.canBeNested);
+        && Objects.equals(this.tailText, other.tailText) && this.hidden == other.hidden
+        && this.decodePaired == other.decodePaired && this.enabled == other.enabled
+        && this.canBeNested == other.canBeNested;
   }
 
 }

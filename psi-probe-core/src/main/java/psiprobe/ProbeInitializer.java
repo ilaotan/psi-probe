@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -12,16 +12,17 @@ package psiprobe;
 
 import com.opensymphony.sitemesh.webapp.SiteMeshFilter;
 
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.MultipartConfigElement;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.SessionTrackingMode;
+
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
-import javax.servlet.SessionTrackingMode;
 
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -41,9 +42,6 @@ public class ProbeInitializer implements WebApplicationInitializer {
         new AnnotationConfigWebApplicationContext()) {
       rootContext.register(ProbeConfig.class);
 
-      // Set Role that can view session attribute values
-      servletContext.setInitParameter("attribute.value.roles", "ROLE_MANAGER,ROLE_MANAGER-GUI");
-
       // Set context loader listener
       servletContext.addListener(new ContextLoaderListener(rootContext));
     }
@@ -51,15 +49,23 @@ public class ProbeInitializer implements WebApplicationInitializer {
     // Set probe servlet
     ServletRegistration.Dynamic probe = servletContext.addServlet("probe", ProbeServlet.class);
 
+    // Use temp directory unlimited in size for multipart uploads
+    MultipartConfigElement multipartConfig = new MultipartConfigElement(null, -1L, -1L, 0);
+    probe.setMultipartConfig(multipartConfig);
+
+    // Set Role that can view session attribute values
+    servletContext.setInitParameter("attribute.value.roles", "ROLE_MANAGER,ROLE_MANAGER-GUI");
+
+    // Set Initial Parameters
     Map<String, String> initParameters = new HashMap<>();
     initParameters.put("contextConfigLocation", "");
     probe.setInitParameters(initParameters);
 
+    // Set load on startup
     probe.setLoadOnStartup(0);
-    probe.addMapping("*.htm");
-    probe.addMapping("*.ajax");
-    probe.addMapping("/logs/*");
-    probe.addMapping("/chart.png");
+
+    // Add Mapping
+    probe.addMapping("*.htm", "*.ajax", "/logs/*", "/chart.png");
 
     // Set sitemesh filter
     FilterRegistration.Dynamic sitemesh =
@@ -77,12 +83,7 @@ public class ProbeInitializer implements WebApplicationInitializer {
 
     // Set session cookie config
     servletContext.getSessionCookieConfig().setHttpOnly(true);
-    /**
-     * Disable secure cookie until http session issues can be resolved. While tomcat will handle
-     * this normally with http, spring has been shown to continually create new sessions. This may
-     * not be related to spring security but rather spring web mvc.
-     */
-    // servletContext.getSessionCookieConfig().setSecure(true);
+    servletContext.getSessionCookieConfig().setSecure(true);
 
     // Set session tracking mode
     EnumSet<SessionTrackingMode> trackingMode = EnumSet.of(SessionTrackingMode.COOKIE);

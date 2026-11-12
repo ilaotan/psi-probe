@@ -11,98 +11,99 @@
 
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="false" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 
-<html>
-	<head>
-		<title><spring:message code="probe.jsp.title.datasources"/></title>
-		<script type="text/javascript" src="<c:url value='/js/prototype.js'/>"></script>
-		<script type="text/javascript" src="<c:url value='/js/scriptaculous/scriptaculous.js'/>"></script>
-		<script type="text/javascript" src="<c:url value='/js/func.js'/>"></script>
-		<script type="text/javascript" src="<c:url value='/js/behaviour.js'/>"></script>
-	</head>
+<!DOCTYPE html>
+<html lang="${lang}">
+    <head>
+        <title><spring:message code="probe.jsp.title.datasources"/></title>
+        <script src="<c:url value='/js/prototype.js'/>"></script>
+        <script src="<c:url value='/js/scriptaculous/scriptaculous.js'/>"></script>
+        <script src="<c:url value='/js/func.js'/>"></script>
+        <script src="<c:url value='/js/behaviour.js'/>"></script>
+    </head>
 
-	<body>
+    <body>
 
-		<c:set var="navTabDatasources" value="active" scope="request"/>
+        <c:set var="navTabDatasources" value="active" scope="request"/>
 
-		<c:if test="${! empty errorMessage}">
-			<div class="errorMessage">
-				<p>
-					${errorMessage}
-				</p>
-			</div>
-		</c:if>
+        <c:if test="${! empty errorMessage}">
+            <div class="errorMessage">
+                <p>
+                    ${errorMessage}
+                </p>
+            </div>
+        </c:if>
 
-		<c:choose>
-			<c:when test="${! empty privateResources || ! empty globalResources}">
+        <c:choose>
+            <c:when test="${! empty privateResources || ! empty globalResources}">
 
-				<ul class="options">
-					<li id="groupByJdbcUrl">
-						<a href="<c:url value='/datasourcegroups.htm' />">
-							<spring:message code="probe.jsp.datasources.opt.groupByJdbcUrl"/>
-						</a>
-					</li>
-					<li id="abbreviations">
-						<a href="#">
-							<spring:message code="probe.jsp.generic.abbreviations"/>
-						</a>
-					</li>
-				</ul>
+                <ul class="options">
+                    <li id="groupByJdbcUrl">
+                        <a href="<c:url value='/datasourcegroups.htm' />">
+                            <spring:message code="probe.jsp.datasources.opt.groupByJdbcUrl"/>
+                        </a>
+                    </li>
+                    <li id="abbreviations">
+                        <a href="#">
+                            <spring:message code="probe.jsp.generic.abbreviations"/>
+                        </a>
+                    </li>
+                </ul>
 
-				<div class="blockContainer">
+                <div class="blockContainer">
 
-					<div id="help" class="helpMessage" style="display: none;">
-						<div class="ajax_activity"></div>
-					</div>
+                    <div id="help" class="helpMessage" style="display: none;">
+                        <div class="ajax_activity"></div>
+                    </div>
 
-					<c:if test="${supportsGlobal}">
-						<h3>
-							<spring:message code="probe.jsp.datasources.h3.global"/>
-						</h3>
-						<c:choose>
-							<c:when test="${not empty globalResources}">
-								<c:set var="resources" value="${globalResources}" scope="request" />
-								<c:set var="isGlobalResources" value="true" scope="request" />
-								<c:import url="datasources_table.jsp" />
-							</c:when>
-							<c:otherwise>
-								<p><spring:message code="probe.jsp.datasources.global.empty" /></p>
-							</c:otherwise>
-						</c:choose>
-					</c:if>
+                    <c:if test="${supportsGlobal}">
+                        <h3>
+                            <spring:message code="probe.jsp.datasources.h3.global"/>
+                        </h3>
+                        <c:choose>
+                            <c:when test="${! empty globalResources}">
+                                <c:set var="resources" value="${globalResources}" scope="request" />
+                                <c:set var="isGlobalResources" value="true" scope="request" />
+                                <c:import url="datasources_table.jsp" />
+                            </c:when>
+                            <c:otherwise>
+                                <p><spring:message code="probe.jsp.datasources.global.empty" /></p>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:if>
 
-					<c:if test="${supportsPrivate}">
-						<h3>
-							<spring:message code="probe.jsp.datasources.h3.app"/>
-						</h3>
-						<c:choose>
-							<c:when test="${not empty privateResources}">
-								<c:set var="resources" value="${privateResources}" scope="request" />
-								<c:set var="isGlobalResources" value="false" scope="request" />
-								<c:import url="datasources_table.jsp" />
-							</c:when>
-							<c:otherwise>
-								<p><spring:message code="probe.jsp.datasources.app.empty" /></p>
-							</c:otherwise>
-						</c:choose>
-					</c:if>
+                    <c:if test="${supportsPrivate}">
+                        <h3>
+                            <spring:message code="probe.jsp.datasources.h3.app"/>
+                        </h3>
+                        <c:choose>
+                            <c:when test="${! empty privateResources}">
+                                <c:set var="resources" value="${privateResources}" scope="request" />
+                                <c:set var="isGlobalResources" value="false" scope="request" />
+                                <c:import url="datasources_table.jsp" />
+                            </c:when>
+                            <c:otherwise>
+                                <p><spring:message code="probe.jsp.datasources.app.empty" /></p>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:if>
 
-				</div>
+                </div>
 
-				<script type="text/javascript">
-					setupHelpToggle('<c:url value="/help/datasources.ajax"/>');
-				</script>
+                <script>
+                    setupHelpToggle('<c:url value="/help/datasources.ajax"/>');
+                </script>
 
-			</c:when>
-			<c:otherwise>
-				<div class="infoMessage">
-					<p>
-						<spring:message code="probe.jsp.datasources.empty"/>
-					</p>
-				</div>
-			</c:otherwise>
-		</c:choose>
-	</body>
+            </c:when>
+            <c:otherwise>
+                <div class="infoMessage">
+                    <p>
+                        <spring:message code="probe.jsp.datasources.empty"/>
+                    </p>
+                </div>
+            </c:otherwise>
+        </c:choose>
+    </body>
 </html>

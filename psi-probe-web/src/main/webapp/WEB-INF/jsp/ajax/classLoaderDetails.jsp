@@ -11,18 +11,18 @@
 
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="false" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 
 
 <c:choose>
-	<c:when test="${! empty urls }">
-		<c:forEach var="u" items="${urls}">
-			${u}<br/>
-		</c:forEach>
-	</c:when>
+    <c:when test="${! empty urls }">
+        <c:forEach var="u" items="${urls}">
+            ${u}<br/>
+        </c:forEach>
+    </c:when>
 
-	<c:otherwise>
-		<spring:message code="probe.jsp.threads.info.unavailable"/>
-	</c:otherwise>
+    <c:otherwise>
+        <spring:message code="probe.jsp.threads.info.unavailable"/>
+    </c:otherwise>
 </c:choose>

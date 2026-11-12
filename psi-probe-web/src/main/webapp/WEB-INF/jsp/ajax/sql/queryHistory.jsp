@@ -11,24 +11,24 @@
 
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="false" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 
 <%-- An Ajax HTML snippet to display a history of executed SQL queries. --%>
 
 <c:choose>
-	<c:when test="${! empty queryHistory}">
-		<ul>
-			<c:forEach var="sql" items="${queryHistory}" varStatus="id">
-				<li>
-					<a href="<c:url value='/sql/queryHistoryItem.ajax?sqlId=${id.index}'/>" onClick="getQueryHistoryItem(this); return false;">
-						<span style="display: block"><spring:escapeBody htmlEscape="true" javaScriptEscape="false">${sql}</spring:escapeBody></span>
-					</a>
-				</li>
-			</c:forEach>
-		</ul>
-	</c:when>
-	<c:otherwise>
-		<div id="historyEmpty"><spring:message code="probe.jsp.dataSourceTest.queryHistory.empty"/></div>
-	</c:otherwise>
+    <c:when test="${! empty queryHistory}">
+        <ul>
+            <c:forEach var="sql" items="${queryHistory}" varStatus="id">
+                <li>
+                    <a href="<c:url value='/sql/queryHistoryItem.ajax?sqlId=${id.index}'/>" onClick="getQueryHistoryItem(this); return false;">
+                        <span style="display: block"><spring:escapeBody htmlEscape="true" javaScriptEscape="false">${sql}</spring:escapeBody></span>
+                    </a>
+                </li>
+            </c:forEach>
+        </ul>
+    </c:when>
+    <c:otherwise>
+        <div id="historyEmpty"><spring:message code="probe.jsp.dataSourceTest.queryHistory.empty"/></div>
+    </c:otherwise>
 </c:choose>

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -12,6 +12,7 @@ package psiprobe.beans.stats.listeners;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import psiprobe.Utils;
 
@@ -42,10 +43,10 @@ public abstract class AbstractFlapListener extends AbstractThresholdListener {
   private float defaultFlapHighWeight;
 
   /** The flaps. */
-  private final HashMap<String, LinkedList<Boolean>> flaps = new HashMap<>();
+  private final Map<String, LinkedList<Boolean>> flaps = new HashMap<>();
 
   /** The flapping states. */
-  private final HashMap<String, Boolean> flappingStates = new HashMap<>();
+  private final Map<String, Boolean> flappingStates = new HashMap<>();
 
   /**
    * Flapping started.
@@ -142,6 +143,7 @@ public abstract class AbstractFlapListener extends AbstractThresholdListener {
    *
    * @param name the name
    * @param crossedThreshold the crossed threshold
+   *
    * @return true, if successful
    */
   protected boolean checkFlappingStateChanged(String name, boolean crossedThreshold) {
@@ -163,6 +165,7 @@ public abstract class AbstractFlapListener extends AbstractThresholdListener {
    *
    * @param name the name
    * @param flapping the flapping
+   *
    * @return the float
    */
   protected float calculateStateTransitionPercentage(String name, boolean flapping) {
@@ -175,7 +178,7 @@ public abstract class AbstractFlapListener extends AbstractThresholdListener {
     for (int i = list.size() - 1; i >= 0; i--) {
       boolean thisFlap = list.get(i);
       if (flapping != thisFlap) {
-        float weight = lowWeight + (weightRange * i / (flapInterval - 1));
+        float weight = lowWeight + weightRange * i / (flapInterval - 1);
         result += weight;
       }
     }
@@ -202,6 +205,7 @@ public abstract class AbstractFlapListener extends AbstractThresholdListener {
    * Gets the flapping state.
    *
    * @param name the name
+   *
    * @return the flapping state
    */
   protected boolean getFlappingState(String name) {
@@ -227,21 +231,18 @@ public abstract class AbstractFlapListener extends AbstractThresholdListener {
    * Gets the flaps.
    *
    * @param name the name
+   *
    * @return the flaps
    */
   protected LinkedList<Boolean> getFlaps(String name) {
-    LinkedList<Boolean> list = flaps.get(name);
-    if (list == null) {
-      list = new LinkedList<>();
-      flaps.put(name, list);
-    }
-    return list;
+    return flaps.computeIfAbsent(name, s -> new LinkedList<>());
   }
 
   /**
    * Gets the flap interval.
    *
    * @param name the name
+   *
    * @return the flap interval
    */
   protected int getFlapInterval(String name) {
@@ -253,6 +254,7 @@ public abstract class AbstractFlapListener extends AbstractThresholdListener {
    * Gets the flap start threshold.
    *
    * @param name the name
+   *
    * @return the flap start threshold
    */
   protected float getFlapStartThreshold(String name) {
@@ -264,6 +266,7 @@ public abstract class AbstractFlapListener extends AbstractThresholdListener {
    * Gets the flap stop threshold.
    *
    * @param name the name
+   *
    * @return the flap stop threshold
    */
   protected float getFlapStopThreshold(String name) {
@@ -275,6 +278,7 @@ public abstract class AbstractFlapListener extends AbstractThresholdListener {
    * Gets the flap low weight.
    *
    * @param name the name
+   *
    * @return the flap low weight
    */
   protected float getFlapLowWeight(String name) {
@@ -286,6 +290,7 @@ public abstract class AbstractFlapListener extends AbstractThresholdListener {
    * Gets the flap high weight.
    *
    * @param name the name
+   *
    * @return the flap high weight
    */
   protected float getFlapHighWeight(String name) {

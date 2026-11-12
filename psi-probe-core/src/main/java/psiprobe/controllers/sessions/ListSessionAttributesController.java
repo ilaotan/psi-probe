@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,8 +10,8 @@
  */
 package psiprobe.controllers.sessions;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +42,7 @@ public class ListSessionAttributesController extends AbstractContextHandlerContr
   protected ModelAndView handleContext(String contextName, Context context,
       HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-    boolean privileged = SecurityUtils.hasAttributeValueRole(getServletContext(), request);
+    boolean privileged = SecurityUtils.hasAttributeValueRole(getServletContext());
     boolean calcSize =
         privileged && ServletRequestUtils.getBooleanParameter(request, "size", false);
     String sid = ServletRequestUtils.getStringParameter(request, "sid");

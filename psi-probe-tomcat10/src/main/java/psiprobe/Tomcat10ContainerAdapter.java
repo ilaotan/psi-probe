@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,6 +10,8 @@
  */
 package psiprobe;
 
+import jakarta.servlet.ServletContext;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -17,8 +19,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import jakarta.servlet.ServletContext;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Valve;
@@ -54,10 +54,10 @@ public class Tomcat10ContainerAdapter extends AbstractTomcatContainer {
     if (binding == null) {
       return false;
     }
-    return binding.startsWith("Apache Tomcat/10.0");
-// Do not exist yet
-//        || binding.startsWith("Apache Tomcat (TomEE)/10.0")
-//        || binding.startsWith("Pivotal tc") && binding.contains("/10.0");
+    return binding.startsWith("Apache Tomcat/10.1")
+        || binding.startsWith("Apache Tomcat (TomEE)/10.0")
+        || binding.startsWith("NonStop(tm) Servlets For JavaServer Pages(tm) v10.1")
+        || binding.startsWith("Vmware tc") && binding.contains("/10.1");
   }
 
   /**
@@ -66,6 +66,7 @@ public class Tomcat10ContainerAdapter extends AbstractTomcatContainer {
    * @param fmap the fmap
    * @param dm the dm
    * @param filterClass the filter class
+   *
    * @return the filter mappings
    */
   protected List<FilterMapping> getFilterMappings(FilterMap fmap, String dm, String filterClass) {
@@ -88,8 +89,7 @@ public class Tomcat10ContainerAdapter extends AbstractTomcatContainer {
   }
 
   @Override
-  public void addContextResourceLink(Context context, List<ApplicationResource> resourceList,
-      boolean contextBound) {
+  public void addContextResourceLink(Context context, List<ApplicationResource> resourceList) {
 
     NamingResourcesImpl namingResources = context.getNamingResources();
     for (ContextResourceLink link : namingResources.findResourceLinks()) {
@@ -108,8 +108,7 @@ public class Tomcat10ContainerAdapter extends AbstractTomcatContainer {
   }
 
   @Override
-  public void addContextResource(Context context, List<ApplicationResource> resourceList,
-      boolean contextBound) {
+  public void addContextResource(Context context, List<ApplicationResource> resourceList) {
     NamingResourcesImpl namingResources = context.getNamingResources();
     for (ContextResource contextResource : namingResources.findResources()) {
       ApplicationResource resource = new ApplicationResource();
@@ -150,6 +149,7 @@ public class Tomcat10ContainerAdapter extends AbstractTomcatContainer {
             dm = "REQUEST";
             break;
           default:
+            // Can be any other filters, for those set to space
             dm = "";
         }
 
@@ -183,6 +183,7 @@ public class Tomcat10ContainerAdapter extends AbstractTomcatContainer {
    * Gets the filter info.
    *
    * @param fd the fd
+   *
    * @return the filter info
    */
   private static FilterInfo getFilterInfo(FilterDef fd) {

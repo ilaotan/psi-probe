@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,30 +10,35 @@
  */
 package psiprobe.beans.accessors;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.HikariPoolMXBean;
 
-import mockit.Mocked;
+import java.sql.SQLException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.vibur.dbcp.ViburDBCPDataSource;
 
 /**
  * The Class HikariCpDatasourceAccessorTest.
  */
+@ExtendWith(MockitoExtension.class)
 class HikariCpDatasourceAccessorTest {
 
   /** The accessor. */
   HikariCpDatasourceAccessor accessor;
 
   /** The source. */
-  @Mocked
+  @Mock
   HikariDataSource source;
 
   /** The bad source. */
-  ComboPooledDataSource badSource;
+  ViburDBCPDataSource badSource;
 
   /**
    * Before.
@@ -41,7 +46,7 @@ class HikariCpDatasourceAccessorTest {
   @BeforeEach
   void before() {
     accessor = new HikariCpDatasourceAccessor();
-    badSource = new ComboPooledDataSource();
+    badSource = new ViburDBCPDataSource();
   }
 
   /**
@@ -63,12 +68,16 @@ class HikariCpDatasourceAccessorTest {
   /**
    * Gets the info test.
    *
-   * @throws Exception the exception
+   * @throws SQLException the sql exception
    */
-  @Disabled
   @Test
-  void getInfoTest() throws Exception {
-    accessor.getInfo(source);
+  void getInfoTest() throws SQLException {
+    var poolMxBean = Mockito.mock(HikariPoolMXBean.class);
+    Mockito.when(source.getHikariPoolMXBean()).thenReturn(poolMxBean);
+    Mockito.when(poolMxBean.getActiveConnections()).thenReturn(1);
+    Mockito.when(poolMxBean.getTotalConnections()).thenReturn(2);
+
+    Assertions.assertNotNull(accessor.getInfo(source));
   }
 
 }

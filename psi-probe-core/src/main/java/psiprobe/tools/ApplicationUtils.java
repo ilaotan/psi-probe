@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -9,6 +9,9 @@
  * PURPOSE.
  */
 package psiprobe.tools;
+
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -22,8 +25,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.naming.NamingException;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -66,6 +67,7 @@ public final class ApplicationUtils {
    *
    * @param context the context
    * @param containerWrapper the container wrapper
+   *
    * @return the application
    */
   public static Application getApplication(Context context, ContainerWrapperBean containerWrapper) {
@@ -85,6 +87,7 @@ public final class ApplicationUtils {
    * @param resourceResolver the resolver to use for resources associated with the given context
    * @param calcSize flag which controls whether to calculate session size
    * @param containerWrapper the wrapper for the context's root containing server
+   *
    * @return Application object
    */
   public static Application getApplication(Context context, ResourceResolver resourceResolver,
@@ -94,7 +97,7 @@ public final class ApplicationUtils {
     logger.debug("Querying webapp: {}", context.getName());
 
     Application app = new Application();
-    app.setName(context.getName().length() > 0 ? context.getName() : "/");
+    app.setName(!context.getName().isEmpty() ? context.getName() : "/");
     app.setDocBase(context.getDocBase());
     app.setDisplayName(context.getDisplayName());
 
@@ -157,21 +160,54 @@ public final class ApplicationUtils {
    */
   public static void collectApplicationServletStats(Context context, Application app) {
     int svltCount = 0;
-    int reqCount = 0;
-    int errCount = 0;
+    long reqCount = 0;
+    long errCount = 0;
     long procTime = 0;
     long minTime = Long.MAX_VALUE;
     long maxTime = 0;
 
     for (Container container : context.findChildren()) {
-      if (container instanceof StandardWrapper) {
-        StandardWrapper sw = (StandardWrapper) container;
+      if (container instanceof StandardWrapper sw) {
         svltCount++;
-        reqCount += sw.getRequestCount();
-        errCount += sw.getErrorCount();
+
+        // Get Request Count (bridge between tomcat 10 and 11 using int vs long
+        Object requestCount = null;
+        try {
+          requestCount = MethodUtils.invokeMethod(sw, "getRequestCount");
+          if (requestCount instanceof Long result) {
+            // tomcat 11+
+            reqCount += result;
+          } else {
+            // tomcat 10
+            reqCount += (int) requestCount;
+          }
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+          logger.error("Unable to find getRequestCount", e);
+        }
+
+        // Get Error Count (bridge between tomcat 10 and 11 using int vs long
+        try {
+          Object errorCount = MethodUtils.invokeMethod(sw, "getErrorCount");
+          if (errorCount instanceof Long result) {
+            // Tomcat 11+
+            errCount += result;
+          } else {
+            // Tomcat 10
+            errCount += (int) errorCount;
+          }
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+          logger.error("Unable to find getErrorCount", e);
+        }
+
         procTime += sw.getProcessingTime();
-        if (sw.getRequestCount() > 0) {
-          minTime = Math.min(minTime, sw.getMinTime());
+        if (requestCount != null) {
+          if (requestCount instanceof Long result && result > 0) {
+            // Tomcat 11+
+            minTime = Math.min(minTime, sw.getMinTime());
+          } else if (requestCount instanceof Integer result && result > 0) {
+            // Tomcat 10
+            minTime = Math.min(minTime, sw.getMinTime());
+          }
         }
         maxTime = Math.max(maxTime, sw.getMaxTime());
       }
@@ -190,6 +226,7 @@ public final class ApplicationUtils {
    * @param context the context
    * @param resolver the resolver
    * @param containerWrapper the container wrapper
+   *
    * @return the application data source usage scores
    */
   public static int[] getApplicationDataSourceUsageScores(Context context,
@@ -197,7 +234,7 @@ public final class ApplicationUtils {
 
     logger.debug("Calculating datasource usage score");
 
-    int[] scores = new int[] {0, 0};
+    int[] scores = {0, 0};
     List<ApplicationResource> appResources;
     try {
       appResources = resolver.getApplicationResources(context, containerWrapper);
@@ -219,6 +256,7 @@ public final class ApplicationUtils {
    * @param session the session
    * @param calcSize the calc size
    * @param addAttributes the add attributes
+   *
    * @return the application session
    */
   public static ApplicationSession getApplicationSession(Session session, boolean calcSize,
@@ -233,16 +271,7 @@ public final class ApplicationUtils {
       sbean.setLastAccessTime(new Date(session.getLastAccessedTime()));
       sbean.setMaxIdleTime(session.getMaxInactiveInterval() * 1000);
       sbean.setManagerType(session.getManager().getClass().getName());
-
-      // Tomcat 8+ dropped support of getInfo off session. This patch allows it to continue working
-      // for tomcat 7.
-      try {
-        Object info = MethodUtils.invokeMethod(session, "getInfo");
-        sbean.setInfo(String.valueOf(info));
-      } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-        sbean.setInfo(session.getClass().getSimpleName());
-        logger.trace("Cannot determine session info for tomcat 8+", e);
-      }
+      sbean.setInfo(session.getClass().getSimpleName());
 
       boolean sessionSerializable = true;
       int attributeCount = 0;
@@ -305,6 +334,7 @@ public final class ApplicationUtils {
    * Gets the application attributes.
    *
    * @param context the context
+   *
    * @return the application attributes
    */
   public static List<Attribute> getApplicationAttributes(Context context) {
@@ -327,6 +357,7 @@ public final class ApplicationUtils {
    *
    * @param context the context
    * @param containerWrapper the container wrapper
+   *
    * @return the application init params
    */
   public static List<ApplicationParam> getApplicationInitParams(Context context,
@@ -340,13 +371,13 @@ public final class ApplicationUtils {
    *
    * @param context the context
    * @param servletName the servlet name
+   *
    * @return the application servlet
    */
   public static ServletInfo getApplicationServlet(Context context, String servletName) {
     Container container = context.findChild(servletName);
 
-    if (container instanceof Wrapper) {
-      Wrapper wrapper = (Wrapper) container;
+    if (container instanceof Wrapper wrapper) {
       return getServletInfo(wrapper, context.getName());
     }
     return null;
@@ -357,43 +388,54 @@ public final class ApplicationUtils {
    *
    * @param wrapper the wrapper
    * @param contextName the context name
+   *
    * @return the servlet info
    */
   private static ServletInfo getServletInfo(Wrapper wrapper, String contextName) {
     ServletInfo si = new ServletInfo();
-    si.setApplicationName(contextName.length() > 0 ? contextName : "/");
+    si.setApplicationName(!contextName.isEmpty() ? contextName : "/");
     si.setServletName(wrapper.getName());
     si.setServletClass(wrapper.getServletClass());
     si.setAvailable(!wrapper.isUnavailable());
     si.setLoadOnStartup(wrapper.getLoadOnStartup());
     si.setRunAs(wrapper.getRunAs());
     si.getMappings().addAll(Arrays.asList(wrapper.findMappings()));
-    if (wrapper instanceof StandardWrapper) {
-      StandardWrapper sw = (StandardWrapper) wrapper;
+    if (wrapper instanceof StandardWrapper sw) {
       si.setAllocationCount(sw.getCountAllocated());
-      si.setErrorCount(sw.getErrorCount());
+
+      // Get Error Count (bridge between tomcat 10 and 11 using int vs long
+      try {
+        Object errorCount = MethodUtils.invokeMethod(sw, "getErrorCount");
+        if (errorCount instanceof Long result) {
+          // Tomcat 11+
+          si.setErrorCount(result);
+        } else {
+          // Tomcat 10
+          si.setErrorCount((int) errorCount);
+        }
+      } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        logger.error("Unable to find getErrorCount", e);
+      }
+
       si.setLoadTime(sw.getLoadTime());
-      si.setMaxInstances(sw.getMaxInstances());
       si.setMaxTime(sw.getMaxTime());
       si.setMinTime(sw.getMinTime() == Long.MAX_VALUE ? 0 : sw.getMinTime());
       si.setProcessingTime(sw.getProcessingTime());
-      si.setRequestCount(sw.getRequestCount());
-      // Tomcat 7.0.72+, 8.0.37+, 8.5.5+, and 9.0.0.M10 modified from boolean to Boolean.
-      // Since SingleThreadModel deprecated in servlet 2.4 with no direct replacement,
-      // we will continue to handle as boolean. Previously calling this would have
-      // resulted in class being loaded if not already. This is why Null is returned
-      // now.
+
+      // Get Request Count (bridge between tomcat 10 and 11 using int vs long
       try {
-        Object singleThreaded = MethodUtils.invokeMethod(sw, "isSingleThreadModel");
-        if (singleThreaded == null) {
-          si.setSingleThreaded(false);
+        Object requestCount = MethodUtils.invokeMethod(sw, "getRequestCount");
+        if (requestCount instanceof Long result) {
+          // Tomcat 11+
+          si.setRequestCount(result);
         } else {
-          si.setSingleThreaded(Boolean.parseBoolean(String.valueOf(singleThreaded)));
+          // Tomcat 10
+          si.setRequestCount((int) requestCount);
         }
       } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-        logger.error("Cannot determine single threading");
-        logger.trace("", e);
+        logger.error("Unable to find getRequestCount", e);
       }
+
     }
     return si;
   }
@@ -402,14 +444,14 @@ public final class ApplicationUtils {
    * Gets the application servlets.
    *
    * @param context the context
+   *
    * @return the application servlets
    */
   public static List<ServletInfo> getApplicationServlets(Context context) {
     Container[] cns = context.findChildren();
     List<ServletInfo> servlets = new ArrayList<>(cns.length);
     for (Container container : cns) {
-      if (container instanceof Wrapper) {
-        Wrapper wrapper = (Wrapper) container;
+      if (container instanceof Wrapper wrapper) {
         servlets.add(getServletInfo(wrapper, context.getName()));
       }
     }
@@ -420,6 +462,7 @@ public final class ApplicationUtils {
    * Gets the application servlet maps.
    *
    * @param context the context
+   *
    * @return the application servlet maps
    */
   public static List<ServletMapping> getApplicationServletMaps(Context context) {
@@ -430,12 +473,11 @@ public final class ApplicationUtils {
         String sn = context.findServletMapping(servletMapping);
         if (sn != null) {
           ServletMapping sm = new ServletMapping();
-          sm.setApplicationName(context.getName().length() > 0 ? context.getName() : "/");
+          sm.setApplicationName(!context.getName().isEmpty() ? context.getName() : "/");
           sm.setUrl(servletMapping);
           sm.setServletName(sn);
           Container container = context.findChild(sn);
-          if (container instanceof Wrapper) {
-            Wrapper wrapper = (Wrapper) container;
+          if (container instanceof Wrapper wrapper) {
             sm.setServletClass(wrapper.getServletClass());
             sm.setAvailable(!wrapper.isUnavailable());
           }
@@ -451,6 +493,7 @@ public final class ApplicationUtils {
    *
    * @param context the context
    * @param containerWrapper the container wrapper
+   *
    * @return the application filters
    */
   public static List<FilterInfo> getApplicationFilters(Context context,

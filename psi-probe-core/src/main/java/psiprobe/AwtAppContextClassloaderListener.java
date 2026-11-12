@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,17 +10,19 @@
  */
 package psiprobe;
 
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.annotation.WebListener;
+
 import javax.imageio.ImageIO;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Prevents a classloader leak.
- * 
+ *
+ * <p>
  * As suggested by: <a href="https://cdivilly.wordpress.com/2012/04/23/permgen-memory-leak/">Colm
  * Divilly</a>
  */
@@ -34,7 +36,7 @@ public class AwtAppContextClassloaderListener implements ServletContextListener 
   /**
    * Forces the {@code sun.awt.AppContext} singleton to be created and initialized when the context
    * is initialized.
-   * 
+   *
    * @param sce the event containing the context being initialized
    */
   @Override
@@ -53,8 +55,7 @@ public class AwtAppContextClassloaderListener implements ServletContextListener 
          * Forces the sun.awt.AppContext singleton to be created and initialized. Call
          * ImageIO.getCacheDirectory() to avoid direct call to Oracle JVM internal class
          * sun.awt.AppContext. Same solution as in
-         * org.apache.catalina.core.JreMemoryLeakPreventionListener which is optional on Tomcat
-         * 1.7.0_02 or greater.
+         * org.apache.catalina.core.JreMemoryLeakPreventionListener which is optional on Tomcat.
          */
         ImageIO.getCacheDirectory();
       } finally {

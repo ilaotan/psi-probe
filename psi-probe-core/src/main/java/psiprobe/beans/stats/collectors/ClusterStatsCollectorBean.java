@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,7 +10,7 @@
  */
 package psiprobe.beans.stats.collectors;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Value;
 
@@ -32,42 +32,6 @@ public class ClusterStatsCollectorBean extends AbstractStatsCollectorBean {
   /** The cluster wrapper. */
   @Inject
   private ClusterWrapperBean clusterWrapper;
-
-  /**
-   * Gets the container wrapper.
-   *
-   * @return the container wrapper
-   */
-  public ContainerWrapperBean getContainerWrapper() {
-    return containerWrapper;
-  }
-
-  /**
-   * Sets the container wrapper.
-   *
-   * @param containerWrapper the new container wrapper
-   */
-  public void setContainerWrapper(ContainerWrapperBean containerWrapper) {
-    this.containerWrapper = containerWrapper;
-  }
-
-  /**
-   * Gets the cluster wrapper.
-   *
-   * @return the cluster wrapper
-   */
-  public ClusterWrapperBean getClusterWrapper() {
-    return clusterWrapper;
-  }
-
-  /**
-   * Sets the cluster wrapper.
-   *
-   * @param clusterWrapper the new cluster wrapper
-   */
-  public void setClusterWrapper(ClusterWrapperBean clusterWrapper) {
-    this.clusterWrapper = clusterWrapper;
-  }
 
   @Override
   public void collect() throws Exception {
@@ -92,8 +56,9 @@ public class ClusterStatsCollectorBean extends AbstractStatsCollectorBean {
    * @param period the period
    * @param span the span
    */
-  public void setMaxSeries(@Value("${psiprobe.beans.stats.collectors.cluster.period}") long period,
-      @Value("${psiprobe.beans.stats.collectors.cluster.span}") long span) {
+  public void setMaxSeries(
+      @Value("${psiprobe.beans.stats.collectors.cluster.period}") String period,
+      @Value("${psiprobe.beans.stats.collectors.cluster.span}") String span) {
     super.setMaxSeries((int) TimeExpression.dataPoints(period, span));
   }
 

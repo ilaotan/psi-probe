@@ -11,96 +11,97 @@
 
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="false" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 <%@ taglib uri="http://displaytag.sf.net" prefix="display" %>
 
 <%-- Displays a list of servlet context attributes for a given application --%>
 
-<html>
+<!DOCTYPE html>
+<html lang="${lang}">
 
-	<head>
-		<title>
-			<spring:message htmlEscape="true" code="probe.jsp.title.app.attributes" arguments="${param.webapp}"/>
-		</title>
-		<link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}<spring:theme code='scroller.css'/>"/>
-		<script type="text/javascript" src="<c:url value='/js/prototype.js'/>"></script>
-		<script type="text/javascript" src="<c:url value='/js/behaviour.js'/>"></script>
-		<script type="text/javascript" src="<c:url value='/js/scriptaculous/scriptaculous.js'/>"></script>
-		<script type="text/javascript" src="<c:url value='/js/areascroller.js'/>"></script>
-	</head>
+    <head>
+        <title>
+            <spring:message htmlEscape="true" code="probe.jsp.title.app.attributes" arguments="${param.webapp}"/>
+        </title>
+        <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/css/classic/scroller.css"/>
+        <script src="<c:url value='/js/prototype.js'/>"></script>
+        <script src="<c:url value='/js/behaviour.js'/>"></script>
+        <script src="<c:url value='/js/scriptaculous/scriptaculous.js'/>"></script>
+        <script src="<c:url value='/js/areascroller.js'/>"></script>
+    </head>
 
-	<%-- Make Tab #1 visually "active". --%>
-	<c:set var="navTabApps" value="active" scope="request"/>
-	<c:set var="use_decorator" value="application" scope="request"/>
-	<c:set var="appTabAttributes" value="active" scope="request"/>
+    <%-- Make Tab #1 visually "active". --%>
+    <c:set var="navTabApps" value="active" scope="request"/>
+    <c:set var="use_decorator" value="application" scope="request"/>
+    <c:set var="appTabAttributes" value="active" scope="request"/>
 
-	<body>
+    <body>
 
-		<div class="embeddedBlockContainer">
-			<h3><spring:message code="probe.jsp.app.attributes.h3.attributes"/></h3>
+        <div class="embeddedBlockContainer">
+            <h3><spring:message code="probe.jsp.app.attributes.h3.attributes"/></h3>
 
-			<c:choose>
-				<c:when test="${empty appAttributes}">
-					<div class="infoMessage">
-						<p>
-							<spring:message code="probe.jsp.app.attributes.noattributes"/>
-						</p>
-					</div>
-				</c:when>
-				<c:otherwise>
-					<table id="resultsTable" style="padding:0;border-spacing:0;border-collapse:separate;">
-						<tr>
-							<td id="left_scroller" class="scroller">&#160;</td>
-							<td id="separator" width="1%">&#160;</td>
-							<td>
-								<div id="appAttrTblContainer" class="scrollable_content">
-									<display:table htmlId="appAttrTbl" name="appAttributes" uid="attribute"
-											class="genericTbl" style="padding:0;border-spacing:0;border-collapse:separate;"
-											requestURI="" defaultsort="1">
-										<display:column title="&#160;" style="width:20px;" class="leftMostIcon">
-											<c:url value='/app/rmappattr.htm' var='rmappattr_url'>
-												<c:param name='webapp' value='${param.webapp}'/>
-												<c:param name='attr' value='${attribute.name}'/>
-											</c:url>
-											<a href="${rmappattr_url}" class="imglink">
-												<img class="lnk"
-														src="${pageContext.request.contextPath}<spring:theme code='remove.img'/>"
-														alt="<spring:message code='probe.jsp.app.attributes.col.delete'/>"
-														title="<spring:message code='probe.jsp.app.attributes.col.delete.title'/>"/>
-											</a>
-										</display:column>
-										<display:column property="name" sortable="true" maxLength="40"
-												titleKey="probe.jsp.app.attributes.col.name"/>
-										<display:column property="type" sortable="true" maxLength="40"
-												titleKey="probe.jsp.app.attributes.col.type"/>
-										<display:column titleKey="probe.jsp.app.attributes.col.value">
-											<c:choose>
-												<c:when test="${displayValues}">
-													<c:catch var="displayException">
-														<c:out value="${attribute.value}" escapeXml="true"/>
-													</c:catch>
-													<c:if test="${not empty displayException}">
-														<span class="errorValue">**************</span>
-														<c:remove var="displayException" />
-													</c:if>
-												</c:when>
-												<c:otherwise>
-													**************
-												</c:otherwise>
-											</c:choose>
-										</display:column>
-									</display:table>
-								</div>
-							</td>
-							<td id="right_scroller" class="scroller">&#160;</td>
-						</tr>
-					</table>
-					<script type="text/javascript">
-						setupScrollers('appAttrTblContainer');
-					</script>
-				</c:otherwise>
-			</c:choose>
-		</div>
-	</body>
+            <c:choose>
+                <c:when test="${empty appAttributes}">
+                    <div class="infoMessage">
+                        <p>
+                            <spring:message code="probe.jsp.app.attributes.noattributes"/>
+                        </p>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <table id="resultsTable" style="padding:0;border-spacing:0;border-collapse:separate;">
+                        <tr>
+                            <td id="left_scroller" class="scroller">&#160;</td>
+                            <td id="separator" style="width: 1%;">&#160;</td>
+                            <td>
+                                <div id="appAttrTblContainer" class="scrollable_content">
+                                    <display:table htmlId="appAttrTbl" name="appAttributes" uid="attribute"
+                                            class="genericTbl" style="padding:0;border-spacing:0;border-collapse:separate;"
+                                            requestURI="" defaultsort="1">
+                                        <display:column title="&#160;" style="width:20px;" class="leftMostIcon">
+                                            <c:url value='/app/rmappattr.htm' var='rmappattr_url'>
+                                                <c:param name='webapp' value='${param.webapp}'/>
+                                                <c:param name='attr' value='${attribute.name}'/>
+                                            </c:url>
+                                            <a href="${rmappattr_url}" class="imglink">
+                                                <img class="lnk"
+                                                        src="${pageContext.request.contextPath}/css/classic/img/bin.jpg"
+                                                        alt="<spring:message code='probe.jsp.app.attributes.col.delete'/>"
+                                                        title="<spring:message code='probe.jsp.app.attributes.col.delete.title'/>"/>
+                                            </a>
+                                        </display:column>
+                                        <display:column property="name" sortable="true" maxLength="40"
+                                                titleKey="probe.jsp.app.attributes.col.name"/>
+                                        <display:column property="type" sortable="true" maxLength="40"
+                                                titleKey="probe.jsp.app.attributes.col.type"/>
+                                        <display:column titleKey="probe.jsp.app.attributes.col.value">
+                                            <c:choose>
+                                                <c:when test="${displayValues}">
+                                                    <c:catch var="displayException">
+                                                        <c:out value="${attribute.value}" escapeXml="true"/>
+                                                    </c:catch>
+                                                    <c:if test="${! empty displayException}">
+                                                        <span class="errorValue">**************</span>
+                                                        <c:remove var="displayException" />
+                                                    </c:if>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    **************
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </display:column>
+                                    </display:table>
+                                </div>
+                            </td>
+                            <td id="right_scroller" class="scroller">&#160;</td>
+                        </tr>
+                    </table>
+                    <script>
+                        setupScrollers('appAttrTblContainer');
+                    </script>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </body>
 </html>

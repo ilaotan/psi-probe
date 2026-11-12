@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,15 +10,13 @@
  */
 package psiprobe.jsp;
 
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.tagext.TagSupport;
+
 import java.io.IOException;
 import java.util.Collections;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
-
 import org.apache.commons.text.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.ServletRequestUtils;
 
 /**
@@ -29,9 +27,6 @@ public class AddQueryParamTag extends TagSupport {
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /** The Constant logger. */
-  private static final Logger logger = LoggerFactory.getLogger(AddQueryParamTag.class);
-
   /** The param. */
   private String param;
 
@@ -41,10 +36,10 @@ public class AddQueryParamTag extends TagSupport {
   @Override
   public int doStartTag() throws JspException {
     StringBuilder query = new StringBuilder();
-    query.append(param).append("=").append(value);
+    query.append(param).append('=').append(value);
     for (String name : Collections.list(pageContext.getRequest().getParameterNames())) {
       if (!param.equals(name)) {
-        query.append("&").append(StringEscapeUtils.escapeHtml4(name)).append("=")
+        query.append('&').append(StringEscapeUtils.escapeHtml4(name)).append('=')
             .append(StringEscapeUtils.escapeHtml4(
                 ServletRequestUtils.getStringParameter(pageContext.getRequest(), name, "")));
       }
@@ -52,8 +47,7 @@ public class AddQueryParamTag extends TagSupport {
     try {
       pageContext.getOut().print(query);
     } catch (IOException e) {
-      logger.debug("Exception printing query string to JspWriter", e);
-      throw new JspException(e);
+      throw new JspException("Exception printing query string to JspWriter", e);
     }
     return EVAL_BODY_INCLUDE;
   }
@@ -75,7 +69,6 @@ public class AddQueryParamTag extends TagSupport {
   public void setParam(String param) {
     this.param = param;
   }
-
 
   /**
    * Gets the value.

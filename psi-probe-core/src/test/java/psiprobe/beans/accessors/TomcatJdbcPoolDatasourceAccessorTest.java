@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,29 +10,33 @@
  */
 package psiprobe.beans.accessors;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 
-import mockit.Mocked;
+import java.sql.SQLException;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * The Class TomcatJdbcPoolDatasourceAccessorTest.
  */
+@ExtendWith(MockitoExtension.class)
 class TomcatJdbcPoolDatasourceAccessorTest {
 
   /** The accessor. */
   TomcatJdbcPoolDatasourceAccessor accessor;
 
   /** The source. */
-  @Mocked
+  @Mock
   DataSource source;
 
   /** The bad source. */
-  ComboPooledDataSource badSource;
+  HikariDataSource badSource;
 
   /**
    * Before.
@@ -40,7 +44,7 @@ class TomcatJdbcPoolDatasourceAccessorTest {
   @BeforeEach
   void before() {
     accessor = new TomcatJdbcPoolDatasourceAccessor();
-    badSource = new ComboPooledDataSource();
+    badSource = new HikariDataSource();
   }
 
   /**
@@ -62,11 +66,11 @@ class TomcatJdbcPoolDatasourceAccessorTest {
   /**
    * Gets the info test.
    *
-   * @throws Exception the exception
+   * @throws SQLException the sql exception
    */
   @Test
-  void getInfoTest() throws Exception {
-    accessor.getInfo(source);
+  void getInfoTest() throws SQLException {
+    Assertions.assertNotNull(accessor.getInfo(source));
   }
 
 }

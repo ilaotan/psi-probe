@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,11 +10,11 @@
  */
 package psiprobe.beans.stats.collectors;
 
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.inject.Inject;
 
 import org.jfree.data.xy.XYDataItem;
 
@@ -30,7 +30,7 @@ public abstract class AbstractStatsCollectorBean {
 
   /** The stats collection. */
   @Inject
-  private StatsCollection statsCollection;
+  protected StatsCollection statsCollection;
 
   /** The max series. */
   private int maxSeries = 240;
@@ -43,24 +43,6 @@ public abstract class AbstractStatsCollectorBean {
 
   /** The previous data2 d. */
   private final Map<String, Entry> previousData2D = new TreeMap<>();
-
-  /**
-   * Gets the stats collection.
-   *
-   * @return the stats collection
-   */
-  public StatsCollection getStatsCollection() {
-    return statsCollection;
-  }
-
-  /**
-   * Sets the stats collection.
-   *
-   * @param statsCollection the new stats collection
-   */
-  public void setStatsCollection(StatsCollection statsCollection) {
-    this.statsCollection = statsCollection;
-  }
 
   /**
    * Gets the max series.
@@ -110,7 +92,9 @@ public abstract class AbstractStatsCollectorBean {
    *
    * @param name the name
    * @param value the value
+   *
    * @return the long
+   *
    * @throws InterruptedException the interrupted exception
    */
   protected long buildDeltaStats(String name, long value) throws InterruptedException {
@@ -123,7 +107,9 @@ public abstract class AbstractStatsCollectorBean {
    * @param name the name
    * @param value the value
    * @param time the time
+   *
    * @return the long
+   *
    * @throws InterruptedException the interrupted exception
    */
   protected long buildDeltaStats(String name, long value, long time) throws InterruptedException {
@@ -143,6 +129,7 @@ public abstract class AbstractStatsCollectorBean {
    *
    * @param name the name
    * @param value the value
+   *
    * @throws InterruptedException the interrupted exception
    */
   protected void buildAbsoluteStats(String name, long value) throws InterruptedException {
@@ -155,6 +142,7 @@ public abstract class AbstractStatsCollectorBean {
    * @param name the name
    * @param value the value
    * @param time the time
+   *
    * @throws InterruptedException the interrupted exception
    */
   protected void buildAbsoluteStats(String name, long value, long time)
@@ -221,6 +209,7 @@ public abstract class AbstractStatsCollectorBean {
    * @param name the name of the value, which allows the collector to be used for multiple values
    * @param value time spent on the task in milliseconds (A or B in the example above)
    * @param time system time in milliseconds (T1 or T2 in the example above)
+   *
    * @throws InterruptedException if a lock could not be obtained
    */
   protected void buildTimePercentageStats(String name, long value, long time)

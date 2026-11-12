@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -18,7 +18,7 @@ import java.util.Comparator;
 /**
  * <code>UniqueList</code> is a successor of <code>java.util.Vector</code> to provide a collection
  * that contains no duplicate elements, more formally such that e1.compareTo(e2) == 0.
- * 
+ *
  * <p>
  * The collection is kept ordered whenever elements added or removed and besides uniqueness it is to
  * provide fast element search based again on e1.compareTo(e2) values.
@@ -41,10 +41,11 @@ public class UniqueList<T extends Comparable<? super T>> extends ArrayList<T> {
    *
    * @param obj the obj
    * @param comp the comp
+   *
    * @return true, if successful
    */
   protected synchronized boolean add(T obj, Comparator<? super T> comp) {
-    if (size() == 0) {
+    if (isEmpty()) {
       return super.add(obj);
     }
     int index;

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -45,7 +45,9 @@ public final class Whois {
    * @param server the server
    * @param port the port
    * @param query the query
+   *
    * @return the response
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static Response lookup(String server, int port, String query) throws IOException {
@@ -59,13 +61,15 @@ public final class Whois {
    * @param port the port
    * @param query the query
    * @param timeout the timeout
+   *
    * @return the response
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static Response lookup(String server, int port, String query, long timeout)
       throws IOException {
 
-    return lookup(server, port, query, timeout, System.getProperty("line.separator"));
+    return lookup(server, port, query, timeout, System.lineSeparator());
   }
 
   /**
@@ -76,7 +80,9 @@ public final class Whois {
    * @param query the query
    * @param timeout the timeout
    * @param lineSeparator the line separator
+   *
    * @return the response
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static Response lookup(String server, int port, String query, long timeout,
@@ -139,7 +145,7 @@ public final class Whois {
   /**
    * The Class Response.
    */
-  public static class Response {
+  public static final class Response {
 
     /** The summary. */
     String summary;
@@ -188,6 +194,11 @@ public final class Whois {
     public int getPort() {
       return port;
     }
+
+    /**
+     * Instantiates a new response.
+     */
+    private Response() {}
 
   }
 

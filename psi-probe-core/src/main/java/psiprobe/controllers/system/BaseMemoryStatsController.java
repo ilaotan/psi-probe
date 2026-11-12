@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,9 +10,9 @@
  */
 package psiprobe.controllers.system;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.ParameterizableViewController;
@@ -30,24 +30,6 @@ public class BaseMemoryStatsController extends ParameterizableViewController {
 
   /** The collection period. */
   private long collectionPeriod;
-
-  /**
-   * Gets the jvm memory info accessor bean.
-   *
-   * @return the jvm memory info accessor bean
-   */
-  public JvmMemoryInfoAccessorBean getJvmMemoryInfoAccessorBean() {
-    return jvmMemoryInfoAccessorBean;
-  }
-
-  /**
-   * Sets the jvm memory info accessor bean.
-   *
-   * @param jvmMemoryInfoAccessorBean the new jvm memory info accessor bean
-   */
-  public void setJvmMemoryInfoAccessorBean(JvmMemoryInfoAccessorBean jvmMemoryInfoAccessorBean) {
-    this.jvmMemoryInfoAccessorBean = jvmMemoryInfoAccessorBean;
-  }
 
   /**
    * Gets the collection period.
@@ -72,7 +54,7 @@ public class BaseMemoryStatsController extends ParameterizableViewController {
       HttpServletResponse response) throws Exception {
 
     ModelAndView mv = new ModelAndView(getViewName());
-    mv.addObject("pools", getJvmMemoryInfoAccessorBean().getPools());
+    mv.addObject("pools", jvmMemoryInfoAccessorBean.getPools());
     mv.addObject("collectionPeriod", getCollectionPeriod());
     return mv;
   }

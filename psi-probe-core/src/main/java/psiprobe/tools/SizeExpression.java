@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -52,20 +52,20 @@ public final class SizeExpression {
 
   /**
    * Parses the given expression into a numerical value.
-   * 
+   *
    * <p>
    * An expression has three parts:
    * </p>
    * <table>
    * <caption>Size Summary Table</caption>
-   * 
+   *
    * <thead>
    * <tr>
    * <th>Name</th>
    * <th>Description</th>
    * </tr>
    * </thead>
-   * 
+   *
    * <tbody>
    * <tr>
    * <td>Base Number</td>
@@ -83,16 +83,16 @@ public final class SizeExpression {
    * Otherwise, it uses base-10 (1000).</td>
    * </tr>
    * </tbody>
-   * 
+   *
    * <tfoot>
    * <tr>
    * <td colspan="2"><em>Note: Whitespace may or may not exist between the Base Number and
    * Prefix.</em></td>
    * </tr>
    * </tfoot>
-   * 
+   *
    * </table>
-   * 
+   *
    * <p>
    * Examples:
    * </p>
@@ -102,9 +102,11 @@ public final class SizeExpression {
    * <li>"2kb" returns {@code 2048}</li>
    * <li>"3.5mb" returns {@code 3670016}</li>
    * </ul>
-   * 
+   *
    * @param expression the expression to parse
+   *
    * @return the parsed value
+   *
    * @throws NumberFormatException if the given expression cannot be parsed
    */
   public static long parse(String expression) {
@@ -130,11 +132,12 @@ public final class SizeExpression {
 
   /**
    * Formats the value as an expression.
-   * 
+   *
    * @param value the numerical value to be formatted
    * @param decimalPlaces the number of decimal places in the mantissa
    * @param base2 whether to use the base-2 (1024) multiplier and format with "B" units. If false,
    *        uses the base-10 (1000) multiplier and no units.
+   *
    * @return a formatted string expression of the value
    */
   public static String format(long value, int decimalPlaces, boolean base2) {
@@ -172,9 +175,10 @@ public final class SizeExpression {
 
   /**
    * Rounds a decimal value to the given decimal place.
-   * 
+   *
    * @param value the value to round
    * @param decimalPlaces the number of decimal places to preserve.
+   *
    * @return the rounded value
    */
   private static double round(double value, int decimalPlaces) {
@@ -183,10 +187,11 @@ public final class SizeExpression {
 
   /**
    * Returns the base-2 or base-10 multiplier for a given prefix.
-   * 
+   *
    * @param unitPrefix the character representing the prefix. Can be K, M, G, T, or P.
    * @param base2 whether to use the base-2 (1024) multiplier. If false, uses the base-10 (1000)
    *        multiplier.
+   *
    * @return the multiplier for the given prefix
    */
   private static double multiplier(char unitPrefix, boolean base2) {

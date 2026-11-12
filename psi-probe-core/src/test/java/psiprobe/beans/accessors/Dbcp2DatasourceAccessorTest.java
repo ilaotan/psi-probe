@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,7 +10,9 @@
  */
 package psiprobe.beans.accessors;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.zaxxer.hikari.HikariDataSource;
+
+import java.sql.SQLException;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.junit.jupiter.api.Assertions;
@@ -29,7 +31,7 @@ class Dbcp2DatasourceAccessorTest {
   BasicDataSource source;
 
   /** The bad source. */
-  ComboPooledDataSource badSource;
+  HikariDataSource badSource;
 
   /**
    * Before.
@@ -38,7 +40,7 @@ class Dbcp2DatasourceAccessorTest {
   void before() {
     accessor = new Dbcp2DatasourceAccessor();
     source = new BasicDataSource();
-    badSource = new ComboPooledDataSource();
+    badSource = new HikariDataSource();
   }
 
   /**
@@ -60,11 +62,11 @@ class Dbcp2DatasourceAccessorTest {
   /**
    * Gets the info test.
    *
-   * @throws Exception the exception
+   * @throws SQLException the sql exception
    */
   @Test
-  void getInfoTest() throws Exception {
-    accessor.getInfo(source);
+  void getInfoTest() throws SQLException {
+    Assertions.assertNotNull(accessor.getInfo(source));
   }
 
 }

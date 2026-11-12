@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -12,6 +12,7 @@ package psiprobe.tools;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,9 @@ public final class AsyncSocketFactory {
    * @param server the server
    * @param port the port
    * @param timeout the timeout
+   *
    * @return the socket
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static Socket createSocket(String server, int port, long timeout) throws IOException {
@@ -45,7 +48,7 @@ public final class AsyncSocketFactory {
     socketWrapper.server = server;
     socketWrapper.port = port;
 
-    Object sync = new Object();
+    ReentrantLock sync = new ReentrantLock();
     Thread socketThread = new Thread(new SocketRunnable(socketWrapper, sync));
     socketThread.setDaemon(true);
     Thread timeoutThread = new Thread(new TimeoutRunnable(sync, timeout * 1000));
@@ -54,14 +57,23 @@ public final class AsyncSocketFactory {
     timeoutThread.start();
     socketThread.start();
 
-    synchronized (sync) {
+    sync.lock();
+    try {
       if (socketWrapper.socket == null) {
-        try {
-          sync.wait(timeout * 1000);
-        } catch (InterruptedException e) {
-          logger.trace("", e);
+        boolean inProgress = true;
+        while (inProgress) {
+          try {
+            sync.wait(timeout * 1000);
+          } catch (InterruptedException e) {
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
+            logger.trace("", e);
+          }
+          inProgress = false;
         }
       }
+    } finally {
+      sync.unlock();
     }
 
     timeoutThread.interrupt();
@@ -69,9 +81,10 @@ public final class AsyncSocketFactory {
 
     socketWrapper.valid = false;
 
-    if (socketWrapper.getSocket() == null && socketWrapper.exception != null) {
+    if (socketWrapper.socket == null && socketWrapper.exception != null) {
       throw socketWrapper.exception;
-    } else if (socketWrapper.getSocket() == null) {
+    }
+    if (socketWrapper.socket == null) {
       throw new TimeoutException();
     }
 
@@ -81,7 +94,7 @@ public final class AsyncSocketFactory {
   /**
    * The Class SocketWrapper.
    */
-  static class SocketWrapper {
+  static final class SocketWrapper {
 
     /** The socket. */
     Socket socket;
@@ -152,18 +165,23 @@ public final class AsyncSocketFactory {
       return valid;
     }
 
+    /**
+     * Instantiates a new socket wrapper.
+     */
+    private SocketWrapper() {}
+
   }
 
   /**
    * The Class SocketRunnable.
    */
-  static class SocketRunnable implements Runnable {
+  static final class SocketRunnable implements Runnable {
 
     /** The socket wrapper. */
     private final SocketWrapper socketWrapper;
 
     /** The sync. */
-    private final Object sync;
+    private final ReentrantLock sync;
 
     /**
      * Instantiates a new socket runnable.
@@ -171,7 +189,7 @@ public final class AsyncSocketFactory {
      * @param socketWrapper the socket wrapper
      * @param sync the sync
      */
-    public SocketRunnable(SocketWrapper socketWrapper, Object sync) {
+    private SocketRunnable(SocketWrapper socketWrapper, ReentrantLock sync) {
       this.socketWrapper = socketWrapper;
       this.sync = sync;
     }
@@ -188,8 +206,11 @@ public final class AsyncSocketFactory {
         logger.trace("", e);
         socketWrapper.setException(e);
       }
-      synchronized (sync) {
-        sync.notify();
+      sync.lock();
+      try {
+        sync.notifyAll();
+      } finally {
+        sync.unlock();
       }
     }
 
@@ -198,10 +219,10 @@ public final class AsyncSocketFactory {
   /**
    * The Class TimeoutRunnable.
    */
-  static class TimeoutRunnable implements Runnable {
+  static final class TimeoutRunnable implements Runnable {
 
     /** The sync. */
-    private final Object sync;
+    private final ReentrantLock sync;
 
     /** The timeout. */
     private final long timeout;
@@ -212,7 +233,7 @@ public final class AsyncSocketFactory {
      * @param sync the sync
      * @param timeout the timeout
      */
-    public TimeoutRunnable(Object sync, long timeout) {
+    private TimeoutRunnable(ReentrantLock sync, long timeout) {
       this.sync = sync;
       this.timeout = timeout;
     }
@@ -221,10 +242,15 @@ public final class AsyncSocketFactory {
     public void run() {
       try {
         Thread.sleep(timeout);
-        synchronized (sync) {
-          sync.notify();
+        sync.lock();
+        try {
+          sync.notifyAll();
+        } finally {
+          sync.unlock();
         }
       } catch (InterruptedException e) {
+        // Restore interrupted state...
+        Thread.currentThread().interrupt();
         logger.trace("", e);
       }
     }

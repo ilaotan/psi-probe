@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -99,6 +99,7 @@ public class Tokenizer {
    * Load cache.
    *
    * @param count the count
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private void loadCache(int count) throws IOException {
@@ -131,6 +132,7 @@ public class Tokenizer {
    * Gets the token.
    *
    * @return the token
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public Token getToken() throws IOException {
@@ -144,62 +146,63 @@ public class Tokenizer {
    * Next token.
    *
    * @return the token
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public Token nextToken() throws IOException {
     if (pushCount > 0) {
       pushCount--;
       return token;
-    } else if (upcomingToken.type != Tokenizer.TT_ERROR) {
+    }
+    if (upcomingToken.type != Tokenizer.TT_ERROR) {
       token.assign(upcomingToken);
       upcomingToken.type = Tokenizer.TT_ERROR;
       return token;
-    } else {
-      token.init();
-      char[] chr = new char[1];
-      while (hasMore()) {
-        read(chr, 1);
+    }
 
-        int symbolIndex = lookupSymbol(chr[0]);
+    token.init();
+    char[] chr = new char[1];
+    while (hasMore()) {
+      read(chr, 1);
 
-        if (symbolIndex != -1) {
-          // we have found a symbol
-          TokenizerToken workToken =
-              token.type == Tokenizer.TT_TOKEN && token.text.length() > 0 ? upcomingToken : token;
-          TokenizerSymbol symbol = symbols.get(symbolIndex);
-          boolean hideSymbol = symbol.hidden;
+      int symbolIndex = lookupSymbol(chr[0]);
+
+      if (symbolIndex != -1) {
+        // we have found a symbol
+        TokenizerToken workToken =
+            token.type == Tokenizer.TT_TOKEN && !token.text.isEmpty() ? upcomingToken : token;
+        TokenizerSymbol symbol = symbols.get(symbolIndex);
+        boolean hideSymbol = symbol.hidden;
+
+        if (!hideSymbol) {
+          workToken.init();
+          workToken.text.append(symbol.startText);
+          workToken.type = Tokenizer.TT_SYMBOL;
+          workToken.name = symbol.name;
+        }
+
+        if (symbol.tailText != null) {
+          // the symbol is a block, look for the tailText
+          while (hasMore() && !compare(symbol.tailText.toCharArray(), 0)) {
+            read(chr, 1);
+            if (!hideSymbol) {
+              workToken.text.append(chr);
+              workToken.innerText.append(chr);
+            }
+          }
 
           if (!hideSymbol) {
-            workToken.init();
-            workToken.text.append(symbol.startText);
-            workToken.type = Tokenizer.TT_SYMBOL;
-            workToken.name = symbol.name;
+            workToken.text.append(symbol.tailText);
           }
-
-          if (symbol.tailText != null) {
-            // the symbol is a block
-            // look for the tailText
-            while (hasMore() && !compare(symbol.tailText.toCharArray(), 0)) {
-              read(chr, 1);
-              if (!hideSymbol) {
-                workToken.text.append(chr);
-                workToken.innerText.append(chr);
-              }
-            }
-
-            if (!hideSymbol) {
-              workToken.text.append(symbol.tailText);
-            }
-            workToken.type = Tokenizer.TT_BLOCK;
-          }
-
-          if (token.text.length() > 0) {
-            break;
-          }
-        } else {
-          token.text.append(chr);
-          token.type = Tokenizer.TT_TOKEN;
+          workToken.type = Tokenizer.TT_BLOCK;
         }
+
+        if (!token.text.isEmpty()) {
+          break;
+        }
+      } else {
+        token.text.append(chr);
+        token.type = Tokenizer.TT_TOKEN;
       }
     }
     return token;
@@ -231,7 +234,9 @@ public class Tokenizer {
    *
    * @param chars the chars
    * @param offs the offs
+   *
    * @return true, if successful
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private boolean compare(char[] chars, int offs) throws IOException {
@@ -252,7 +257,9 @@ public class Tokenizer {
    * Lookup symbol.
    *
    * @param chr the chr
+   *
    * @return the int
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private int lookupSymbol(char chr) throws IOException {
@@ -269,15 +276,14 @@ public class Tokenizer {
       }
       while (index < symbols.size()) {
         TokenizerSymbol symbol = symbols.get(index);
-        if (symbol.compareTo(chrObj) == 0) {
-          if (compare(symbol.startText.toCharArray(), 1)) {
-            result = index;
-            break;
-          }
-          index++;
-        } else {
+        if (symbol.compareTo(chrObj) != 0) {
           break;
         }
+        if (compare(symbol.startText.toCharArray(), 1)) {
+          result = index;
+          break;
+        }
+        index++;
       }
     }
     return result;
@@ -288,6 +294,7 @@ public class Tokenizer {
    *
    * @param chrs the chrs
    * @param count the count
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private void read(char[] chrs, int count) throws IOException {
@@ -303,6 +310,7 @@ public class Tokenizer {
    * Checks for more.
    *
    * @return true, if successful
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public boolean hasMore() throws IOException {
@@ -353,7 +361,9 @@ public class Tokenizer {
    * Gets the next string.
    *
    * @param defaultValue the default value
+   *
    * @return the next string
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public String getNextString(String defaultValue) throws IOException {
@@ -365,7 +375,9 @@ public class Tokenizer {
    *
    * @param trueValue the true value
    * @param defaultValue the default value
+   *
    * @return the next boolean
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public boolean getNextBoolean(String trueValue, boolean defaultValue) throws IOException {
@@ -376,7 +388,9 @@ public class Tokenizer {
    * Gets the next long.
    *
    * @param defaultValue the default value
+   *
    * @return the next long
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public long getNextLong(long defaultValue) throws IOException {
@@ -412,10 +426,10 @@ public class Tokenizer {
     int type = Tokenizer.TT_ERROR;
 
     /** The line. */
-    int line = 0;
+    int line;
 
     /** The col. */
-    int col = 0;
+    int col;
 
     /**
      * Instantiates a new tokenizer token.

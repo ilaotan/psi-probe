@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,15 +10,17 @@
  */
 package psiprobe.controllers.threads;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -45,24 +47,25 @@ public class ListSunThreadsController extends ParameterizableViewController {
 
   @Override
   protected ModelAndView handleRequestInternal(HttpServletRequest request,
-      HttpServletResponse response) throws Exception {
+      HttpServletResponse response) throws MalformedObjectNameException {
 
     List<SunThread> threads = null;
     int executionStackDepth = 1;
 
     MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
-    ObjectName threadingOName = new ObjectName("java.lang:type=Threading");
+    ObjectName objectNameThreading = new ObjectName("java.lang:type=Threading");
 
-    long[] deadlockedIds =
-        (long[]) mbeanServer.invoke(threadingOName, "findMonitorDeadlockedThreads", null, null);
-    long[] allIds = (long[]) mbeanServer.getAttribute(threadingOName, "AllThreadIds");
+    long[] deadlockedIds = (long[]) JmxTools.invoke(mbeanServer, objectNameThreading,
+        "findMonitorDeadlockedThreads", null, null);
+    long[] allIds =
+        (long[]) JmxTools.getAttribute(mbeanServer, objectNameThreading, "AllThreadIds");
 
     if (allIds != null) {
       threads = new ArrayList<>(allIds.length);
 
       for (long id : allIds) {
-        CompositeData cd = (CompositeData) mbeanServer.invoke(threadingOName, "getThreadInfo",
-            new Object[] {id, executionStackDepth}, new String[] {"long", "int"});
+        CompositeData cd = (CompositeData) JmxTools.invoke(mbeanServer, objectNameThreading,
+            "getThreadInfo", new Object[] {id, executionStackDepth}, new String[] {"long", "int"});
 
         if (cd != null) {
           SunThread st = new SunThread();
@@ -101,6 +104,7 @@ public class ListSunThreadsController extends ParameterizableViewController {
    *
    * @param haystack the haystack
    * @param needle the needle
+   *
    * @return true, if successful
    */
   private static boolean contains(long[] haystack, long needle) {

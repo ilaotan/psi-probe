@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -37,6 +37,7 @@ public class CommonsLoggerAccessor extends DefaultAccessor {
    * Gets the destination.
    *
    * @param logIndex the log index
+   *
    * @return the destination
    */
   public LogDestination getDestination(String logIndex) {

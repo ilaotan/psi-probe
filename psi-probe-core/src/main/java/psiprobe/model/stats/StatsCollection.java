@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -12,12 +12,14 @@ package psiprobe.model.stats;
 
 import com.thoughtworks.xstream.XStream;
 
+import jakarta.inject.Inject;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,8 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-
-import javax.inject.Inject;
 
 import org.jfree.data.xy.XYDataItem;
 import org.slf4j.Logger;
@@ -113,6 +113,7 @@ public class StatsCollection implements InitializingBean, DisposableBean, Applic
    * Checks if is collected.
    *
    * @param statsName the stats name
+   *
    * @return true, if is collected
    */
   public synchronized boolean isCollected(String statsName) {
@@ -142,10 +143,11 @@ public class StatsCollection implements InitializingBean, DisposableBean, Applic
    *
    * @param name the name
    * @param maxElements the max elements
+   *
    * @return the list
    */
   public synchronized List<XYDataItem> newStats(String name, int maxElements) {
-    List<XYDataItem> stats = Collections.synchronizedList(new ArrayList<XYDataItem>(maxElements));
+    List<XYDataItem> stats = Collections.synchronizedList(new ArrayList<>(maxElements));
     statsData.put(name, stats);
     return stats;
   }
@@ -166,6 +168,7 @@ public class StatsCollection implements InitializingBean, DisposableBean, Applic
    * Gets the stats.
    *
    * @param name the name
+   *
    * @return the stats
    */
   public synchronized List<XYDataItem> getStats(String name) {
@@ -176,6 +179,7 @@ public class StatsCollection implements InitializingBean, DisposableBean, Applic
    * Gets the last value for stat.
    *
    * @param statName the stat name
+   *
    * @return the last value for stat
    */
   public long getLastValueForStat(String statName) {
@@ -194,8 +198,9 @@ public class StatsCollection implements InitializingBean, DisposableBean, Applic
 
   /**
    * Returns series if stat name starts with the prefix.
-   * 
+   *
    * @param statNamePrefix they key under which the stats are stored
+   *
    * @return a Map of matching stats. Map keys are stat names and map values are corresponding
    *         series.
    */
@@ -215,8 +220,8 @@ public class StatsCollection implements InitializingBean, DisposableBean, Applic
    * @return the file
    */
   private File makeFile() {
-    return storagePath == null ? new File(contextTempDir, swapFileName)
-        : new File(storagePath, swapFileName);
+    return storagePath == null ? Path.of(contextTempDir.getPath(), swapFileName).toFile()
+        : Path.of(storagePath, swapFileName).toFile();
   }
 
   /**
@@ -227,18 +232,19 @@ public class StatsCollection implements InitializingBean, DisposableBean, Applic
   private void shiftFiles(int index) {
     if (index >= maxFiles - 1) {
       try {
-        if (Files.exists(Paths.get(makeFile().getAbsolutePath() + "." + index))) {
-          Files.delete(Paths.get(makeFile().getAbsolutePath() + "." + index));
+        if (Files.exists(Path.of(makeFile().getAbsolutePath() + "." + index))) {
+          Files.delete(Path.of(makeFile().getAbsolutePath() + "." + index));
         }
       } catch (IOException e) {
         logger.error("Could not delete file {}",
-            new File(makeFile().getAbsolutePath() + "." + index).getName());
+            Path.of(makeFile().getAbsolutePath() + "." + index).toFile().getName());
       }
     } else {
       shiftFiles(index + 1);
-      File srcFile = index == 0 ? makeFile() : new File(makeFile().getAbsolutePath() + "." + index);
+      File srcFile =
+          index == 0 ? makeFile() : Path.of(makeFile().getAbsolutePath() + "." + index).toFile();
       if (Files.exists(srcFile.toPath())) {
-        File destFile = new File(makeFile().getAbsolutePath() + "." + (index + 1));
+        File destFile = Path.of(makeFile().getAbsolutePath() + "." + (index + 1)).toFile();
         if (!srcFile.renameTo(destFile)) {
           logger.error("Could not rename file {} to {}", srcFile.getName(), destFile.getName());
         }
@@ -271,6 +277,7 @@ public class StatsCollection implements InitializingBean, DisposableBean, Applic
    * Deserialize.
    *
    * @param file the file
+   *
    * @return the map
    */
   @SuppressWarnings("unchecked")
@@ -280,7 +287,7 @@ public class StatsCollection implements InitializingBean, DisposableBean, Applic
       long start = System.currentTimeMillis();
       try {
         try (InputStream fis = Files.newInputStream(file.toPath())) {
-          stats = (Map<String, List<XYDataItem>>) (new XStream().fromXML(fis));
+          stats = (Map<String, List<XYDataItem>>) xstream.fromXML(fis);
 
           if (stats != null) {
             // adjust stats data so that charts look realistic.
@@ -301,6 +308,15 @@ public class StatsCollection implements InitializingBean, DisposableBean, Applic
           }
         }
         logger.debug("stats data read in {}ms", System.currentTimeMillis() - start);
+      } catch (ExceptionInInitializerError e) {
+        if (e.getCause() != null && e.getCause().getMessage() != null && e.getCause().getMessage()
+            .contains("does not \"opens java.util\" to unnamed module")) {
+          logger.error(
+              "Stats deserialization disabled, use '--add-opens java.base/java.util=ALL-UNNAMED' to start Tomcat to enable again");
+        } else {
+          logger.error("Could not read stats data from '{}' during initialization",
+              file.getAbsolutePath(), e);
+        }
       } catch (Exception e) {
         logger.error("Could not read stats data from '{}'", file.getAbsolutePath(), e);
       }
@@ -334,7 +350,8 @@ public class StatsCollection implements InitializingBean, DisposableBean, Applic
     Map<String, List<XYDataItem>> stats;
 
     while (true) {
-      File file = index == 0 ? makeFile() : new File(makeFile().getAbsolutePath() + "." + index);
+      File file =
+          index == 0 ? makeFile() : Path.of(makeFile().getAbsolutePath() + "." + index).toFile();
       stats = deserialize(file);
       index += 1;
       if (stats != null || index >= maxFiles - 1) {
@@ -358,7 +375,7 @@ public class StatsCollection implements InitializingBean, DisposableBean, Applic
   @Override
   public void setApplicationContext(ApplicationContext applicationContext) {
     WebApplicationContext wac = (WebApplicationContext) applicationContext;
-    contextTempDir = (File) wac.getServletContext().getAttribute("javax.servlet.context.tempdir");
+    contextTempDir = (File) wac.getServletContext().getAttribute("jakarta.servlet.context.tempdir");
   }
 
 }

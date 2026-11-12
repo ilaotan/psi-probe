@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,24 +10,24 @@
  */
 package psiprobe.tools;
 
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Part;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Part;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,6 +164,7 @@ public class Mailer {
    * Send.
    *
    * @param mailMessage the mail message
+   *
    * @throws MessagingException the messaging exception
    */
   public void send(MailMessage mailMessage) throws MessagingException {
@@ -189,7 +190,9 @@ public class Mailer {
    *
    * @param session the session
    * @param mailMessage the mail message
+   *
    * @return the mime message
+   *
    * @throws MessagingException the messaging exception
    */
   private MimeMessage createMimeMessage(Session session, MailMessage mailMessage)
@@ -242,7 +245,9 @@ public class Mailer {
    * Creates the addresses.
    *
    * @param addresses the addresses
+   *
    * @return the Internet address[]
+   *
    * @throws AddressException the address exception
    */
   private static InternetAddress[] createAddresses(String[] addresses) throws AddressException {
@@ -258,7 +263,9 @@ public class Mailer {
    * Creates the attachment part.
    *
    * @param attachment the attachment
+   *
    * @return the mime body part
+   *
    * @throws MessagingException the messaging exception
    */
   private static MimeBodyPart createAttachmentPart(DataSource attachment)
@@ -276,7 +283,9 @@ public class Mailer {
    *
    * @param body the body
    * @param html the html
+   *
    * @return the mime body part
+   *
    * @throws MessagingException the messaging exception
    */
   private static MimeBodyPart createMessageBodyPart(String body, boolean html)

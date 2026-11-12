@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,12 +10,13 @@
  */
 package psiprobe.beans;
 
+import jakarta.inject.Inject;
+
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
@@ -114,11 +115,9 @@ public class ResourceResolverBean implements ResourceResolver {
       }
 
       try {
-        containerWrapper.getTomcatContainer().addContextResource(context, resourceList,
-            contextBound);
+        containerWrapper.getTomcatContainer().addContextResource(context, resourceList);
 
-        containerWrapper.getTomcatContainer().addContextResourceLink(context, resourceList,
-            contextBound);
+        containerWrapper.getTomcatContainer().addContextResourceLink(context, resourceList);
 
         for (ApplicationResource resourceList1 : resourceList) {
           lookupResource(resourceList1, contextBound, false);
@@ -158,8 +157,8 @@ public class ResourceResolverBean implements ResourceResolver {
         resource.setLookedUp(true);
         for (String accessorString : datasourceMappers) {
           logger.debug("Looking up datasource adapter: {}", accessorString);
-          DatasourceAccessor accessor = (DatasourceAccessor) Class.forName(accessorString)
-              .getDeclaredConstructor().newInstance();
+          DatasourceAccessor accessor = Class.forName(accessorString)
+              .asSubclass(DatasourceAccessor.class).getDeclaredConstructor().newInstance();
           dataSourceInfo = accessor.getInfo(obj);
           if (dataSourceInfo != null) {
             break;
@@ -187,15 +186,17 @@ public class ResourceResolverBean implements ResourceResolver {
       containerWrapper.getTomcatContainer().bindToContext(context);
     }
     try {
-      javax.naming.Context ctx =
-          (context != null) ? new InitialContext() : getGlobalNamingContext();
+      javax.naming.Context ctx = context != null ? new InitialContext() : getGlobalNamingContext();
       String jndiName = resolveJndiName(resourceName, context == null);
-      Object obj = ctx.lookup(jndiName);
       try {
         for (String accessorString : datasourceMappers) {
           logger.debug("Resetting datasource adapter: {}", accessorString);
-          DatasourceAccessor accessor = (DatasourceAccessor) Class.forName(accessorString)
-              .getDeclaredConstructor().newInstance();
+          DatasourceAccessor accessor = Class.forName(accessorString)
+              .asSubclass(DatasourceAccessor.class).getDeclaredConstructor().newInstance();
+          if (ctx == null) {
+            return false;
+          }
+          Object obj = ctx.lookup(jndiName);
           if (accessor.reset(obj)) {
             return true;
           }
@@ -220,13 +221,15 @@ public class ResourceResolverBean implements ResourceResolver {
       containerWrapper.getTomcatContainer().bindToContext(context);
     }
     try {
-      javax.naming.Context ctx =
-          (context != null) ? new InitialContext() : getGlobalNamingContext();
+      javax.naming.Context ctx = context != null ? new InitialContext() : getGlobalNamingContext();
       String jndiName = resolveJndiName(resourceName, context == null);
+      if (ctx == null) {
+        return null;
+      }
       Object obj = ctx.lookup(jndiName);
 
-      if (obj instanceof DataSource) {
-        return (DataSource) obj;
+      if (obj instanceof DataSource dataSource) {
+        return dataSource;
       }
       return null;
     } finally {
@@ -234,24 +237,6 @@ public class ResourceResolverBean implements ResourceResolver {
         containerWrapper.getTomcatContainer().unbindFromContext(context);
       }
     }
-  }
-
-  /**
-   * Gets the datasource mappers.
-   *
-   * @return the datasource mappers
-   */
-  public List<String> getDatasourceMappers() {
-    return datasourceMappers;
-  }
-
-  /**
-   * Sets the datasource mappers.
-   *
-   * @param datasourceMappers the new datasource mappers
-   */
-  public void setDatasourceMappers(List<String> datasourceMappers) {
-    this.datasourceMappers = datasourceMappers;
   }
 
   @Override
@@ -279,7 +264,9 @@ public class ResourceResolverBean implements ResourceResolver {
    *
    * @param name the JNDI name of the resource
    * @param global whether to use the global prefix
+   *
    * @return the JNDI resource name with the prefix appended
+   *
    * @see #DEFAULT_GLOBAL_RESOURCE_PREFIX
    * @see #DEFAULT_RESOURCE_PREFIX
    */
@@ -293,6 +280,7 @@ public class ResourceResolverBean implements ResourceResolver {
    * @param server the server
    * @param objectName the object name
    * @param attributeName the attribute name
+   *
    * @return the string attribute
    */
   private String getStringAttribute(MBeanServer server, ObjectName objectName,
@@ -334,9 +322,9 @@ public class ResourceResolverBean implements ResourceResolver {
           logger.trace("JMX objectName {} does not contain any managedResource", name, e);
         }
 
-        // getGlobalNamingContext() was added to Server interface in Tomcat 7.0.11
-        if (server != null && server instanceof StandardServer) {
-          globalContext = server.getGlobalNamingContext();
+        // Get Global Naming Context
+        if (server instanceof StandardServer standardServer) {
+          globalContext = standardServer.getGlobalNamingContext();
           break;
         }
       }

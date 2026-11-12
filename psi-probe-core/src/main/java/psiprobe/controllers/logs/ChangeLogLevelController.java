@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,10 +10,10 @@
  */
 package psiprobe.controllers.logs;
 
-import java.util.Arrays;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -26,7 +26,9 @@ import psiprobe.tools.logging.jdk.Jdk14HandlerAccessor;
 import psiprobe.tools.logging.log4j.Log4JAppenderAccessor;
 import psiprobe.tools.logging.log4j2.Log4J2AppenderAccessor;
 import psiprobe.tools.logging.logback.LogbackAppenderAccessor;
+import psiprobe.tools.logging.logback13.Logback13AppenderAccessor;
 import psiprobe.tools.logging.slf4jlogback.TomcatSlf4jLogbackAppenderAccessor;
+import psiprobe.tools.logging.slf4jlogback13.TomcatSlf4jLogback13AppenderAccessor;
 
 /**
  * The Class ChangeLogLevelController.
@@ -46,23 +48,20 @@ public class ChangeLogLevelController extends AbstractLogHandlerController {
       LogDestination logDest) throws Exception {
 
     String level = ServletRequestUtils.getRequiredStringParameter(request, "level");
-    if (logDest.getValidLevels() != null
-        && Arrays.asList(logDest.getValidLevels()).contains(level)) {
-
-      if (logDest instanceof Log4JAppenderAccessor) {
-        Log4JAppenderAccessor accessor = (Log4JAppenderAccessor) logDest;
+    if (Arrays.asList(logDest.getValidLevels()).contains(level)) {
+      if (logDest instanceof Log4JAppenderAccessor accessor) {
         accessor.getLoggerAccessor().setLevel(level);
-      } else if (logDest instanceof Log4J2AppenderAccessor) {
-        Log4J2AppenderAccessor accessor = (Log4J2AppenderAccessor) logDest;
+      } else if (logDest instanceof Log4J2AppenderAccessor accessor) {
         accessor.getLoggerAccessor().setLevel(level);
-      } else if (logDest instanceof Jdk14HandlerAccessor) {
-        Jdk14HandlerAccessor accessor = (Jdk14HandlerAccessor) logDest;
+      } else if (logDest instanceof Jdk14HandlerAccessor accessor) {
         accessor.getLoggerAccessor().setLevel(level);
-      } else if (logDest instanceof LogbackAppenderAccessor) {
-        LogbackAppenderAccessor accessor = (LogbackAppenderAccessor) logDest;
+      } else if (logDest instanceof LogbackAppenderAccessor accessor) {
         accessor.getLoggerAccessor().setLevel(level);
-      } else if (logDest instanceof TomcatSlf4jLogbackAppenderAccessor) {
-        TomcatSlf4jLogbackAppenderAccessor accessor = (TomcatSlf4jLogbackAppenderAccessor) logDest;
+      } else if (logDest instanceof Logback13AppenderAccessor accessor) {
+        accessor.getLoggerAccessor().setLevel(level);
+      } else if (logDest instanceof TomcatSlf4jLogbackAppenderAccessor accessor) {
+        accessor.getLoggerAccessor().setLevel(level);
+      } else if (logDest instanceof TomcatSlf4jLogback13AppenderAccessor accessor) {
         accessor.getLoggerAccessor().setLevel(level);
       }
     }

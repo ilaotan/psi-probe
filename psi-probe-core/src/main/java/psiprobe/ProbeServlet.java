@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,13 +10,13 @@
  */
 package psiprobe;
 
-import java.nio.charset.StandardCharsets;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Wrapper;
@@ -56,25 +56,26 @@ public class ProbeServlet extends DispatcherServlet implements ContainerServlet 
 
   /**
    * Associates the {@link Wrapper} with the {@link ContainerWrapperBean}.
-   * 
+   *
    * @param config this servlet's configuration and initialization parameters
+   *
    * @throws ServletException if the wrapper is null or another servlet-interrupting error occurs
    */
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    if (wrapper != null) {
-      getContainerWrapperBean().setWrapper(wrapper);
-    } else {
+    if (wrapper == null) {
       throw new ServletException("Wrapper is null");
     }
+    getContainerWrapperBean().setWrapper(wrapper);
   }
 
   /**
    * Dispatch.
-   * 
+   *
    * @param httpServletRequest the request
    * @param httpServletResponse the response
+   *
    * @throws Exception if setting UTF-8 encoding fails or if the super implementation throws an
    *         exception
    */

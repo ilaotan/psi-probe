@@ -12,36 +12,36 @@
 
 -->
 <project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>com.github.psi-probe</groupId>
         <artifactId>psi-probe</artifactId>
-        <version>3.5.4-SNAPSHOT</version>
+        <version>5.5.1-SNAPSHOT</version>
     </parent>
 
+    <groupId>com.github.psi-probe</groupId>
     <artifactId>psi-probe-core</artifactId>
-    <packaging>jar</packaging>
+    <version>5.5.1-SNAPSHOT</version>
 
     <name>psi-probe-core</name>
-    <description>
-        PSI Probe Core - Core logic, data models, and controllers
-    </description>
+    <description>PSI Probe Core - Core logic, data models, and controllers</description>
+    <url>https://github.com/psi-probe/psi-probe/</url>
 
     <scm>
         <connection>scm:git:ssh://git@github.com/psi-probe/psi-probe.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/psi-probe/psi-probe.git</developerConnection>
+        <tag>HEAD</tag>
         <url>https://github.com/psi-probe/psi-probe/</url>
-      <tag>HEAD</tag>
     </scm>
 
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>psi-probe-ojdbc</artifactId>
-            <version>${probe-ojdbc.version}</version>
-        </dependency>
+    <properties>
+        <!-- Jacoco minimum code coverage -->
+        <jacoco.minimum.coverage>0.45</jacoco.minimum.coverage>
+    </properties>
 
+    <dependencies>
         <!-- tomcat libs start -->
         <dependency>
             <groupId>org.apache.tomcat</groupId>
@@ -76,13 +76,8 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>jakarta.mail</artifactId>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-mail</artifactId>
             <scope>compile</scope>
         </dependency>
 
@@ -93,8 +88,18 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>commons-dbcp</groupId>
-            <artifactId>commons-dbcp</artifactId>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc10</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ucp</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -108,13 +113,23 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.jolbox</groupId>
-            <artifactId>bonecp</artifactId>
+            <groupId>org.apache.tomee</groupId>
+            <artifactId>openejb-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
+            <groupId>org.apache.tomee</groupId>
+            <artifactId>openejb-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomee</groupId>
+            <artifactId>openejb-loader</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomee</groupId>
+            <artifactId>tomee-jdbc</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -123,20 +138,17 @@
             <scope>provided</scope>
         </dependency>
 
-
+        <!-- Guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <scope>compile</scope>
         </dependency>
+
+        <!-- Tanuki Wrapper -->
         <dependency>
             <groupId>tanukisoft</groupId>
             <artifactId>wrapper</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.openejb</groupId>
-            <artifactId>openejb-core</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -152,13 +164,13 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-beanutils2</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -169,6 +181,11 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -184,7 +201,7 @@
         <dependency>
             <groupId>jakarta.transaction</groupId>
             <artifactId>jakarta.transaction-api</artifactId>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jfree</groupId>
@@ -205,38 +222,17 @@
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
             <scope>compile</scope>
-            <exclusions>
-                 <exclusion>
-                      <groupId>com.zaxxer</groupId>
-                      <artifactId>HikariCP-java7</artifactId>
-                 </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
-            <groupId>opensymphony</groupId>
+            <groupId>com.github.hazendaz</groupId>
             <artifactId>sitemesh</artifactId>
             <scope>compile</scope>
         </dependency>
 
         <!-- Spring -->
         <dependency>
-            <groupId>xpp3</groupId>
-            <artifactId>xpp3_min</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -253,6 +249,16 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -277,11 +283,11 @@
                 <directory>${project.basedir}/src/main/resources</directory>
             </resource>
             <resource>
+                <filtering>true</filtering>
                 <directory>${project.basedir}/src/main/resources</directory>
                 <includes>
-                   <include>version.properties</include>
+                    <include>version.properties</include>
                 </includes>
-                <filtering>true</filtering>
             </resource>
         </resources>
     </build>

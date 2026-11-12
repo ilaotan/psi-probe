@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -58,7 +58,7 @@ public class Instruments {
   public static final long SIZE_REFERENCE;
 
   /** The Constant ACCESSOR. */
-  private static final Accessor ACCESSOR = AccessorFactory.getInstance();
+  private static final Accessor ACCESSOR = new SimpleAccessor();
 
   /** The Constant IGNORE_NIO. */
   private static final boolean IGNORE_NIO;
@@ -80,12 +80,13 @@ public class Instruments {
   private final List<Object> nextQueue = new LinkedList<>();
 
   /** The class loader. */
-  private ClassLoader classLoader = null;
+  private ClassLoader classLoader;
 
   /**
    * Size of.
    *
    * @param obj the obj
+   *
    * @return the long
    */
   public static long sizeOf(Object obj) {
@@ -97,6 +98,7 @@ public class Instruments {
    *
    * @param obj the obj
    * @param cl the cl
+   *
    * @return the long
    */
   public static long sizeOf(Object obj, ClassLoader cl) {
@@ -110,6 +112,7 @@ public class Instruments {
    *
    * @param obj the obj
    * @param objects the objects
+   *
    * @return the long
    */
   public static long sizeOf(Object obj, Set<Object> objects) {
@@ -122,6 +125,7 @@ public class Instruments {
    * Internal size of.
    *
    * @param root the root
+   *
    * @return the long
    */
   private long internalSizeOf(Object root) {
@@ -161,6 +165,7 @@ public class Instruments {
    * Size of object.
    *
    * @param obj the obj
+   *
    * @return the long
    */
   private long sizeOfObject(Object obj) {
@@ -192,6 +197,7 @@ public class Instruments {
    * Size of array.
    *
    * @param obj the obj
+   *
    * @return the long
    */
   private long sizeOfArray(Object obj) {
@@ -212,30 +218,38 @@ public class Instruments {
    *
    * @param <T> the generic type
    * @param type the type
+   *
    * @return the long
    */
   private static <T> long sizeOfPrimitive(Class<T> type) {
     if (type == Boolean.TYPE) {
       return SIZE_BOOLEAN;
-    } else if (type == Byte.TYPE) {
-      return SIZE_BYTE;
-    } else if (type == Character.TYPE) {
-      return SIZE_CHAR;
-    } else if (type == Short.TYPE) {
-      return SIZE_SHORT;
-    } else if (type == Integer.TYPE) {
-      return SIZE_INT;
-    } else if (type == Long.TYPE) {
-      return SIZE_LONG;
-    } else if (type == Float.TYPE) {
-      return SIZE_FLOAT;
-    } else if (type == Double.TYPE) {
-      return SIZE_DOUBLE;
-    } else if (type == Void.TYPE) {
-      return SIZE_VOID;
-    } else {
-      return SIZE_REFERENCE;
     }
+    if (type == Byte.TYPE) {
+      return SIZE_BYTE;
+    }
+    if (type == Character.TYPE) {
+      return SIZE_CHAR;
+    }
+    if (type == Short.TYPE) {
+      return SIZE_SHORT;
+    }
+    if (type == Integer.TYPE) {
+      return SIZE_INT;
+    }
+    if (type == Long.TYPE) {
+      return SIZE_LONG;
+    }
+    if (type == Float.TYPE) {
+      return SIZE_FLOAT;
+    }
+    if (type == Double.TYPE) {
+      return SIZE_DOUBLE;
+    }
+    if (type == Void.TYPE) {
+      return SIZE_VOID;
+    }
+    return SIZE_REFERENCE;
   }
 
   /**
@@ -252,6 +266,7 @@ public class Instruments {
    *
    * @param obj the obj
    * @param name the name
+   *
    * @return the field
    */
   public static Object getField(Object obj, String name) {
@@ -270,6 +285,7 @@ public class Instruments {
    * @param <T> the generic type
    * @param clazz the clazz
    * @param name the name
+   *
    * @return the field
    */
   public static <T> Field findField(Class<T> clazz, String name) {

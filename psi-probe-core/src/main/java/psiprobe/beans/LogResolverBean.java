@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,19 +10,20 @@
  */
 package psiprobe.beans;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletContext;
+
 import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Loader;
@@ -50,8 +51,12 @@ import psiprobe.tools.logging.log4j2.Log4J2LoggerContextAccessor;
 import psiprobe.tools.logging.log4j2.Log4J2WebLoggerContextUtilsAccessor;
 import psiprobe.tools.logging.logback.LogbackFactoryAccessor;
 import psiprobe.tools.logging.logback.LogbackLoggerAccessor;
+import psiprobe.tools.logging.logback13.Logback13FactoryAccessor;
+import psiprobe.tools.logging.logback13.Logback13LoggerAccessor;
 import psiprobe.tools.logging.slf4jlogback.TomcatSlf4jLogbackFactoryAccessor;
 import psiprobe.tools.logging.slf4jlogback.TomcatSlf4jLogbackLoggerAccessor;
+import psiprobe.tools.logging.slf4jlogback13.TomcatSlf4jLogback13FactoryAccessor;
+import psiprobe.tools.logging.slf4jlogback13.TomcatSlf4jLogback13LoggerAccessor;
 
 /**
  * The Class LogResolverBean.
@@ -67,24 +72,6 @@ public class LogResolverBean {
 
   /** The stdout files. */
   private List<String> stdoutFiles = new ArrayList<>();
-
-  /**
-   * Gets the container wrapper.
-   *
-   * @return the container wrapper
-   */
-  public ContainerWrapperBean getContainerWrapper() {
-    return containerWrapper;
-  }
-
-  /**
-   * Sets the container wrapper.
-   *
-   * @param containerWrapper the new container wrapper
-   */
-  public void setContainerWrapper(ContainerWrapperBean containerWrapper) {
-    this.containerWrapper = containerWrapper;
-  }
 
   /**
    * Gets the stdout files.
@@ -110,13 +97,14 @@ public class LogResolverBean {
    * Gets the log destinations.
    *
    * @param all the all
+   *
    * @return the log destinations
    */
   public List<LogDestination> getLogDestinations(boolean all) {
     List<LogDestination> allAppenders = getAllLogDestinations();
 
-    if (allAppenders == null) {
-      return null;
+    if (allAppenders.isEmpty()) {
+      return List.of();
     }
 
     //
@@ -125,12 +113,11 @@ public class LogResolverBean {
     List<LogDestination> uniqueList = new LinkedList<>();
     AbstractLogComparator cmp = new LogDestinationComparator(all);
 
-    Collections.sort(allAppenders, cmp);
+    allAppenders.sort(cmp);
     for (LogDestination dest : allAppenders) {
-      if (Collections.binarySearch(uniqueList, dest, cmp) < 0) {
-        if (all || dest.getFile() == null || dest.getFile().exists()) {
-          uniqueList.add(new DisconnectedLogDestination().builder(dest));
-        }
+      if (Collections.binarySearch(uniqueList, dest, cmp) < 0
+          && (all || dest.getFile() == null || dest.getFile().exists())) {
+        uniqueList.add(new DisconnectedLogDestination().builder(dest));
       }
     }
     return uniqueList;
@@ -140,6 +127,7 @@ public class LogResolverBean {
    * Gets the log sources.
    *
    * @param logFile the log file
+   *
    * @return the log sources
    */
   public List<LogDestination> getLogSources(File logFile) {
@@ -162,10 +150,10 @@ public class LogResolverBean {
     List<LogDestination> sources = new LinkedList<>();
 
     List<LogDestination> allAppenders = getAllLogDestinations();
-    if (allAppenders != null) {
+    if (!allAppenders.isEmpty()) {
       AbstractLogComparator cmp = new LogSourceComparator();
 
-      Collections.sort(allAppenders, cmp);
+      allAppenders.sort(cmp);
       for (LogDestination dest : allAppenders) {
         if (Collections.binarySearch(sources, dest, cmp) < 0) {
           sources.add(new DisconnectedLogDestination().builder(dest));
@@ -182,7 +170,7 @@ public class LogResolverBean {
    */
   private List<LogDestination> getAllLogDestinations() {
     if (!Instruments.isInitialized()) {
-      return null;
+      return List.of();
     }
 
     List<LogDestination> allAppenders = new ArrayList<>();
@@ -204,7 +192,7 @@ public class LogResolverBean {
     //
     // interrogate webapp classloaders and available loggers
     //
-    List<Context> contexts = getContainerWrapper().getTomcatContainer().findContexts();
+    List<Context> contexts = containerWrapper.getTomcatContainer().findContexts();
     for (Context ctx : contexts) {
       interrogateContext(ctx, allAppenders);
     }
@@ -221,28 +209,37 @@ public class LogResolverBean {
    * @param root the root
    * @param logName the log name
    * @param logIndex the log index
+   *
    * @return the log destination
    */
   public LogDestination getLogDestination(String logType, String webapp, boolean context,
       boolean root, String logName, String logIndex) {
 
-    LogDestination result = null;
+    // Supported loggers
+    List<String> loggers = new ArrayList<>();
+    loggers.add("jdk");
+    loggers.add("log4j");
+    loggers.add("log4j2");
+    loggers.add("logback");
+    loggers.add("logback13");
+    loggers.add("tomcatSlf4jLogback");
+    loggers.add("tomcatSlf4jLogback13");
+
     Context ctx = null;
     Application application = null;
     if (webapp != null) {
-      ctx = getContainerWrapper().getTomcatContainer().findContext(webapp);
+      ctx = containerWrapper.getTomcatContainer().findContext(webapp);
       if (ctx != null) {
-        application = ApplicationUtils.getApplication(ctx, getContainerWrapper());
+        application = ApplicationUtils.getApplication(ctx, containerWrapper);
       }
     }
 
+    LogDestination result = null;
     if (logName != null && "stdout".equals(logType)) {
       result = getStdoutLogDestination(logName);
     } else if (ctx != null && "catalina".equals(logType)) {
       result = getCatalinaLogDestination(ctx, application);
-    } else if (logIndex != null && ("jdk".equals(logType) || "log4j".equals(logType)
-        || "log4j2".equals(logType) || "logback".equals(logType))
-        || "tomcatSlf4jLogback".equals(logType)) {
+    } else if (logIndex != null && loggers.contains(logType)) {
       if (context && ctx != null && !"log4j2".equals(logType)) {
         result = getCommonsLogDestination(ctx, application, logIndex);
       } else if (ctx != null && "log4j2".equals(logType)) {
@@ -251,21 +248,31 @@ public class LogResolverBean {
         ClassLoader cl;
         ClassLoader prevCl = null;
         if (ctx != null) {
-          cl = ctx.getLoader().getClassLoader();
-          prevCl = ClassUtils.overrideThreadContextClassLoader(cl);
+          Loader ctxLoader = ctx.getLoader();
+          cl = ctxLoader != null ? ctxLoader.getClassLoader() : null;
+          if (cl != null) {
+            prevCl = ClassUtils.overrideThreadContextClassLoader(cl);
+          } else {
+            cl = Thread.currentThread().getContextClassLoader().getParent();
+          }
         } else {
           cl = Thread.currentThread().getContextClassLoader().getParent();
         }
         try {
-          if ((root || logName != null) && logIndex != null) {
+          if (root || logName != null) {
             if ("jdk".equals(logType)) {
               result = getJdk14LogDestination(cl, application, root, logName, logIndex);
             } else if ("log4j".equals(logType)) {
               result = getLog4JLogDestination(cl, application, root, logName, logIndex);
             } else if ("logback".equals(logType)) {
               result = getLogbackLogDestination(cl, application, root, logName, logIndex);
+            } else if ("logback13".equals(logType)) {
+              result = getLogback13LogDestination(cl, application, root, logName, logIndex);
             } else if ("tomcatSlf4jLogback".equals(logType)) {
               result = getLogbackTomcatJuliLogDestination(cl, application, root, logName, logIndex);
+            } else if ("tomcatSlf4jLogback13".equals(logType)) {
+              result =
+                  getLogback13TomcatJuliLogDestination(cl, application, root, logName, logIndex);
             }
           }
         } finally {
@@ -285,8 +292,13 @@ public class LogResolverBean {
    * @param allAppenders the all appenders
    */
   private void interrogateContext(Context ctx, List<LogDestination> allAppenders) {
-    Application application = ApplicationUtils.getApplication(ctx, getContainerWrapper());
-    ClassLoader cl = ctx.getLoader().getClassLoader();
+    Application application = ApplicationUtils.getApplication(ctx, containerWrapper);
+    Loader loader = ctx.getLoader();
+    if (loader == null) {
+      logger.debug("Context {} has no loader, skipping classloader interrogation", ctx.getName());
+      return;
+    }
+    ClassLoader cl = loader.getClassLoader();
     Object contextLogger = ctx.getLogger();
     if (contextLogger != null) {
       if (contextLogger.getClass().getName().startsWith("org.apache.commons.logging")) {
@@ -320,17 +332,7 @@ public class LogResolverBean {
             logConfigAccessor.setApplication(application);
             logConfigAccessor.setContext(true);
             logConfigAccessor.setLoggerContext(loggerContextAccessor);
-            Method getAppenders =
-                MethodUtils.getAccessibleMethod(loggerConfig.getClass(), "getAppenders");
-            @SuppressWarnings("unchecked")
-            Map<String, Object> appenders = (Map<String, Object>) getAppenders.invoke(loggerConfig);
-            for (Object appender : appenders.values()) {
-              Log4J2AppenderAccessor appenderAccessor = new Log4J2AppenderAccessor();
-              appenderAccessor.setTarget(appender);
-              appenderAccessor.setLoggerAccessor(logConfigAccessor);
-              appenderAccessor.setApplication(application);
-              allAppenders.add(appenderAccessor);
-            }
+            allAppenders.addAll(logConfigAccessor.getAppenders());
           }
         }
       } catch (Exception e) {
@@ -395,6 +397,15 @@ public class LogResolverBean {
       logger.debug("Could not resolve logback loggers for '{}'", applicationName, e);
     }
 
+    // check for Logback 1.3 loggers
+    try {
+      Logback13FactoryAccessor logback13Accessor = new Logback13FactoryAccessor(cl);
+      logback13Accessor.setApplication(application);
+      appenders.addAll(logback13Accessor.getAppenders());
+    } catch (Exception e) {
+      logger.debug("Could not resolve logback 1.3 loggers for '{}'", applicationName, e);
+    }
+
     // check for tomcat-slf4j-logback loggers
     try {
       TomcatSlf4jLogbackFactoryAccessor tomcatSlf4jLogbackAccessor =
@@ -403,6 +414,17 @@ public class LogResolverBean {
       appenders.addAll(tomcatSlf4jLogbackAccessor.getAppenders());
     } catch (Exception e) {
       logger.debug("Could not resolve tomcat-slf4j-logback loggers for '{}'", applicationName, e);
+    }
+
+    // check for tomcat-slf4j-logback 1.3 loggers
+    try {
+      TomcatSlf4jLogback13FactoryAccessor tomcatSlf4jLogback13Accessor =
+          new TomcatSlf4jLogback13FactoryAccessor(cl);
+      tomcatSlf4jLogback13Accessor.setApplication(application);
+      appenders.addAll(tomcatSlf4jLogback13Accessor.getAppenders());
+    } catch (Exception e) {
+      logger.debug("Could not resolve tomcat-slf4j-logback 1.3 loggers for '{}'", applicationName,
+          e);
     }
   }
 
@@ -424,6 +446,7 @@ public class LogResolverBean {
    * Gets the stdout log destination.
    *
    * @param logName the log name
+   *
    * @return the stdout log destination
    */
   private LogDestination getStdoutLogDestination(String logName) {
@@ -442,10 +465,11 @@ public class LogResolverBean {
    * Resolve stdout log destination.
    *
    * @param fileName the file name
+   *
    * @return the file log accessor
    */
-  private FileLogAccessor resolveStdoutLogDestination(String fileName) {
-    File stdout = new File(System.getProperty("catalina.base"), "logs/" + fileName);
+  protected FileLogAccessor resolveStdoutLogDestination(String fileName) {
+    File stdout = Path.of(System.getProperty("catalina.base"), "logs/" + fileName).toFile();
     if (stdout.exists()) {
       FileLogAccessor fla = new FileLogAccessor();
       fla.setName(fileName);
@@ -460,6 +484,7 @@ public class LogResolverBean {
    *
    * @param ctx the ctx
    * @param application the application
+   *
    * @return the catalina log destination
    */
   private LogDestination getCatalinaLogDestination(Context ctx, Application application) {
@@ -481,6 +506,7 @@ public class LogResolverBean {
    * @param ctx the ctx
    * @param application the application
    * @param logIndex the log index
+   *
    * @return the commons log destination
    */
   private LogDestination getCommonsLogDestination(Context ctx, Application application,
@@ -500,6 +526,7 @@ public class LogResolverBean {
    * @param root the root
    * @param logName the log name
    * @param handlerIndex the handler index
+   *
    * @return the jdk14 log destination
    */
   private LogDestination getJdk14LogDestination(ClassLoader cl, Application application,
@@ -526,6 +553,7 @@ public class LogResolverBean {
    * @param root the root
    * @param logName the log name
    * @param appenderName the appender name
+   *
    * @return the log4j log destination
    */
   private LogDestination getLog4JLogDestination(ClassLoader cl, Application application,
@@ -552,6 +580,7 @@ public class LogResolverBean {
    * @param root the root
    * @param logName the log name
    * @param appenderName the appender name
+   *
    * @return the log4j2 log destination
    */
   private LogDestination getLog4J2LogDestination(Context ctx, Application application, boolean root,
@@ -590,6 +619,16 @@ public class LogResolverBean {
     return result;
   }
 
+  /**
+   * Gets the logger configs.
+   *
+   * @param loggerContext the logger context
+   *
+   * @return the logger configs
+   *
+   * @throws IllegalAccessException the illegal access exception
+   * @throws InvocationTargetException the invocation target exception
+   */
   private Map<String, Object> getLoggerConfigs(Object loggerContext)
       throws IllegalAccessException, InvocationTargetException {
     Method getConfiguration =
@@ -600,6 +639,21 @@ public class LogResolverBean {
     return (Map<String, Object>) getLoggerConfigs.invoke(configuration);
   }
 
+  /**
+   * Gets the logger contexts.
+   *
+   * @param cl the cl
+   *
+   * @return the logger contexts
+   *
+   * @throws ClassNotFoundException the class not found exception
+   * @throws InstantiationException the instantiation exception
+   * @throws IllegalAccessException the illegal access exception
+   * @throws InvocationTargetException the invocation target exception
+   * @throws IllegalArgumentException the illegal argument exception
+   * @throws NoSuchMethodException the no such method exception
+   * @throws SecurityException the security exception
+   */
   private List<Object> getLoggerContexts(ClassLoader cl) throws ClassNotFoundException,
       InstantiationException, IllegalAccessException, InvocationTargetException,
       IllegalArgumentException, NoSuchMethodException, SecurityException {
@@ -618,6 +672,7 @@ public class LogResolverBean {
    * @param root the root
    * @param logName the log name
    * @param appenderName the appender name
+   *
    * @return the logback log destination
    */
   private LogDestination getLogbackLogDestination(ClassLoader cl, Application application,
@@ -637,6 +692,33 @@ public class LogResolverBean {
   }
 
   /**
+   * Gets the logback log destination.
+   *
+   * @param cl the cl
+   * @param application the application
+   * @param root the root
+   * @param logName the log name
+   * @param appenderName the appender name
+   *
+   * @return the logback log destination
+   */
+  private LogDestination getLogback13LogDestination(ClassLoader cl, Application application,
+      boolean root, String logName, String appenderName) {
+
+    try {
+      Logback13FactoryAccessor manager = new Logback13FactoryAccessor(cl);
+      manager.setApplication(application);
+      Logback13LoggerAccessor log = root ? manager.getRootLogger() : manager.getLogger(logName);
+      if (log != null) {
+        return log.getAppender(appenderName);
+      }
+    } catch (Exception e) {
+      logger.debug("getLogback13LogDestination failed", e);
+    }
+    return null;
+  }
+
+  /**
    * Gets the logback tomcat juli log destination.
    *
    * @param cl the cl
@@ -644,6 +726,7 @@ public class LogResolverBean {
    * @param root the root
    * @param logName the log name
    * @param appenderName the appender name
+   *
    * @return the logback tomcat juli log destination
    */
   private LogDestination getLogbackTomcatJuliLogDestination(ClassLoader cl, Application application,
@@ -659,6 +742,34 @@ public class LogResolverBean {
       }
     } catch (Exception e) {
       logger.debug("getTomcatSlf4jLogbackLogDestination failed", e);
+    }
+    return null;
+  }
+
+  /**
+   * Gets the logback tomcat juli log destination.
+   *
+   * @param cl the cl
+   * @param application the application
+   * @param root the root
+   * @param logName the log name
+   * @param appenderName the appender name
+   *
+   * @return the logback tomcat juli log destination
+   */
+  private LogDestination getLogback13TomcatJuliLogDestination(ClassLoader cl,
+      Application application, boolean root, String logName, String appenderName) {
+
+    try {
+      TomcatSlf4jLogback13FactoryAccessor manager = new TomcatSlf4jLogback13FactoryAccessor(cl);
+      manager.setApplication(application);
+      TomcatSlf4jLogback13LoggerAccessor log =
+          root ? manager.getRootLogger() : manager.getLogger(logName);
+      if (log != null) {
+        return log.getAppender(appenderName);
+      }
+    } catch (Exception e) {
+      logger.debug("getTomcatSlf4jLogback13LogDestination failed", e);
     }
     return null;
   }
@@ -686,6 +797,7 @@ public class LogResolverBean {
      * Convert to string.
      *
      * @param d1 the d1
+     *
      * @return the string
      */
     protected abstract String convertToString(LogDestination d1);

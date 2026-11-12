@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -27,22 +27,18 @@ class SizeExpressionTests {
 
   /**
    * Sets the up.
-   *
-   * @throws Exception the exception
    */
   @BeforeEach
-  void setUp() throws Exception {
+  void setUp() {
     this.defaultLocale = Locale.getDefault();
     Locale.setDefault(Locale.US);
   }
 
   /**
    * Tear down.
-   *
-   * @throws Exception the exception
    */
   @AfterEach
-  void tearDown() throws Exception {
+  void tearDown() {
     Locale.setDefault(defaultLocale);
   }
 
@@ -50,7 +46,7 @@ class SizeExpressionTests {
    * Test format no decimal base2.
    */
   @Test
-  void testFormatNoDecimalBase2() {
+  void formatNoDecimalBase2Test() {
     Assertions.assertEquals("1 B", SizeExpression.format(1, 0, true));
     Assertions.assertEquals("10 B", SizeExpression.format(10, 0, true));
     Assertions.assertEquals("100 B", SizeExpression.format(100, 0, true));
@@ -65,7 +61,7 @@ class SizeExpressionTests {
    * Test format no decimal base10.
    */
   @Test
-  void testFormatNoDecimalBase10() {
+  void formatNoDecimalBase10Test() {
     Assertions.assertEquals("1", SizeExpression.format(1, 0, false));
     Assertions.assertEquals("10", SizeExpression.format(10, 0, false));
     Assertions.assertEquals("100", SizeExpression.format(100, 0, false));
@@ -80,7 +76,7 @@ class SizeExpressionTests {
    * Test format one decimal base2.
    */
   @Test
-  void testFormatOneDecimalBase2() {
+  void formatOneDecimalBase2Test() {
     Assertions.assertEquals("1 B", SizeExpression.format(1, 1, true));
     Assertions.assertEquals("10 B", SizeExpression.format(10, 1, true));
     Assertions.assertEquals("100 B", SizeExpression.format(100, 1, true));
@@ -95,7 +91,7 @@ class SizeExpressionTests {
    * Test format one decimal base10.
    */
   @Test
-  void testFormatOneDecimalBase10() {
+  void formatOneDecimalBase10Test() {
     Assertions.assertEquals("1", SizeExpression.format(1, 1, false));
     Assertions.assertEquals("10", SizeExpression.format(10, 1, false));
     Assertions.assertEquals("100", SizeExpression.format(100, 1, false));
@@ -110,7 +106,7 @@ class SizeExpressionTests {
    * Test format all prefixes base2.
    */
   @Test
-  void testFormatAllPrefixesBase2() {
+  void formatAllPrefixesBase2Test() {
     Assertions.assertEquals("1 B", SizeExpression.format(1, 0, true));
     Assertions.assertEquals("1 KB", SizeExpression.format(1024, 0, true));
     Assertions.assertEquals("1 MB", SizeExpression.format(1048576, 0, true));
@@ -123,7 +119,7 @@ class SizeExpressionTests {
    * Test format all prefixes base10.
    */
   @Test
-  void testFormatAllPrefixesBase10() {
+  void formatAllPrefixesBase10Test() {
     Assertions.assertEquals("1", SizeExpression.format(1, 0, false));
     Assertions.assertEquals("1K", SizeExpression.format(1000, 0, false));
     Assertions.assertEquals("1M", SizeExpression.format(1000000, 0, false));
@@ -136,7 +132,7 @@ class SizeExpressionTests {
    * Test parse with unit.
    */
   @Test
-  void testParseWithUnit() {
+  void parseWithUnitTest() {
     Assertions.assertEquals(1, SizeExpression.parse("1B"));
     Assertions.assertEquals(10, SizeExpression.parse("10B"));
     Assertions.assertEquals(100, SizeExpression.parse("100B"));
@@ -155,7 +151,7 @@ class SizeExpressionTests {
    * Test parse without unit.
    */
   @Test
-  void testParseWithoutUnit() {
+  void parseWithoutUnitTest() {
     Assertions.assertEquals(1, SizeExpression.parse("1"));
     Assertions.assertEquals(10, SizeExpression.parse("10"));
     Assertions.assertEquals(100, SizeExpression.parse("100"));

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,16 +10,14 @@
  */
 package psiprobe.jsp;
 
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.tagext.TagSupport;
+
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Collections;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.ServletRequestUtils;
 
 /**
@@ -30,9 +28,6 @@ public class ParamToggleTag extends TagSupport {
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
 
-  /** The Constant logger. */
-  private static final Logger logger = LoggerFactory.getLogger(ParamToggleTag.class);
-
   /** The param. */
   private String param = "size";
 
@@ -41,24 +36,29 @@ public class ParamToggleTag extends TagSupport {
     boolean getSize =
         ServletRequestUtils.getBooleanParameter(pageContext.getRequest(), param, false);
     StringBuilder query = new StringBuilder();
-    query.append(param).append("=").append(!getSize);
+
     String encoding = pageContext.getResponse().getCharacterEncoding();
     for (String name : Collections.list(pageContext.getRequest().getParameterNames())) {
       if (!param.equals(name)) {
-        try {
-          String value = ServletRequestUtils.getStringParameter(pageContext.getRequest(), name, "");
-          String encodedValue = URLEncoder.encode(value, encoding);
-          query.append("&").append(name).append("=").append(encodedValue);
-        } catch (UnsupportedEncodingException e) {
-          throw new JspException(e);
+        String value = ServletRequestUtils.getStringParameter(pageContext.getRequest(), name, "");
+        String encodedValue = URLEncoder.encode(value, Charset.forName(encoding));
+        if (!query.isEmpty()) {
+          query.append('&');
         }
+        query.append(name).append('=').append(encodedValue);
       }
     }
+
+    if (!query.isEmpty()) {
+      query.append('&');
+    }
+    // size param has to be last
+    query.append(param).append('=').append(!getSize);
+
     try {
       pageContext.getOut().print(query);
     } catch (IOException e) {
-      logger.debug("Exception printing query string to JspWriter", e);
-      throw new JspException(e);
+      throw new JspException("Exception printing query string to JspWriter", e);
     }
     return EVAL_BODY_INCLUDE;
   }

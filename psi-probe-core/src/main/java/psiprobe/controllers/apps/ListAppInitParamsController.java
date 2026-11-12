@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,8 +10,8 @@
  */
 package psiprobe.controllers.apps;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,8 +41,8 @@ public class ListAppInitParamsController extends AbstractContextHandlerControlle
       HttpServletRequest request, HttpServletResponse response) throws Exception {
 
     ModelAndView mv = new ModelAndView(getViewName(), "appInitParams",
-        ApplicationUtils.getApplicationInitParams(context, getContainerWrapper()));
-    if (SecurityUtils.hasAttributeValueRole(getServletContext(), request)) {
+        ApplicationUtils.getApplicationInitParams(context, containerWrapper));
+    if (SecurityUtils.hasAttributeValueRole(getServletContext())) {
       mv.addObject("allowedToViewValues", Boolean.TRUE);
     }
     return mv;

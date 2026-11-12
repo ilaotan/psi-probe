@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,11 +10,15 @@
  */
 package psiprobe.beans;
 
+import jakarta.inject.Inject;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 
-import javax.inject.Inject;
+import javax.naming.NamingException;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -41,7 +45,7 @@ public class ContainerWrapperBean {
   private volatile TomcatContainer tomcatContainer;
 
   /** The lock. */
-  private final Object lock = new Object();
+  private final ReentrantLock lock = new ReentrantLock();
 
   /** List of class names to adapt particular Tomcat implementation to TomcatContainer interface. */
   @Inject
@@ -87,8 +91,8 @@ public class ContainerWrapperBean {
   public void setWrapper(Wrapper wrapper) {
     if (tomcatContainer == null) {
 
-      synchronized (lock) {
-
+      lock.lock();
+      try {
         if (tomcatContainer == null) {
 
           String serverInfo = ServerInfo.getServerInfo();
@@ -97,8 +101,8 @@ public class ContainerWrapperBean {
             try {
               Object obj = Class.forName(className).getDeclaredConstructor().newInstance();
               logger.debug("Testing container adapter: {}", className);
-              if (obj instanceof TomcatContainer) {
-                if (forceFirstAdapter || ((TomcatContainer) obj).canBoundTo(serverInfo)) {
+              if (obj instanceof TomcatContainer container) {
+                if (forceFirstAdapter || container.canBoundTo(serverInfo)) {
                   logger.info("Using {}", className);
                   tomcatContainer = (TomcatContainer) obj;
                   tomcatContainer.setWrapper(wrapper);
@@ -119,6 +123,8 @@ public class ContainerWrapperBean {
             logger.error("No suitable container adapter found!");
           }
         }
+      } finally {
+        lock.unlock();
       }
     }
 
@@ -142,24 +148,6 @@ public class ContainerWrapperBean {
   }
 
   /**
-   * Gets the adapter classes.
-   *
-   * @return the adapter classes
-   */
-  public List<String> getAdapterClasses() {
-    return adapterClasses;
-  }
-
-  /**
-   * Sets the adapter classes.
-   *
-   * @param adapterClasses the new adapter classes
-   */
-  public void setAdapterClasses(List<String> adapterClasses) {
-    this.adapterClasses = adapterClasses;
-  }
-
-  /**
    * Gets the resource resolver.
    *
    * @return the resource resolver
@@ -178,32 +166,14 @@ public class ContainerWrapperBean {
   }
 
   /**
-   * Gets the resource resolvers.
-   *
-   * @return the resource resolvers
-   */
-  public Map<String, ResourceResolver> getResourceResolvers() {
-    return resourceResolvers;
-  }
-
-  /**
-   * Sets the resource resolvers.
-   *
-   * @param resourceResolvers the resource resolvers
-   */
-  public void setResourceResolvers(Map<String, ResourceResolver> resourceResolvers) {
-    this.resourceResolvers = resourceResolvers;
-  }
-
-  /**
    * Gets the data sources.
    *
    * @return the data sources
-   * @throws Exception the exception
+   *
+   * @throws NamingException the naming exception
    */
-  public List<ApplicationResource> getDataSources() throws Exception {
-    List<ApplicationResource> resources = new ArrayList<>();
-    resources.addAll(getPrivateDataSources());
+  public List<ApplicationResource> getDataSources() throws NamingException {
+    List<ApplicationResource> resources = new ArrayList<>(getPrivateDataSources());
     resources.addAll(getGlobalDataSources());
     return resources;
   }
@@ -212,9 +182,10 @@ public class ContainerWrapperBean {
    * Gets the private data sources.
    *
    * @return the private data sources
-   * @throws Exception the exception
+   *
+   * @throws NamingException the naming exception
    */
-  public List<ApplicationResource> getPrivateDataSources() throws Exception {
+  public List<ApplicationResource> getPrivateDataSources() throws NamingException {
     List<ApplicationResource> resources = new ArrayList<>();
     if (tomcatContainer != null && getResourceResolver().supportsPrivateResources()) {
       for (Context app : getTomcatContainer().findContexts()) {
@@ -231,9 +202,10 @@ public class ContainerWrapperBean {
    * Gets the global data sources.
    *
    * @return the global data sources
-   * @throws Exception the exception
+   *
+   * @throws NamingException the naming exception
    */
-  public List<ApplicationResource> getGlobalDataSources() throws Exception {
+  public List<ApplicationResource> getGlobalDataSources() throws NamingException {
     List<ApplicationResource> resources = new ArrayList<>();
     if (getResourceResolver().supportsGlobalResources()) {
       List<ApplicationResource> globalResources = getResourceResolver().getApplicationResources();
@@ -249,8 +221,8 @@ public class ContainerWrapperBean {
    * @param resources the resources
    * @param dataSources the data sources
    */
-  protected void filterDataSources(List<ApplicationResource> resources,
-      List<ApplicationResource> dataSources) {
+  protected void filterDataSources(Iterable<ApplicationResource> resources,
+      Collection<ApplicationResource> dataSources) {
 
     for (ApplicationResource res : resources) {
       if (res.getDataSourceInfo() != null) {

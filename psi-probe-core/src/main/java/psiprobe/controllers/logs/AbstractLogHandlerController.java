@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,9 +10,9 @@
  */
 package psiprobe.controllers.logs;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,30 +33,11 @@ public abstract class AbstractLogHandlerController extends ParameterizableViewCo
 
   /** The log resolver. */
   @Inject
-  private LogResolverBean logResolver;
-
-  /**
-   * Gets the log resolver.
-   *
-   * @return the log resolver
-   */
-  public LogResolverBean getLogResolver() {
-    return logResolver;
-  }
-
-  /**
-   * Sets the log resolver.
-   *
-   * @param logResolver the new log resolver
-   */
-  public void setLogResolver(LogResolverBean logResolver) {
-    this.logResolver = logResolver;
-  }
+  protected LogResolverBean logResolver;
 
   @Override
   protected ModelAndView handleRequestInternal(HttpServletRequest request,
       HttpServletResponse response) throws Exception {
-
 
     String logType = ServletRequestUtils.getStringParameter(request, "logType");
     String webapp = ServletRequestUtils.getStringParameter(request, "webapp");
@@ -93,7 +74,9 @@ public abstract class AbstractLogHandlerController extends ParameterizableViewCo
    * @param request the request
    * @param response the response
    * @param logDest the log dest
+   *
    * @return the model and view
+   *
    * @throws Exception the exception
    */
   protected abstract ModelAndView handleLogFile(HttpServletRequest request,

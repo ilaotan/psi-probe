@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -25,7 +25,7 @@ public class SimpleAccessor implements Accessor {
 
   @Override
   public Object get(Object obj, Field field) {
-    boolean accessible = pre(field);
+    boolean accessible = pre(obj, field);
     try {
       return get0(obj, field);
     } catch (IllegalArgumentException | IllegalAccessException e) {
@@ -41,12 +41,14 @@ public class SimpleAccessor implements Accessor {
    *
    * @param obj the obj
    * @param field the field
+   *
    * @return the 0
+   *
    * @throws IllegalAccessException the illegal access exception
    */
   private Object get0(Object obj, Field field) throws IllegalAccessException {
 
-    if (field.isAccessible()) {
+    if (field.canAccess(obj)) {
       return field.get(obj);
     }
     return null;
@@ -55,11 +57,13 @@ public class SimpleAccessor implements Accessor {
   /**
    * Pre.
    *
+   * @param obj the obj
    * @param field the field
+   *
    * @return true, if successful
    */
-  private boolean pre(Field field) {
-    boolean accessible = field.isAccessible();
+  private boolean pre(Object obj, Field field) {
+    boolean accessible = field.canAccess(obj);
     if (!accessible) {
       try {
         field.setAccessible(true);

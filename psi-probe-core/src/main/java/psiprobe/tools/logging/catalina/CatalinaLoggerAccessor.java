@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,6 +11,7 @@
 package psiprobe.tools.logging.catalina;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -42,13 +43,13 @@ public class CatalinaLoggerAccessor extends AbstractLogDestination {
     String dir = (String) invokeMethod(getTarget(), "getDirectory", null, null);
     String prefix = (String) invokeMethod(getTarget(), "getPrefix", null, null);
     String suffix = (String) invokeMethod(getTarget(), "getSuffix", null, null);
-    boolean timestamp =
-        Boolean.parseBoolean(String.valueOf(Instruments.getField(getTarget(), "timestamp")));
+    boolean timestamp = Instruments.getField(getTarget(), "timestamp") != null;
     String date = timestamp ? new SimpleDateFormat("yyyy-MM-dd").format(new Date()) : "";
 
-    File file = notNull(date, dir, prefix, suffix) ? new File(dir, prefix + date + suffix) : null;
+    File file =
+        notNull(date, dir, prefix, suffix) ? Path.of(dir, prefix + date + suffix).toFile() : null;
     if (file != null && !file.isAbsolute()) {
-      return new File(System.getProperty("catalina.base"), file.getPath());
+      return Path.of(System.getProperty("catalina.base"), file.getPath()).toFile();
     }
     return file;
   }
@@ -57,6 +58,7 @@ public class CatalinaLoggerAccessor extends AbstractLogDestination {
    * Not null.
    *
    * @param strings the strings
+   *
    * @return true, if successful
    */
   private boolean notNull(String... strings) {

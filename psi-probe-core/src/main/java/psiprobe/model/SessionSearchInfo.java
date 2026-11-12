@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -367,7 +367,7 @@ public class SessionSearchInfo implements Serializable {
     attrNameMsgs.clear();
 
     if (attrName != null) {
-      String[] attrNames = attrName.split(",");
+      String[] attrNames = attrName.split(",", -1);
       if (attrNames.length == 0 && !attrName.isEmpty()) {
         attrNameMsgs.add("");
       } else {
@@ -389,7 +389,7 @@ public class SessionSearchInfo implements Serializable {
    * @return the attr name patterns
    */
   public List<Pattern> getAttrNamePatterns() {
-    return attrNamePatterns;
+    return new ArrayList<>(attrNamePatterns);
   }
 
   /**
@@ -398,7 +398,7 @@ public class SessionSearchInfo implements Serializable {
    * @return the attr name msgs
    */
   public List<String> getAttrNameMsgs() {
-    return attrNameMsgs;
+    return new ArrayList<>(attrNameMsgs);
   }
 
   /**
@@ -587,7 +587,7 @@ public class SessionSearchInfo implements Serializable {
    * @return the error messages
    */
   public List<String> getErrorMessages() {
-    return errorMessages;
+    return new ArrayList<>(errorMessages);
   }
 
   /**

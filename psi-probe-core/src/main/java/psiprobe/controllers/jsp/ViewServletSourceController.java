@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,14 +10,15 @@
  */
 package psiprobe.controllers.jsp;
 
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.nio.file.Path;
 
 import org.apache.catalina.Context;
 import org.apache.jasper.EmbeddedServletOptions;
@@ -48,7 +49,7 @@ public class ViewServletSourceController extends AbstractContextHandlerControlle
   protected ModelAndView handleContext(String contextName, Context context,
       HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-    String jspName = ServletRequestUtils.getStringParameter(request, "source", null);
+    String jspName = ServletRequestUtils.getStringParameter(request, "source");
     ServletContext sctx = context.getServletContext();
     ServletConfig scfg = (ServletConfig) context.findChild("jsp");
     Options opt = new EmbeddedServletOptions(scfg, sctx);
@@ -57,10 +58,10 @@ public class ViewServletSourceController extends AbstractContextHandlerControlle
 
     if (jspName != null) {
       String servletName =
-          getContainerWrapper().getTomcatContainer().getServletFileNameForJsp(context, jspName);
+          containerWrapper.getTomcatContainer().getServletFileNameForJsp(context, jspName);
 
       if (servletName != null) {
-        File servletFile = new File(servletName);
+        File servletFile = Path.of(servletName).toFile();
         if (servletFile.exists()) {
           try (InputStream fis = Files.newInputStream(servletFile.toPath())) {
             content = Utils.highlightStream(jspName, fis, "java", encoding);

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,11 +10,14 @@
  */
 package psiprobe;
 
-import java.io.IOException;
 import jakarta.servlet.ServletException;
+
+import java.io.IOException;
+
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+
 import psiprobe.model.ApplicationSession;
 import psiprobe.model.IpInfo;
 

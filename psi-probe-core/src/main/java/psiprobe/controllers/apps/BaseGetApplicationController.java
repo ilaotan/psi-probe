@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,9 +10,9 @@
  */
 package psiprobe.controllers.apps;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.springframework.web.bind.ServletRequestUtils;
@@ -35,7 +35,7 @@ public class BaseGetApplicationController extends AbstractContextHandlerControll
 
   /** The stats collection. */
   @Inject
-  private StatsCollection statsCollection;
+  protected StatsCollection statsCollection;
 
   /** The collection period. */
   private long collectionPeriod;
@@ -56,24 +56,6 @@ public class BaseGetApplicationController extends AbstractContextHandlerControll
    */
   public void setExtendedInfo(boolean extendedInfo) {
     this.extendedInfo = extendedInfo;
-  }
-
-  /**
-   * Gets the stats collection.
-   *
-   * @return the stats collection
-   */
-  public StatsCollection getStatsCollection() {
-    return statsCollection;
-  }
-
-  /**
-   * Sets the stats collection.
-   *
-   * @param statsCollection the new stats collection
-   */
-  public void setStatsCollection(StatsCollection statsCollection) {
-    this.statsCollection = statsCollection;
   }
 
   /**
@@ -99,15 +81,15 @@ public class BaseGetApplicationController extends AbstractContextHandlerControll
       HttpServletRequest request, HttpServletResponse response) throws Exception {
 
     boolean calcSize = ServletRequestUtils.getBooleanParameter(request, "size", false)
-        && SecurityUtils.hasAttributeValueRole(getServletContext(), request);
+        && SecurityUtils.hasAttributeValueRole(getServletContext());
 
-    ResourceResolver resourceResolver = getContainerWrapper().getResourceResolver();
+    ResourceResolver resourceResolver = containerWrapper.getResourceResolver();
     Application app = ApplicationUtils.getApplication(context,
-        isExtendedInfo() ? resourceResolver : null, calcSize, getContainerWrapper());
+        isExtendedInfo() ? resourceResolver : null, calcSize, containerWrapper);
 
-    if (isExtendedInfo() && getStatsCollection() != null) {
+    if (isExtendedInfo() && statsCollection != null) {
       String avgStatisticName = "app.avg_proc_time." + app.getName();
-      app.setAvgTime(getStatsCollection().getLastValueForStat(avgStatisticName));
+      app.setAvgTime(statsCollection.getLastValueForStat(avgStatisticName));
     }
 
     return new ModelAndView(getViewName()).addObject("app", app)

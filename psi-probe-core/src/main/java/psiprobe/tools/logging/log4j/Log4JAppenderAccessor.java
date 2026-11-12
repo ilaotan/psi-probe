@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,6 +11,7 @@
 package psiprobe.tools.logging.log4j;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import psiprobe.tools.logging.AbstractLogDestination;
 
@@ -77,7 +78,7 @@ public class Log4JAppenderAccessor extends AbstractLogDestination {
   @Override
   public File getFile() {
     String fileName = (String) getProperty(getTarget(), "file", null);
-    return fileName != null ? new File(fileName) : getStdoutFile();
+    return fileName != null ? Path.of(fileName).toFile() : getStdoutFile();
   }
 
   @Override

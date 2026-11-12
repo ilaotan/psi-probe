@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * An {@code OutputStream} which writes to a commons-logging {@code Log} at a particular level.
  */
-public class LogOutputStream extends OutputStream {
+public final class LogOutputStream extends OutputStream {
 
   /** The Constant INTERNAL_LOGGER. */
   private static final Logger INTERNAL_LOGGER = LoggerFactory.getLogger(LogOutputStream.class);
@@ -59,7 +59,7 @@ public class LogOutputStream extends OutputStream {
   /**
    * Creates a new instance of {@code LogOutputStream} which will write to a given {@code Log} at
    * the given level.
-   * 
+   *
    * @param log the {@code Log} to which to write
    * @param level the level at which to write
    */
@@ -74,9 +74,10 @@ public class LogOutputStream extends OutputStream {
   /**
    * Creates a {@code PrintStream} with autoFlush enabled which will write to the given {@code Log}
    * at the given level.
-   * 
+   *
    * @param log the {@code Log} to which to write
    * @param level the level at which to write
+   *
    * @return a {@code PrintStream} that writes to the given log
    */
   public static PrintStream createPrintStream(Logger log, int level) {
@@ -156,11 +157,11 @@ public class LogOutputStream extends OutputStream {
 
   /**
    * Writes the given message to this stream's {@code Log} at this stream's level.
-   * 
+   *
    * @param message the message to be written
    */
   private void log(String message) {
-    if (message == null || "".equals(message)) {
+    if (message == null || message.isEmpty()) {
       return;
     }
     switch (level) {

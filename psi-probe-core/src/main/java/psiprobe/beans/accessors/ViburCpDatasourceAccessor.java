@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,14 +10,9 @@
  */
 package psiprobe.beans.accessors;
 
-import java.lang.management.ManagementFactory;
-
-import javax.management.JMX;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
+import java.sql.SQLException;
 
 import org.vibur.dbcp.ViburDBCPDataSource;
-import org.vibur.dbcp.ViburMonitoringMBean;
 
 import psiprobe.model.DataSourceInfo;
 
@@ -27,20 +22,15 @@ import psiprobe.model.DataSourceInfo;
 public class ViburCpDatasourceAccessor implements DatasourceAccessor {
 
   @Override
-  public DataSourceInfo getInfo(final Object resource) throws Exception {
+  public DataSourceInfo getInfo(final Object resource) throws SQLException {
     DataSourceInfo dataSourceInfo = null;
     if (canMap(resource)) {
       ViburDBCPDataSource source = (ViburDBCPDataSource) resource;
 
-      MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
-      ObjectName poolName = new ObjectName(source.getJmxName());
-      ViburMonitoringMBean poolProxy =
-          JMX.newMXBeanProxy(mbeanServer, poolName, ViburMonitoringMBean.class);
-
       dataSourceInfo = new DataSourceInfo();
-      dataSourceInfo.setBusyConnections(poolProxy.getPoolTaken());
+      dataSourceInfo.setBusyConnections(source.getPool().taken());
       dataSourceInfo.setEstablishedConnections(
-          poolProxy.getPoolRemainingCreated() + poolProxy.getPoolTaken());
+          source.getPool().remainingCreated() + source.getPool().taken());
       dataSourceInfo.setMaxConnections(source.getPoolMaxSize());
       dataSourceInfo.setJdbcUrl(source.getJdbcUrl());
       dataSourceInfo.setUsername(source.getUsername());
@@ -51,7 +41,7 @@ public class ViburCpDatasourceAccessor implements DatasourceAccessor {
   }
 
   @Override
-  public boolean reset(final Object resource) throws Exception {
+  public boolean reset(final Object resource) {
     return false;
   }
 

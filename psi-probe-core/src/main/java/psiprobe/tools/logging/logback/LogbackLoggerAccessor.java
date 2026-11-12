@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -13,6 +13,7 @@ package psiprobe.tools.logging.logback;
 import com.google.common.collect.Iterators;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +29,7 @@ public class LogbackLoggerAccessor extends DefaultAccessor {
 
   /**
    * Returns all appenders of this logger.
-   * 
+   *
    * @return a list of {@link LogbackAppenderAccessor}s
    */
   @SuppressWarnings("unchecked")
@@ -38,7 +39,7 @@ public class LogbackLoggerAccessor extends DefaultAccessor {
       for (Object appender : Collections.list(Iterators.asEnumeration(
           (Iterator<Object>) MethodUtils.invokeMethod(getTarget(), "iteratorForAppenders")))) {
         List<Object> siftedAppenders = getSiftedAppenders(appender);
-        if (siftedAppenders != null) {
+        if (!siftedAppenders.isEmpty()) {
           for (Object siftedAppender : siftedAppenders) {
             wrapAndAddAppender(siftedAppender, appenders);
           }
@@ -47,8 +48,8 @@ public class LogbackLoggerAccessor extends DefaultAccessor {
         }
       }
     } catch (NoClassDefFoundError e) {
-      logger.error("{}#getAppenders() failed", getTarget().getClass().getName(), e);
-      logger.error("To see this logger, upgrade slf4j to 1.7.21+");
+      logger.error("{}#getAppenders() failed, To see this logger, upgrade slf4j to 1.7.21+",
+          getTarget().getClass().getName(), e);
     } catch (Exception e) {
       logger.error("{}#getAppenders() failed", getTarget().getClass().getName(), e);
     }
@@ -57,8 +58,9 @@ public class LogbackLoggerAccessor extends DefaultAccessor {
 
   /**
    * Returns the appender of this logger with the given name.
-   * 
+   *
    * @param name the name of the appender to return
+   *
    * @return the appender with the given name, or null if no such appender exists for this logger
    */
   public LogbackAppenderAccessor getAppender(String name) {
@@ -108,7 +110,7 @@ public class LogbackLoggerAccessor extends DefaultAccessor {
 
   /**
    * Gets the log level of this logger.
-   * 
+   *
    * @return the level of this logger
    */
   public String getLevel() {
@@ -123,7 +125,7 @@ public class LogbackLoggerAccessor extends DefaultAccessor {
 
   /**
    * Sets the log level of this logger.
-   * 
+   *
    * @param newLevelStr the name of the new level
    */
   public void setLevel(String newLevelStr) {
@@ -140,7 +142,9 @@ public class LogbackLoggerAccessor extends DefaultAccessor {
    * Gets the sifted appenders.
    *
    * @param appender the appender
+   *
    * @return the sifted appenders
+   *
    * @throws Exception the exception
    */
   @SuppressWarnings("unchecked")
@@ -148,17 +152,10 @@ public class LogbackLoggerAccessor extends DefaultAccessor {
     if ("ch.qos.logback.classic.sift.SiftingAppender".equals(appender.getClass().getName())) {
       Object tracker = MethodUtils.invokeMethod(appender, "getAppenderTracker");
       if (tracker != null) {
-        try {
-          return (List<Object>) MethodUtils.invokeMethod(tracker, "allComponents");
-        } catch (final NoSuchMethodException e) {
-          // XXX Legacy 1.0.x and lower support for logback
-          logger.trace("", e);
-          return (List<Object>) MethodUtils.invokeMethod(tracker, "valueList");
-        }
+        return (List<Object>) MethodUtils.invokeMethod(tracker, "allComponents");
       }
-      return new ArrayList<>();
     }
-    return null;
+    return List.of();
   }
 
   /**
@@ -167,7 +164,7 @@ public class LogbackLoggerAccessor extends DefaultAccessor {
    * @param appender the appender
    * @param appenders the appenders
    */
-  private void wrapAndAddAppender(Object appender, List<LogbackAppenderAccessor> appenders) {
+  private void wrapAndAddAppender(Object appender, Collection<LogbackAppenderAccessor> appenders) {
     LogbackAppenderAccessor appenderAccessor = wrapAppender(appender);
     if (appenderAccessor != null) {
       appenders.add(appenderAccessor);
@@ -178,6 +175,7 @@ public class LogbackLoggerAccessor extends DefaultAccessor {
    * Wrap appender.
    *
    * @param appender the appender
+   *
    * @return the logback appender accessor
    */
   private LogbackAppenderAccessor wrapAppender(Object appender) {

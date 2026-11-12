@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -75,11 +75,12 @@ public class JBossResourceResolverBean implements ResourceResolver {
       try {
         Set<ObjectName> dsNames =
             server.queryNames(new ObjectName("jboss.jca:service=ManagedConnectionPool,*"), null);
-        for (ObjectName managedConnectionPoolOName : dsNames) {
+        for (ObjectName objectNameManagedConnectionPool : dsNames) {
           ApplicationResource resource = new ApplicationResource();
-          resource.setName(managedConnectionPoolOName.getKeyProperty("name"));
+          resource.setName(objectNameManagedConnectionPool.getKeyProperty("name"));
           resource.setType("jboss");
-          String criteria = (String) server.getAttribute(managedConnectionPoolOName, "Criteria");
+          String criteria =
+              (String) server.getAttribute(objectNameManagedConnectionPool, "Criteria");
           if ("ByApplication".equals(criteria)) {
             resource.setAuth("Application");
           } else if ("ByContainerAndApplication".equals(criteria)) {
@@ -89,15 +90,15 @@ public class JBossResourceResolverBean implements ResourceResolver {
           }
           DataSourceInfo dsInfo = new DataSourceInfo();
           dsInfo.setMaxConnections(
-              (Integer) server.getAttribute(managedConnectionPoolOName, "MaxSize"));
+              (Integer) server.getAttribute(objectNameManagedConnectionPool, "MaxSize"));
           dsInfo.setEstablishedConnections(
-              (Integer) server.getAttribute(managedConnectionPoolOName, "ConnectionCount"));
+              (Integer) server.getAttribute(objectNameManagedConnectionPool, "ConnectionCount"));
           dsInfo.setBusyConnections(
-              ((Long) server.getAttribute(managedConnectionPoolOName, "InUseConnectionCount"))
+              ((Long) server.getAttribute(objectNameManagedConnectionPool, "InUseConnectionCount"))
                   .intValue());
-          ObjectName connectionFactoryOName = new ObjectName(
+          ObjectName objectNameConnectionFactory = new ObjectName(
               "jboss.jca:service=ManagedConnectionFactory,name=" + resource.getName());
-          Element elm = (Element) server.getAttribute(connectionFactoryOName,
+          Element elm = (Element) server.getAttribute(objectNameConnectionFactory,
               "ManagedConnectionFactoryProperties");
 
           if (elm != null) {
@@ -139,17 +140,20 @@ public class JBossResourceResolverBean implements ResourceResolver {
    * Gets the application resources.
    *
    * @param context the context
+   *
    * @return the application resources
+   *
    * @throws NamingException the naming exception
    */
   public List<ApplicationResource> getApplicationResources(Context context) throws NamingException {
+    // TODO 11/23/2023 Not implemented
     return new ArrayList<>();
   }
 
   @Override
   public List<ApplicationResource> getApplicationResources(Context context,
       ContainerWrapperBean containerWrapper) throws NamingException {
-
+    // TODO 11/23/2023 Not implemented
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
@@ -157,13 +161,13 @@ public class JBossResourceResolverBean implements ResourceResolver {
   public boolean resetResource(Context context, String resourceName,
       ContainerWrapperBean containerWrapper) throws NamingException {
     try {
-      ObjectName poolOName =
+      ObjectName objectNamePool =
           new ObjectName("jboss.jca:service=ManagedConnectionPool,name=" + resourceName);
       MBeanServer server = getMBeanServer();
       if (server != null) {
         try {
-          server.invoke(poolOName, "stop", null, null);
-          server.invoke(poolOName, "start", null, null);
+          server.invoke(objectNamePool, "stop", null, null);
+          server.invoke(objectNamePool, "start", null, null);
           return true;
         } catch (Exception e) {
           logger.error("Could not reset resource '{}'", resourceName, e);

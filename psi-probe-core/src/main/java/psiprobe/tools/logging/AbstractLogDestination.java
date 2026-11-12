@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,6 +11,7 @@
 package psiprobe.tools.logging;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.sql.Timestamp;
 
 /**
@@ -43,9 +44,9 @@ public abstract class AbstractLogDestination extends DefaultAccessor implements 
    *
    * @return the stdout file
    */
-  protected File getStdoutFile() {
-    File file = new File(System.getProperty("catalina.base"), "logs/catalina.out");
-    return file.exists() ? file : new File("stdout");
+  public File getStdoutFile() {
+    File file = Path.of(System.getProperty("catalina.base"), "logs/catalina.out").toFile();
+    return file.exists() ? file : Path.of("stdout").toFile();
   }
 
   @Override
@@ -72,7 +73,7 @@ public abstract class AbstractLogDestination extends DefaultAccessor implements 
 
   @Override
   public String[] getValidLevels() {
-    return null;
+    return new String[0];
   }
 
   @Override

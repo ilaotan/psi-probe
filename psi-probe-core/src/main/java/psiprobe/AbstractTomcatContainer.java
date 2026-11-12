@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,6 +10,9 @@
  */
 package psiprobe;
 
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -17,20 +20,21 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.naming.NamingException;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -44,6 +48,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.jasper.EmbeddedServletOptions;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.Options;
+import org.apache.jasper.compiler.Compiler;
 import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.naming.ContextBindings;
 import org.apache.naming.factory.ResourceLinkFactory;
@@ -76,7 +81,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
   protected Connector[] connectors;
 
   /** The deployer o name. */
-  protected ObjectName deployerOName;
+  protected ObjectName objectNameDeployer;
 
   /** The mbean server. */
   protected MBeanServer mbeanServer;
@@ -88,7 +93,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
     URL,
 
     /** The servlet name. */
-    SERVLET_NAME;
+    SERVLET_NAME
   }
 
   @Override
@@ -100,7 +105,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
       Service service = engine.getService();
       connectors = service.findConnectors();
       try {
-        deployerOName =
+        objectNameDeployer =
             new ObjectName(host.getParent().getName() + ":type=Deployer,host=" + host.getName());
       } catch (MalformedObjectNameException e) {
         logger.trace("", e);
@@ -114,28 +119,28 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
 
   @Override
   public File getAppBase() {
-    File base = new File(host.getAppBase());
+    Path base = Path.of(host.getAppBase());
     if (!base.isAbsolute()) {
-      base = new File(System.getProperty("catalina.base"), host.getAppBase());
+      base = Path.of(System.getProperty("catalina.base"), host.getAppBase());
     }
-    return base;
+    return base.toFile();
   }
 
   @Override
   public String getConfigBase() {
-    File configBase = new File(System.getProperty("catalina.base"), "conf");
     Container baseHost = null;
     Container thisContainer = host;
     while (thisContainer != null) {
-      if (thisContainer instanceof Host) {
-        baseHost = thisContainer;
+      if (thisContainer instanceof Host thisHost) {
+        baseHost = thisHost;
       }
       thisContainer = thisContainer.getParent();
     }
+    Path configBase = Path.of(System.getProperty("catalina.base"), "conf");
     if (baseHost != null) {
-      configBase = new File(configBase, baseHost.getName());
+      configBase = configBase.resolve(baseHost.getName());
     }
-    return configBase.getAbsolutePath();
+    return configBase.toFile().getAbsolutePath();
   }
 
   @Override
@@ -152,8 +157,8 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
   public List<Context> findContexts() {
     List<Context> results = new ArrayList<>();
     for (Container child : host.findChildren()) {
-      if (child instanceof Context) {
-        results.add((Context) child);
+      if (child instanceof Context context) {
+        results.add(context);
       }
     }
     return results;
@@ -197,23 +202,27 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
       try {
         stop(name);
       } catch (Exception e) {
-        logger.info("Stopping '{}' threw this exception:", name, e);
+        if (name.matches("\\w*")) {
+          logger.info("Stopping '{}' threw this exception:", name, e);
+        } else {
+          logger.info("Stopping and threw this exception:", e);
+        }
       }
 
-      File appDir;
-      File docBase = new File(ctx.getDocBase());
+      Path appDir;
+      Path docBase = Path.of(ctx.getDocBase());
 
       if (!docBase.isAbsolute()) {
-        appDir = new File(getAppBase(), ctx.getDocBase());
+        appDir = Path.of(getAppBase().getPath(), ctx.getDocBase());
       } else {
         appDir = docBase;
       }
 
-      logger.debug("Deleting '{}'", appDir.getAbsolutePath());
-      Utils.delete(appDir);
+      logger.debug("Deleting '{}'", appDir.toFile().getAbsolutePath());
+      Utils.delete(appDir.toFile());
 
       String warFilename = formatContextFilename(name);
-      File warFile = new File(getAppBase(), warFilename + ".war");
+      File warFile = Path.of(getAppBase().getPath(), warFilename + ".war").toFile();
       logger.debug("Deleting '{}'", warFile.getAbsolutePath());
       Utils.delete(warFile);
 
@@ -231,6 +240,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
    * Removes the internal.
    *
    * @param name the name
+   *
    * @throws Exception the exception
    */
   private void removeInternal(String name) throws Exception {
@@ -238,7 +248,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
   }
 
   @Override
-  public void installWar(String name, URL url) throws Exception {
+  public void installWar(String name) throws Exception {
     checkChanges(name);
   }
 
@@ -246,6 +256,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
    * Install context internal.
    *
    * @param name the name
+   *
    * @throws Exception the exception
    */
   private void installContextInternal(String name) throws Exception {
@@ -259,7 +270,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
       return null;
     }
     Context result = findContextInternal(safeName);
-    if (result == null && "".equals(safeName)) {
+    if (result == null && safeName.isEmpty()) {
       result = findContextInternal("/");
     }
     return result;
@@ -292,22 +303,29 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
   public String formatContextFilename(String contextName) {
     if (contextName == null) {
       return null;
-    } else if ("".equals(contextName)) {
-      return "ROOT";
-    } else if (contextName.startsWith("/")) {
-      return contextName.substring(1);
-    } else {
-      return contextName;
     }
+    String result = contextName.trim();
+    if (result.startsWith("/")) {
+      result = result.substring(1);
+    }
+    if (result.isEmpty()) {
+      return "ROOT";
+    }
+    // For a context with one or more sub-paths, replace all "/" with "#"
+    result = result.replace('/', '#');
+    // For ROOT Parallel Usage, prepend "ROOT"
+    if (result.startsWith("##")) {
+      result = "ROOT" + result;
+    }
+    return result;
   }
 
   @Override
   public void discardWorkDir(Context context) {
-    if (context instanceof StandardContext) {
-      StandardContext standardContext = (StandardContext) context;
+    if (context instanceof StandardContext standardContext) {
       String path = standardContext.getWorkPath();
       logger.info("Discarding '{}'", path);
-      Utils.delete(new File(path, "org"));
+      Utils.delete(Path.of(path, "org").toFile());
     } else {
       logger.error("context '{}' is not an instance of '{}', expected StandardContext",
           context.getName(), context.getClass().getName());
@@ -356,7 +374,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
                 Item item = summary.getItems().get(name);
                 if (item != null) {
                   try {
-                    org.apache.jasper.compiler.Compiler compiler = jcctx.createCompiler();
+                    Compiler compiler = jcctx.createCompiler();
                     compiler.compile();
                     item.setState(Item.STATE_READY);
                     item.setException(null);
@@ -429,10 +447,9 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
       // delete "missing" items by keeping "not missing" ones
       //
       Map<String, Item> hashMap = new HashMap<>();
-      for (String key : summary.getItems().keySet()) {
-        Item item = summary.getItems().get(key);
-        if (!item.isMissing()) {
-          hashMap.put(key, item);
+      for (Entry<String, Item> entry : summary.getItems().entrySet()) {
+        if (!entry.getValue().isMissing()) {
+          hashMap.put(entry.getKey(), entry.getValue());
         }
       }
 
@@ -454,7 +471,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
       try {
         URI configUri = configUrl.toURI();
         if ("file".equals(configUri.getScheme())) {
-          return new File(configUri.getPath());
+          return Path.of(configUri).toFile();
         }
       } catch (URISyntaxException ex) {
         logger.error("Could not convert URL to URI: '{}'", configUrl, ex);
@@ -488,6 +505,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
    *
    * @param context the context
    * @param bind the bind
+   *
    * @throws NamingException the naming exception
    */
   private void changeContextBinding(Context context, boolean bind) throws NamingException {
@@ -519,15 +537,8 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
 
     if (paths != null) {
       for (String name : paths) {
-        boolean isJsp = false;
-
-        try {
-          isJsp =
-              name.endsWith(".jsp") || name.endsWith(".jspx") || opt.getJspConfig().isJspPage(name);
-        } catch (Exception e) {
-          // XXX Tomcat 7.0.x throws JasperException otherwise this could be removed.
-          logger.info("isJspPage() thrown an error for '{}'", name, e);
-        }
+        boolean isJsp =
+            name.endsWith(".jsp") || name.endsWith(".jspx") || opt.getJspConfig().isJspPage(name);
 
         if (isJsp) {
           JspCompilationContext jcctx =
@@ -550,19 +561,17 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
 
             long time = System.currentTimeMillis();
             try {
-              org.apache.jasper.compiler.Compiler compiler = jcctx.createCompiler();
+              Compiler compiler = jcctx.createCompiler();
               if (compile) {
                 compiler.compile();
                 item.setState(Item.STATE_READY);
                 item.setException(null);
-              } else {
-                if (!compiler.isOutDated()) {
-                  item.setState(Item.STATE_READY);
-                  item.setException(null);
-                } else if (item.getState() != Item.STATE_FAILED) {
-                  item.setState(Item.STATE_OOD);
-                  item.setException(null);
-                }
+              } else if (!compiler.isOutDated()) {
+                item.setState(Item.STATE_READY);
+                item.setException(null);
+              } else if (item.getState() != Item.STATE_FAILED) {
+                item.setState(Item.STATE_OOD);
+                item.setException(null);
               }
               logger.info("Compiled '{}': OK", name);
             } catch (Exception e) {
@@ -574,7 +583,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
               item.setCompileTime(System.currentTimeMillis() - time);
             }
             item.setMissing(false);
-            summary.getItems().put(name, item);
+            summary.putItem(name, item);
           } finally {
             ClassUtils.overrideThreadContextClassLoader(prevCl);
           }
@@ -591,6 +600,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
    * Find context internal.
    *
    * @param name the context name
+   *
    * @return the context
    */
   protected Context findContextInternal(String name) {
@@ -601,19 +611,18 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
    * Check changes.
    *
    * @param name the name
+   *
    * @throws Exception the exception
    */
   protected void checkChanges(String name) throws Exception {
-    Boolean result = (Boolean) mbeanServer.invoke(deployerOName, "isServiced", new String[] {name},
-        new String[] {String.class.getName()});
-    if (!result.booleanValue()) {
-      mbeanServer.invoke(deployerOName, "addServiced", new String[] {name},
-          new String[] {String.class.getName()});
+    Boolean result = (Boolean) mbeanServer.invoke(objectNameDeployer, "tryAddServiced",
+        new String[] {name}, new String[] {String.class.getName()});
+    if (result.booleanValue()) {
       try {
-        mbeanServer.invoke(deployerOName, "check", new String[] {name},
+        mbeanServer.invoke(objectNameDeployer, "check", new String[] {name},
             new String[] {String.class.getName()});
       } finally {
-        mbeanServer.invoke(deployerOName, "removeServiced", new String[] {name},
+        mbeanServer.invoke(objectNameDeployer, "removeServiced", new String[] {name},
             new String[] {String.class.getName()});
       }
     }
@@ -623,6 +632,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
    * Returns the security token required to bind to a naming context.
    *
    * @param context the catalina context
+   *
    * @return the security token for use with <code>ContextBindings</code>
    */
   protected abstract Object getNamingToken(Context context);
@@ -635,6 +645,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
    * @param sctx the sctx
    * @param jrctx the jrctx
    * @param classLoader the class loader
+   *
    * @return the jsp compilation context
    */
   protected abstract JspCompilationContext createJspCompilationContext(String name, Options opt,
@@ -658,7 +669,7 @@ public abstract class AbstractTomcatContainer implements TomcatContainer {
    * @param filterMapType the filter map type
    */
   protected void addFilterMapping(String filterName, String dispatcherMap, String filterClass,
-      String[] types, List<FilterMapping> results, FilterMapType filterMapType) {
+      String[] types, Collection<FilterMapping> results, FilterMapType filterMapType) {
     for (String type : types) {
       FilterMapping fm = new FilterMapping();
       if (filterMapType == FilterMapType.URL) {

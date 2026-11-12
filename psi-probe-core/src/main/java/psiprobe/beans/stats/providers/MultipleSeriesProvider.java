@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,13 +10,13 @@
  */
 package psiprobe.beans.stats.providers;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYDataItem;
@@ -116,9 +116,8 @@ public class MultipleSeriesProvider extends AbstractSeriesProvider {
 
     if (useTop) {
       // sorting stats by the avg value to identify the top series
-      Collections.sort(seriesList,
-          (s1, s2) -> Double.compare(s1.avg, s2.avg) == 0 ? s1.key.compareTo(s2.key)
-              : Double.compare(s1.avg, s2.avg) > 0 ? -1 : 1);
+      seriesList.sort((s1, s2) -> Double.compare(s1.avg, s2.avg) == 0 ? s1.key.compareTo(s2.key)
+          : Double.compare(s1.avg, s2.avg) > 0 ? -1 : 1);
 
       // keeping only the top series in the list
       for (ListIterator<Series> i = seriesList.listIterator(getTop()); i.hasNext();) {
@@ -128,7 +127,7 @@ public class MultipleSeriesProvider extends AbstractSeriesProvider {
     }
 
     // sorting the remaining series by name
-    Collections.sort(seriesList, (s1, s2) -> s1.key.compareTo(s2.key));
+    seriesList.sort(Comparator.comparing(s1 -> s1.key));
 
     for (Series ser : seriesList) {
       synchronized (ser.stats) {
@@ -177,7 +176,7 @@ public class MultipleSeriesProvider extends AbstractSeriesProvider {
           XYDataItem xy = it.next();
           sum += xy.getY().longValue();
 
-          if (useMovingAvg && count % getMovingAvgFrame() == 0 || !it.hasNext()) {
+          if ((useMovingAvg && count % getMovingAvgFrame() == 0) || !it.hasNext()) {
             double thisAvg = (double) sum / count;
             if (thisAvg > avg) {
               avg = thisAvg;

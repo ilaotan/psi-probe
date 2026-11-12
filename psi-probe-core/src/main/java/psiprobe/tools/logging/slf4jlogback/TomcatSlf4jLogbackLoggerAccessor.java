@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -13,6 +13,7 @@ package psiprobe.tools.logging.slf4jlogback;
 import com.google.common.collect.Iterators;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +29,7 @@ public class TomcatSlf4jLogbackLoggerAccessor extends DefaultAccessor {
 
   /**
    * Returns all appenders of this logger.
-   * 
+   *
    * @return a list of {@link TomcatSlf4jLogbackAppenderAccessor}s
    */
   @SuppressWarnings("unchecked")
@@ -39,7 +40,7 @@ public class TomcatSlf4jLogbackLoggerAccessor extends DefaultAccessor {
       for (Object appender : Collections.list(Iterators.asEnumeration(
           (Iterator<Object>) MethodUtils.invokeMethod(getTarget(), "iteratorForAppenders")))) {
         List<Object> siftedAppenders = getSiftedAppenders(appender);
-        if (siftedAppenders != null) {
+        if (!siftedAppenders.isEmpty()) {
           for (Object siftedAppender : siftedAppenders) {
             wrapAndAddAppender(siftedAppender, appenders);
           }
@@ -58,8 +59,9 @@ public class TomcatSlf4jLogbackLoggerAccessor extends DefaultAccessor {
 
   /**
    * Returns the appender of this logger with the given name.
-   * 
+   *
    * @param name the name of the appender to return
+   *
    * @return the appender with the given name, or null if no such appender exists for this logger
    */
   public TomcatSlf4jLogbackAppenderAccessor getAppender(String name) {
@@ -109,7 +111,7 @@ public class TomcatSlf4jLogbackLoggerAccessor extends DefaultAccessor {
 
   /**
    * Gets the log level of this logger.
-   * 
+   *
    * @return the level of this logger
    */
   public String getLevel() {
@@ -124,7 +126,7 @@ public class TomcatSlf4jLogbackLoggerAccessor extends DefaultAccessor {
 
   /**
    * Sets the log level of this logger.
-   * 
+   *
    * @param newLevelStr the name of the new level
    */
   public void setLevel(String newLevelStr) {
@@ -141,7 +143,9 @@ public class TomcatSlf4jLogbackLoggerAccessor extends DefaultAccessor {
    * Gets the sifted appenders.
    *
    * @param appender the appender
+   *
    * @return the sifted appenders
+   *
    * @throws Exception the exception
    */
   @SuppressWarnings("unchecked")
@@ -151,17 +155,10 @@ public class TomcatSlf4jLogbackLoggerAccessor extends DefaultAccessor {
 
       Object tracker = MethodUtils.invokeMethod(appender, "getAppenderTracker");
       if (tracker != null) {
-        try {
-          return (List<Object>) MethodUtils.invokeMethod(tracker, "allComponents");
-        } catch (final NoSuchMethodException e) {
-          // XXX Legacy 1.0.x and lower support for logback
-          logger.trace("", e);
-          return (List<Object>) MethodUtils.invokeMethod(tracker, "valueList");
-        }
+        return (List<Object>) MethodUtils.invokeMethod(tracker, "allComponents");
       }
-      return new ArrayList<>();
     }
-    return null;
+    return List.of();
   }
 
   /**
@@ -171,7 +168,7 @@ public class TomcatSlf4jLogbackLoggerAccessor extends DefaultAccessor {
    * @param appenders the appenders
    */
   private void wrapAndAddAppender(Object appender,
-      List<TomcatSlf4jLogbackAppenderAccessor> appenders) {
+      Collection<TomcatSlf4jLogbackAppenderAccessor> appenders) {
 
     TomcatSlf4jLogbackAppenderAccessor appenderAccessor = wrapAppender(appender);
     if (appenderAccessor != null) {
@@ -183,6 +180,7 @@ public class TomcatSlf4jLogbackLoggerAccessor extends DefaultAccessor {
    * Wrap appender.
    *
    * @param appender the appender
+   *
    * @return the tomcat slf4j logback appender accessor
    */
   private TomcatSlf4jLogbackAppenderAccessor wrapAppender(Object appender) {

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,11 +10,11 @@
  */
 package psiprobe.controllers.threads;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.net.URLClassLoader;
 import java.util.Arrays;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,15 +47,15 @@ public class GetClassLoaderUrlsController extends ParameterizableViewController 
   protected ModelAndView handleRequestInternal(HttpServletRequest request,
       HttpServletResponse response) throws Exception {
 
-    String threadName = ServletRequestUtils.getStringParameter(request, "thread", null);
+    String threadName = ServletRequestUtils.getStringParameter(request, "thread");
 
     Thread thread = Utils.getThreadByName(threadName);
 
     if (thread != null) {
       ClassLoader cl = thread.getContextClassLoader();
-      if (cl != null && cl instanceof URLClassLoader) {
+      if (cl instanceof URLClassLoader urlClassLoader) {
         try {
-          request.setAttribute("urls", Arrays.asList(((URLClassLoader) cl).getURLs()));
+          request.setAttribute("urls", Arrays.asList(urlClassLoader.getURLs()));
         } catch (Exception e) {
           logger.error("There was an exception querying classloader for thread '{}'", threadName,
               e);

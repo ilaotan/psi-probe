@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -12,7 +12,7 @@ package psiprobe.tools.logging;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.beanutils2.PropertyUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
@@ -86,16 +86,16 @@ public class DefaultAccessor {
    * @param name the name
    * @param defaultValue the default value
    * @param forced whether or not to force access to the field
+   *
    * @return the property
    */
   protected Object getProperty(Object obj, String name, Object defaultValue, boolean forced) {
     try {
       if (forced) {
         return FieldUtils.readField(obj, name, forced);
-      } else {
-        return PropertyUtils.isReadable(obj, name) ? PropertyUtils.getProperty(obj, name)
-            : defaultValue;
       }
+      return PropertyUtils.isReadable(obj, name) ? PropertyUtils.getProperty(obj, name)
+          : defaultValue;
     } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException
         | NoSuchMethodException e) {
       logger.error("", e);
@@ -110,6 +110,7 @@ public class DefaultAccessor {
    * @param obj the obj
    * @param name the name
    * @param defaultValue the default value
+   *
    * @return the property
    */
   protected Object getProperty(Object obj, String name, Object defaultValue) {
@@ -123,9 +124,10 @@ public class DefaultAccessor {
    * @param name the name
    * @param param the param
    * @param defaultValue the default value
+   *
    * @return the object
    */
-  protected Object invokeMethod(Object object, String name, Object param, Object defaultValue) {
+  public Object invokeMethod(Object object, String name, Object param, Object defaultValue) {
     try {
       if (param == null) {
         return MethodUtils.invokeMethod(object, name);

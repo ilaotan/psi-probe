@@ -11,23 +11,27 @@
 
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="false" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 
-<html>
-	<head><title>Not supported</title></head>
+<!DOCTYPE html>
+<html lang="${lang}">
+    <head>
+        <title>Not supported</title>
+        <script src="<c:url value='/js/prototype.js'/>"></script>
+    </head>
 
-	<c:set var="navTabLogs" value="active" scope="request"/>
+    <c:set var="navTabLogs" value="active" scope="request"/>
 
-	<body>
-		<div class="errorMessage">
-			<p>
-				<%
-					pageContext.setAttribute("vmName", System.getProperty("java.runtime.name") + " " + System.getProperty("java.runtime.version") + " " +
-							System.getProperty("java.vm.name"));
-				%>
-				<spring:message code="probe.jsp.logs_notSupported.message" arguments="${vmName}"/>
-			</p>
-		</div>
-	</body>
+    <body>
+        <div class="errorMessage">
+            <p>
+                <%
+                    pageContext.setAttribute("vmName", System.getProperty("java.runtime.name") + " " + System.getProperty("java.runtime.version") + " " +
+                            System.getProperty("java.vm.name"));
+                %>
+                <spring:message code="probe.jsp.logs_notSupported.message" arguments="${vmName}"/>
+            </p>
+        </div>
+    </body>
 </html>

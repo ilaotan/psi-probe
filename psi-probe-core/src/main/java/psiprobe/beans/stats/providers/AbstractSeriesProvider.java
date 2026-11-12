@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,6 +11,7 @@
 package psiprobe.beans.stats.providers;
 
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.jfree.data.xy.XYDataItem;
 import org.jfree.data.xy.XYSeries;
@@ -25,19 +26,26 @@ public abstract class AbstractSeriesProvider implements SeriesProvider {
   /** The logger. */
   protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+  /** The lock. */
+  private final ReentrantLock lockObj = new ReentrantLock();
+
   /**
    * To series.
    *
    * @param legend the legend
    * @param stats the stats
+   *
    * @return the XY series
    */
   protected XYSeries toSeries(String legend, List<XYDataItem> stats) {
     XYSeries xySeries = new XYSeries(legend, true, false);
-    synchronized (stats) {
+    lockObj.lock();
+    try {
       for (XYDataItem item : stats) {
         xySeries.addOrUpdate(item.getX(), item.getY());
       }
+    } finally {
+      lockObj.unlock();
     }
     return xySeries;
   }

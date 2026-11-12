@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,12 +10,12 @@
  */
 package psiprobe.controllers.servlets;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import org.apache.catalina.Context;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +47,7 @@ public class ListServletsController extends AbstractContextHandlerController {
 
     List<Context> ctxs;
     if (context == null) {
-      ctxs = getContainerWrapper().getTomcatContainer().findContexts();
+      ctxs = containerWrapper.getTomcatContainer().findContexts();
     } else {
       ctxs = new ArrayList<>();
       ctxs.add(context);
@@ -58,7 +58,7 @@ public class ListServletsController extends AbstractContextHandlerController {
       if (ctx != null) {
         List<ServletInfo> appServlets = ApplicationUtils.getApplicationServlets(ctx);
         for (ServletInfo svlt : appServlets) {
-          Collections.sort(svlt.getMappings());
+          svlt.getMappings().sort(Comparator.naturalOrder());
         }
         servlets.addAll(appServlets);
       }

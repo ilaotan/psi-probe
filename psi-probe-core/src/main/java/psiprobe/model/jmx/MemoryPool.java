@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -9,6 +9,8 @@
  * PURPOSE.
  */
 package psiprobe.model.jmx;
+
+import java.util.Locale;
 
 /**
  * The Class MemoryPool.
@@ -52,7 +54,7 @@ public class MemoryPool {
    */
   public void setName(String name) {
     this.name = name;
-    this.id = name != null ? name.replaceAll(" ", "_").toLowerCase() : null;
+    this.id = name != null ? name.replace(' ', '_').toLowerCase(Locale.ENGLISH) : null;
   }
 
   /**

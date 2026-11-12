@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -32,7 +32,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.]
  *
  * -------------
@@ -47,10 +47,10 @@
  * -------
  * 05-Nov-2002 : Version 1 (DG);
  * 14-Nov-2002 : Modified to have independent x and y offsets (DG);
- * 15-Sep-2019 : Copied from original Jfreechart as code obsoleted and necessary for visuals in Psi Probe without extra rework (JWL);
+ * 15-Sep-2019 : Copied from original Jfreechart as code obsoleted and necessary for visuals in Psi Probe
+ *               without extra rework (JWL);
  *
  */
-
 package psiprobe.jfreechart;
 
 /**
@@ -64,12 +64,12 @@ public interface Effect3D {
    *
    * @return The offset.
    */
-  public double getXOffset();
+  double getXOffset();
 
   /**
    * Returns the y-offset (in Java2D units) for the 3D effect.
    *
    * @return The offset.
    */
-  public double getYOffset();
+  double getYOffset();
 }

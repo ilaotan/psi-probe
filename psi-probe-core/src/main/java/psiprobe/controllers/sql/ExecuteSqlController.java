@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -9,6 +9,10 @@
  * PURPOSE.
  */
 package psiprobe.controllers.sql;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,9 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.apache.catalina.Context;
@@ -61,7 +62,7 @@ public class ExecuteSqlController extends AbstractContextHandlerController {
       HttpServletRequest request, HttpServletResponse response) throws Exception {
 
     String resourceName = ServletRequestUtils.getStringParameter(request, "resource");
-    String sql = ServletRequestUtils.getStringParameter(request, "sql", null);
+    String sql = ServletRequestUtils.getStringParameter(request, "sql");
 
     if (sql == null || sql.isEmpty() || sql.trim().isEmpty()) {
       request.setAttribute("errorMessage",
@@ -95,8 +96,8 @@ public class ExecuteSqlController extends AbstractContextHandlerController {
     DataSource dataSource = null;
 
     try {
-      dataSource = getContainerWrapper().getResourceResolver().lookupDataSource(context,
-          resourceName, getContainerWrapper());
+      dataSource = containerWrapper.getResourceResolver().lookupDataSource(context, resourceName,
+          containerWrapper);
     } catch (NamingException e) {
       request.setAttribute("errorMessage", getMessageSourceAccessor().getMessage(
           "probe.src.dataSourceTest.resource.lookup.failure", new Object[] {resourceName}));
@@ -137,13 +138,6 @@ public class ExecuteSqlController extends AbstractContextHandlerController {
                           .getMessage("probe.src.dataSourceTest.sql.null");
                     } else {
                       value = HtmlUtils.htmlEscape(value);
-                    }
-
-                    // a work around for IE browsers bug of not displaying
-                    // a border around an empty table column
-
-                    if (value.isEmpty()) {
-                      value = "&nbsp;";
                     }
 
                     // Pad the keys of columns with existing labels so they are distinct

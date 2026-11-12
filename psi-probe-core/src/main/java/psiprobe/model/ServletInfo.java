@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,6 +11,7 @@
 package psiprobe.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public class ServletInfo {
   private String runAs;
 
   /** The error count. */
-  private int errorCount;
+  private long errorCount;
 
   /** The load time. */
   private long loadTime;
@@ -52,7 +53,7 @@ public class ServletInfo {
   private long processingTime;
 
   /** The request count. */
-  private int requestCount;
+  private long requestCount;
 
   /** The single threaded. */
   private boolean singleThreaded;
@@ -186,7 +187,7 @@ public class ServletInfo {
    *
    * @return the error count
    */
-  public int getErrorCount() {
+  public long getErrorCount() {
     return errorCount;
   }
 
@@ -195,7 +196,7 @@ public class ServletInfo {
    *
    * @param errorCount the new error count
    */
-  public void setErrorCount(int errorCount) {
+  public void setErrorCount(long errorCount) {
     this.errorCount = errorCount;
   }
 
@@ -276,7 +277,7 @@ public class ServletInfo {
    *
    * @return the request count
    */
-  public int getRequestCount() {
+  public long getRequestCount() {
     return requestCount;
   }
 
@@ -285,7 +286,7 @@ public class ServletInfo {
    *
    * @param requestCount the new request count
    */
-  public void setRequestCount(int requestCount) {
+  public void setRequestCount(long requestCount) {
     this.requestCount = requestCount;
   }
 
@@ -349,7 +350,7 @@ public class ServletInfo {
    * @return the mappings
    */
   public List<String> getMappings() {
-    return mappings;
+    return mappings == null ? List.of() : new ArrayList<>(mappings);
   }
 
   /**
@@ -357,8 +358,8 @@ public class ServletInfo {
    *
    * @param mappings the new mappings
    */
-  public void setMappings(List<String> mappings) {
-    this.mappings = mappings;
+  public void setMappings(Collection<String> mappings) {
+    this.mappings = mappings == null ? List.of() : new ArrayList<>(mappings);
   }
 
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -21,7 +21,7 @@ import psiprobe.tools.logging.DefaultAccessor;
 
 /**
  * Wraps a Logback logger factory from a given web application class loader.
- * 
+ *
  * <p>
  * All Logback classes are loaded via the given class loader and not via psi-probe's own class
  * loader. For this reasons, all methods on Logback objects are invoked via reflection.
@@ -36,6 +36,7 @@ public class LogbackFactoryAccessor extends DefaultAccessor {
    * Attempts to initialize a Logback logger factory via the given class loader.
    *
    * @param cl the ClassLoader to use when fetching the factory
+   *
    * @throws ClassNotFoundException the class not found exception
    * @throws IllegalAccessException the illegal access exception
    * @throws InvocationTargetException the invocation target exception
@@ -61,7 +62,7 @@ public class LogbackFactoryAccessor extends DefaultAccessor {
 
   /**
    * Returns the Logback root logger.
-   * 
+   *
    * @return the root logger
    */
   public LogbackLoggerAccessor getRootLogger() {
@@ -74,6 +75,7 @@ public class LogbackFactoryAccessor extends DefaultAccessor {
    * Returns the Logback logger with a given name.
    *
    * @param name the name
+   *
    * @return the Logger with the given name
    */
   public LogbackLoggerAccessor getLogger(String name) {
@@ -98,7 +100,7 @@ public class LogbackFactoryAccessor extends DefaultAccessor {
 
   /**
    * Returns a list of wrappers for all Logback appenders that have an associated logger.
-   * 
+   *
    * @return a list of {@link LogbackAppenderAccessor}s representing all appenders that are in use
    */
   @SuppressWarnings("unchecked")

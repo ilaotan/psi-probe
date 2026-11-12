@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -9,6 +9,6 @@
  * PURPOSE.
  */
 /**
- * Quick Check Package (ie Tomcat Availability Controllers)
+ * Quick Check Package (ie Tomcat Availability Controllers).
  */
 package psiprobe.controllers.quickcheck;

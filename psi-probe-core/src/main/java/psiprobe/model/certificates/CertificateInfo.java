@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,8 +11,13 @@
 package psiprobe.model.certificates;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+/**
+ * Certificate Information Class.
+ */
 public class CertificateInfo implements Serializable {
 
   /** The Constant serialVersionUID. */
@@ -42,7 +47,7 @@ public class CertificateInfo implements Serializable {
    * @return the key store certs
    */
   public List<Cert> getKeyStoreCerts() {
-    return keyStoreCerts;
+    return keyStoreCerts == null ? List.of() : new ArrayList<>(keyStoreCerts);
   }
 
   /**
@@ -50,8 +55,8 @@ public class CertificateInfo implements Serializable {
    *
    * @param keyStoreCerts the new key store certs
    */
-  public void setKeyStoreCerts(List<Cert> keyStoreCerts) {
-    this.keyStoreCerts = keyStoreCerts;
+  public void setKeyStoreCerts(Collection<Cert> keyStoreCerts) {
+    this.keyStoreCerts = keyStoreCerts == null ? List.of() : new ArrayList<>(keyStoreCerts);
   }
 
   /**

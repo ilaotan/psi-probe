@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,7 +10,7 @@
  */
 package psiprobe.controllers;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,33 +23,21 @@ import psiprobe.beans.ContainerWrapperBean;
  */
 public abstract class AbstractTomcatContainerController extends AbstractController {
 
-  /** The logger. */
+  /**
+   * The logger.
+   * <p>
+   * Direct usage of slf4j rather than spring usage of commons logging located her to protect
+   * downstream usage.
+   */
+  @SuppressWarnings("HidingField")
   protected final Logger logger = LoggerFactory.getLogger(getClass());
 
   /** The container wrapper. */
   @Inject
-  private ContainerWrapperBean containerWrapper;
+  protected ContainerWrapperBean containerWrapper;
 
   /** The view name. */
   private String viewName;
-
-  /**
-   * Gets the container wrapper.
-   *
-   * @return the container wrapper
-   */
-  public ContainerWrapperBean getContainerWrapper() {
-    return containerWrapper;
-  }
-
-  /**
-   * Sets the container wrapper.
-   *
-   * @param containerWrapper the new container wrapper
-   */
-  public void setContainerWrapper(ContainerWrapperBean containerWrapper) {
-    this.containerWrapper = containerWrapper;
-  }
 
   /**
    * Gets the view name.

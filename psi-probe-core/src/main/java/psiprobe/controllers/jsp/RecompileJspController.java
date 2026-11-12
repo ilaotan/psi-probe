@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,13 +10,13 @@
  */
 package psiprobe.controllers.jsp;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Context;
 import org.slf4j.Logger;
@@ -61,15 +61,15 @@ public class RecompileJspController extends AbstractContextHandlerController {
           names.add(name);
         }
       }
-      getContainerWrapper().getTomcatContainer().recompileJsps(context, summary, names);
-      request.getSession(false).setAttribute(DisplayJspController.SUMMARY_ATTRIBUTE, summary);
+      containerWrapper.getTomcatContainer().recompileJsps(context, summary, names);
+      session.setAttribute(DisplayJspController.SUMMARY_ATTRIBUTE, summary);
     } else if (summary != null && contextName.equals(summary.getName())) {
-      String name = ServletRequestUtils.getStringParameter(request, "source", null);
+      String name = ServletRequestUtils.getStringParameter(request, "source");
       if (name != null) {
         List<String> names = new ArrayList<>();
         names.add(name);
-        getContainerWrapper().getTomcatContainer().recompileJsps(context, summary, names);
-        request.getSession(false).setAttribute(DisplayJspController.SUMMARY_ATTRIBUTE, summary);
+        containerWrapper.getTomcatContainer().recompileJsps(context, summary, names);
+        session.setAttribute(DisplayJspController.SUMMARY_ATTRIBUTE, summary);
       } else {
         logger.error("source is not passed, nothing to do");
       }

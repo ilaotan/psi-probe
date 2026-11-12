@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,10 +11,10 @@
 package psiprobe;
 
 import com.google.common.base.Strings;
-import com.uwyn.jhighlight.renderer.Renderer;
-import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
-import java.io.BufferedInputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,9 +41,9 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+import org.codelibs.jhighlight.renderer.Renderer;
+import org.codelibs.jhighlight.renderer.XhtmlRendererFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +73,9 @@ public final class Utils {
    *
    * @param file to be read
    * @param charsetName the charset name
+   *
    * @return String representation of the file contents
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static String readFile(File file, String charsetName) throws IOException {
@@ -85,24 +87,25 @@ public final class Utils {
   /**
    * Reads strings from the intput stream using the given charset. This method closes the input
    * stream after it has been consumed.
-   * 
+   *
    * <p>
    * This method uses the system's default charset if the given one is unsupported.
    * </p>
    *
    * @param is the stream from which to read
    * @param charsetName the charset to use when reading the stream
+   *
    * @return the contents of the given input stream
+   *
    * @throws IOException if reading from the stream fails spectacularly
    */
   public static String readStream(InputStream is, String charsetName) throws IOException {
-
-    //
-    // use system's default encoding if the passed encoding is unsupported
-    //
-    Charset charset = Charset.forName(System.getProperty("file.encoding"));
+    Charset charset;
     if (Charset.isSupported(charsetName)) {
       charset = Charset.forName(charsetName);
+    } else {
+      // use system's default encoding if the passed encoding is unsupported
+      charset = Charset.defaultCharset();
     }
 
     StringBuilder out = new StringBuilder();
@@ -143,13 +146,14 @@ public final class Utils {
    *
    * @param num the num
    * @param defaultValue the default value
+   *
    * @return the int
    */
   public static int toInt(String num, int defaultValue) {
     if (num != null && !num.contains(" ")) {
       try (Scanner scanner = new Scanner(num)) {
         if (scanner.hasNextInt()) {
-          return Integer.parseInt(num);
+          return scanner.nextInt();
         }
       }
     }
@@ -161,6 +165,7 @@ public final class Utils {
    *
    * @param num the num
    * @param defaultValue the default value
+   *
    * @return the int
    */
   public static int toIntHex(String num, int defaultValue) {
@@ -170,7 +175,7 @@ public final class Utils {
       }
       try (Scanner scanner = new Scanner(num)) {
         if (scanner.hasNextInt()) {
-          return Integer.parseInt(num, 16);
+          return scanner.nextInt(16);
         }
       }
     }
@@ -182,13 +187,14 @@ public final class Utils {
    *
    * @param num the num
    * @param defaultValue the default value
+   *
    * @return the long
    */
   public static long toLong(String num, long defaultValue) {
     if (num != null && !num.contains(" ")) {
       try (Scanner scanner = new Scanner(num)) {
         if (scanner.hasNextLong()) {
-          return Long.parseLong(num);
+          return scanner.nextLong();
         }
       }
     }
@@ -200,6 +206,7 @@ public final class Utils {
    *
    * @param num the num
    * @param defaultValue the default value
+   *
    * @return the long
    */
   public static long toLong(Long num, long defaultValue) {
@@ -211,13 +218,14 @@ public final class Utils {
    *
    * @param num the num
    * @param defaultValue the default value
+   *
    * @return the float
    */
   public static float toFloat(String num, float defaultValue) {
     if (num != null && !num.contains(" ")) {
       try (Scanner scanner = new Scanner(num)) {
         if (scanner.hasNextFloat()) {
-          return Float.parseFloat(num);
+          return scanner.nextFloat();
         }
       }
     }
@@ -228,7 +236,9 @@ public final class Utils {
    * Gets the jsp encoding.
    *
    * @param is the is
+   *
    * @return the jsp encoding
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static String getJspEncoding(InputStream is) throws IOException {
@@ -254,8 +264,7 @@ public final class Utils {
     contentTypeTokenizer.addSymbol(" ", true);
     contentTypeTokenizer.addSymbol(";", true);
 
-
-    try (Reader reader = new InputStreamReader(is, StandardCharsets.ISO_8859_1)) {
+    try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
       jspTokenizer.setReader(reader);
       while (jspTokenizer.hasMore()) {
         Token token = jspTokenizer.nextToken();
@@ -267,19 +276,16 @@ public final class Utils {
               Token directiveToken = directiveTokenizer.nextToken();
               if ("pageEncoding".equals(directiveToken.getText())) {
                 if (directiveTokenizer.hasMore()
-                    && "=".equals(directiveTokenizer.nextToken().getText())) {
-                  if (directiveTokenizer.hasMore()) {
-                    encoding = directiveTokenizer.nextToken().getInnerText();
-                    break;
-                  }
+                    && "=".equals(directiveTokenizer.nextToken().getText())
+                    && directiveTokenizer.hasMore()) {
+                  encoding = directiveTokenizer.nextToken().getInnerText();
+                  break;
                 }
-              } else if ("contentType".equals(directiveToken.getText())) {
-                if (directiveTokenizer.hasMore()
-                    && "=".equals(directiveTokenizer.nextToken().getText())) {
-                  if (directiveTokenizer.hasMore()) {
-                    contentType = directiveTokenizer.nextToken().getInnerText();
-                  }
-                }
+              } else if ("contentType".equals(directiveToken.getText())
+                  && directiveTokenizer.hasMore()
+                  && "=".equals(directiveTokenizer.nextToken().getText())
+                  && directiveTokenizer.hasMore()) {
+                contentType = directiveTokenizer.nextToken().getInnerText();
               }
             }
           }
@@ -298,7 +304,7 @@ public final class Utils {
       }
     }
 
-    return encoding != null ? encoding : "ISO-8859-1";
+    return encoding != null ? encoding : StandardCharsets.UTF_8.name();
   }
 
   /**
@@ -307,6 +313,7 @@ public final class Utils {
    * @param request the request
    * @param response the response
    * @param file the file
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static void sendFile(HttpServletRequest request, HttpServletResponse response, File file)
@@ -372,13 +379,12 @@ public final class Utils {
           nomore = true;
         }
 
-        if (len > 0) {
-          out.write(buffer, 0, (int) len);
-          totalRead += len;
-          if (nomore) {
-            break;
-          }
-        } else {
+        if (len <= 0) {
+          break;
+        }
+        out.write(buffer, 0, (int) len);
+        totalRead = totalRead + (int) len;
+        if (nomore) {
           break;
         }
       }
@@ -389,6 +395,7 @@ public final class Utils {
    * Gets the thread by name.
    *
    * @param name the name
+   *
    * @return the thread by name
    */
   public static Thread getThreadByName(String name) {
@@ -400,11 +407,11 @@ public final class Utils {
       }
 
       Thread[] threads = new Thread[masterGroup.activeCount()];
-      int numThreads = masterGroup.enumerate(threads);
+      masterGroup.enumerate(threads);
 
-      for (int i = 0; i < numThreads; i++) {
-        if (threads[i] != null && name.equals(threads[i].getName())) {
-          return threads[i];
+      for (Thread thread : threads) {
+        if (thread != null && name.equals(thread.getName())) {
+          return thread;
         }
       }
     }
@@ -418,7 +425,9 @@ public final class Utils {
    * @param input the input
    * @param rendererName the renderer name
    * @param encoding the encoding
+   *
    * @return the string
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static String highlightStream(String name, InputStream input, String rendererName,
@@ -429,34 +438,39 @@ public final class Utils {
       return null;
     }
 
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    jspRenderer.highlight(name, input, bos, encoding, true);
+    byte[] highlightedBytes;
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+      jspRenderer.highlight(name, input, bos, encoding, true);
+      highlightedBytes = bos.toByteArray();
+    }
 
-    ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-
-    Tokenizer tokenizer = new Tokenizer(new InputStreamReader(bis, Charset.forName(encoding)));
-    tokenizer.addSymbol(new TokenizerSymbol("EOL", "\n", null, false, false, true, false));
-    tokenizer.addSymbol(new TokenizerSymbol("EOL", "\r\n", null, false, false, true, false));
-
-    //
-    // JHighlight adds HTML comment as the first line, so if
-    // we number the lines we could end up with a line number and no line
-    // to avoid that we just ignore the first line all together.
-    //
     StringBuilder buffer = new StringBuilder();
-    long counter = 0;
-    while (tokenizer.hasMore()) {
-      Token tk = tokenizer.nextToken();
-      if ("EOL".equals(tk.getName())) {
-        counter++;
-        buffer.append(tk.getText());
-      } else if (counter > 0) {
-        buffer.append("<span class=\"codeline\">");
-        buffer.append("<span class=\"linenum\">");
-        buffer.append(leftPad(Long.toString(counter), 6, " ").replace(" ", "&nbsp;"));
-        buffer.append("</span>");
-        buffer.append(tk.getText());
-        buffer.append("</span>");
+    try (InputStream bis = new ByteArrayInputStream(highlightedBytes);
+        Reader reader = new InputStreamReader(bis, Charset.forName(encoding))) {
+
+      Tokenizer tokenizer = new Tokenizer(reader);
+      tokenizer.addSymbol(new TokenizerSymbol("EOL", "\n", null, false, false, true, false));
+      tokenizer.addSymbol(new TokenizerSymbol("EOL", "\r\n", null, false, false, true, false));
+
+      //
+      // JHighlight adds HTML comment as the first line, so if
+      // we number the lines we could end up with a line number and no line
+      // to avoid that we just ignore the first line all together.
+      //
+      long counter = 0;
+      while (tokenizer.hasMore()) {
+        Token tk = tokenizer.nextToken();
+        if ("EOL".equals(tk.getName())) {
+          counter++;
+          buffer.append(tk.getText());
+        } else if (counter > 0) {
+          buffer.append("<span class=\"codeline\">");
+          buffer.append("<span class=\"linenum\">");
+          buffer.append(leftPad(Long.toString(counter), 6, " ").replace(" ", "&nbsp;"));
+          buffer.append("</span>");
+          buffer.append(tk.getText());
+          buffer.append("</span>");
+        }
       }
     }
     return buffer.toString();
@@ -467,28 +481,22 @@ public final class Utils {
    *
    * @param response the response
    * @param file the file
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public static void sendCompressedFile(HttpServletResponse response, File file)
       throws IOException {
-    try (ZipOutputStream zip = new ZipOutputStream(response.getOutputStream());
-        InputStream fileInput = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
 
-      String fileName = file.getName();
+    // set some headers
+    String fileName = file.getName();
+    response.setContentType("application/zip");
+    response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".zip");
 
-      // set some headers
-      response.setContentType("application/zip");
-      response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".zip");
-
-      zip.putNextEntry(new ZipEntry(fileName));
-
+    try (OutputStream out = response.getOutputStream();
+        ZipOutputStream zip = new ZipOutputStream(out)) {
       // send the file
-      byte[] buffer = new byte[4096];
-      long len;
-
-      while ((len = fileInput.read(buffer)) > 0) {
-        zip.write(buffer, 0, (int) len);
-      }
+      zip.putNextEntry(new ZipEntry(fileName));
+      Files.copy(file.toPath(), zip);
       zip.closeEntry();
     }
   }
@@ -499,9 +507,10 @@ public final class Utils {
    * @param str the str
    * @param len the len
    * @param fill the fill
+   *
    * @return the string
    */
-  protected static String leftPad(String str, int len, String fill) {
+  static String leftPad(final String str, final int len, final String fill) {
     if (str != null && str.length() < len) {
       return Strings.padStart(str, len, fill.charAt(0));
     }
@@ -513,6 +522,7 @@ public final class Utils {
    *
    * @param baseName the base name
    * @param locale the locale
+   *
    * @return the names for locale
    */
   public static List<String> getNamesForLocale(String baseName, Locale locale) {
@@ -522,17 +532,17 @@ public final class Utils {
     String variant = locale.getVariant();
     StringBuilder temp = new StringBuilder(baseName);
 
-    if (language.length() > 0) {
+    if (!language.isEmpty()) {
       temp.append('_').append(language);
       result.add(0, temp.toString());
     }
 
-    if (country.length() > 0) {
+    if (!country.isEmpty()) {
       temp.append('_').append(country);
       result.add(0, temp.toString());
     }
 
-    if (variant.length() > 0) {
+    if (!variant.isEmpty()) {
       temp.append('_').append(variant);
       result.add(0, temp.toString());
     }
@@ -548,8 +558,8 @@ public final class Utils {
   public static boolean isThreadingEnabled() {
     try {
       MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
-      ObjectName threadingOName = new ObjectName("java.lang:type=Threading");
-      Set<ObjectInstance> threading = mbeanServer.queryMBeans(threadingOName, null);
+      ObjectName objectNameThreading = new ObjectName("java.lang:type=Threading");
+      Set<ObjectInstance> threading = mbeanServer.queryMBeans(objectNameThreading, null);
       return threading != null && !threading.isEmpty();
     } catch (MalformedObjectNameException e) {
       logger.trace("", e);

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -60,6 +60,7 @@ public interface ResourceResolver {
    * Gets the application resources.
    *
    * @return the application resources
+   *
    * @throws NamingException the naming exception
    */
   List<ApplicationResource> getApplicationResources() throws NamingException;
@@ -69,7 +70,9 @@ public interface ResourceResolver {
    *
    * @param context the context
    * @param containerWrapper the container wrapper
+   *
    * @return the application resources
+   *
    * @throws NamingException the naming exception
    */
   List<ApplicationResource> getApplicationResources(Context context,
@@ -81,7 +84,9 @@ public interface ResourceResolver {
    * @param context the context
    * @param resourceName the resource name
    * @param containerWrapper the container wrapper
+   *
    * @return true, if successful
+   *
    * @throws NamingException the naming exception
    */
   boolean resetResource(Context context, String resourceName, ContainerWrapperBean containerWrapper)
@@ -93,7 +98,9 @@ public interface ResourceResolver {
    * @param context the context
    * @param resourceName the resource name
    * @param containerWrapper the container wrapper
+   *
    * @return the data source
+   *
    * @throws NamingException the naming exception
    */
   DataSource lookupDataSource(Context context, String resourceName,
@@ -102,7 +109,7 @@ public interface ResourceResolver {
   /**
    * Method that gets {@link MBeanServer} instance that is "default" for the current environment. It
    * is preferably to use this method to locate the "default" {@link MBeanServer} implementation.
-   * 
+   *
    * @return "default" {@link MBeanServer} instance for the current environment
    */
   MBeanServer getMBeanServer();

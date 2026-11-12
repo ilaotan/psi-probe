@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,11 +10,12 @@
  */
 package psiprobe.controllers.apps;
 
-import java.io.File;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.nio.file.Path;
 
 import org.apache.catalina.Context;
 import org.slf4j.Logger;
@@ -74,13 +75,13 @@ public class BaseDownloadXmlConfController extends AbstractContextHandlerControl
       ServletContext sctx = context.getServletContext();
       xmlPath = sctx.getRealPath("/WEB-INF/web.xml");
     } else if (TARGET_CONTEXT_XML.equals(downloadTarget)) {
-      xmlPath = this.getContainerWrapper().getTomcatContainer().getConfigFile(context).getPath();
+      xmlPath = this.containerWrapper.getTomcatContainer().getConfigFile(context).getPath();
     } else {
       throw new RuntimeException("Unknown download target " + getDownloadTarget());
     }
 
     if (xmlPath != null) {
-      File xmlFile = new File(xmlPath);
+      File xmlFile = Path.of(xmlPath).toFile();
       if (xmlFile.exists()) {
         Utils.sendFile(request, response, xmlFile);
       } else {

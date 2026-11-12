@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,11 +10,11 @@
  */
 package psiprobe.controllers.logs;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.File;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -41,7 +41,7 @@ public class SetupFollowController extends AbstractLogHandlerController {
       LogDestination logDest) throws Exception {
 
     File logFile = logDest.getFile();
-    List<LogDestination> sources = getLogResolver().getLogSources(logFile);
+    List<LogDestination> sources = logResolver.getLogSources(logFile);
     return new ModelAndView(getViewName()).addObject("log", logDest).addObject("sources", sources);
   }
 

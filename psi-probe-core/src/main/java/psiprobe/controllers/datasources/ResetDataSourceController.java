@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,9 +10,10 @@
  */
 package psiprobe.controllers.datasources;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.slf4j.Logger;
@@ -68,7 +69,7 @@ public class ResetDataSourceController extends AbstractContextHandlerController 
   protected ModelAndView handleContext(String contextName, Context context,
       HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-    String resourceName = ServletRequestUtils.getStringParameter(request, "resource", null);
+    String resourceName = ServletRequestUtils.getStringParameter(request, "resource");
     String referer = request.getHeader("Referer");
     String redirectUrl;
     if (referer != null) {
@@ -77,11 +78,11 @@ public class ResetDataSourceController extends AbstractContextHandlerController 
       redirectUrl = request.getContextPath() + getViewName();
     }
 
-    if (resourceName != null && resourceName.length() > 0) {
+    if (resourceName != null && !resourceName.isEmpty()) {
       boolean reset = false;
       try {
-        reset = getContainerWrapper().getResourceResolver().resetResource(context, resourceName,
-            getContainerWrapper());
+        reset = containerWrapper.getResourceResolver().resetResource(context, resourceName,
+            containerWrapper);
       } catch (NamingException e) {
         request.setAttribute("errorMessage", getMessageSourceAccessor()
             .getMessage("probe.src.reset.datasource.notfound", new Object[] {resourceName}));
@@ -89,7 +90,7 @@ public class ResetDataSourceController extends AbstractContextHandlerController 
       }
       if (!reset) {
         request.setAttribute("errorMessage",
-            getMessageSourceAccessor().getMessage("probe.src.reset.datasource.c3p0"));
+            getMessageSourceAccessor().getMessage("probe.src.reset.datasource"));
       }
 
     }
@@ -99,7 +100,7 @@ public class ResetDataSourceController extends AbstractContextHandlerController 
 
   @Override
   protected boolean isContextOptional() {
-    return !getContainerWrapper().getResourceResolver().supportsPrivateResources();
+    return !containerWrapper.getResourceResolver().supportsPrivateResources();
   }
 
   @Value("/resources.htm")

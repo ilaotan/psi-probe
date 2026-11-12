@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,10 +10,13 @@
  */
 package psiprobe.controllers.truststore;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -25,9 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +69,7 @@ public class TrustStoreController extends AbstractTomcatContainerController {
       String trustStore = System.getProperty("javax.net.ssl.trustStore");
       String trustStorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
       if (trustStore != null) {
-        try (InputStream fis = Files.newInputStream(Paths.get(trustStore))) {
+        try (InputStream fis = Files.newInputStream(Path.of(trustStore))) {
           ks.load(fis, trustStorePassword != null ? trustStorePassword.toCharArray() : null);
         } catch (NoSuchAlgorithmException | CertificateException | IOException e) {
           logger.error("", e);
@@ -81,7 +81,7 @@ public class TrustStoreController extends AbstractTomcatContainerController {
             X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
 
             attributes.put("alias", alias);
-            attributes.put("cn", cert.getSubjectDN().toString());
+            attributes.put("cn", cert.getSubjectX500Principal().toString());
             attributes.put("expirationDate",
                 new SimpleDateFormat("yyyy-MM-dd").format(cert.getNotAfter()));
             certificateList.add(attributes);

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -22,19 +22,19 @@ class ThresholdListenerTests {
   private final long defaultThreshold = 10;
 
   /** The listener. */
-  private MockThresholdListener listener = new MockThresholdListener(defaultThreshold);
+  private final MockThresholdListener listener = new MockThresholdListener(defaultThreshold);
 
   /** The below threshold. */
-  private StatsCollectionEvent belowThreshold = new StatsCollectionEvent("test", 0, 0);
+  private final StatsCollectionEvent belowThreshold = new StatsCollectionEvent("test", 0, 0);
 
   /** The above threshold. */
-  private StatsCollectionEvent aboveThreshold = new StatsCollectionEvent("test", 0, 20);
+  private final StatsCollectionEvent aboveThreshold = new StatsCollectionEvent("test", 0, 20);
 
   /**
    * Test first below threshold.
    */
   @Test
-  void testFirstBelowThreshold() {
+  void firstBelowThresholdTest() {
     listener.reset();
     listener.statsCollected(belowThreshold);
     Assertions.assertTrue(listener.isRemainedBelowThreshold());
@@ -44,7 +44,7 @@ class ThresholdListenerTests {
    * Test first above threshold.
    */
   @Test
-  void testFirstAboveThreshold() {
+  void firstAboveThresholdTest() {
     listener.reset();
     listener.statsCollected(aboveThreshold);
     Assertions.assertTrue(listener.isCrossedAboveThreshold());
@@ -54,7 +54,7 @@ class ThresholdListenerTests {
    * Test remain below threshold.
    */
   @Test
-  void testRemainBelowThreshold() {
+  void remainBelowThresholdTest() {
     listener.reset();
     listener.statsCollected(belowThreshold);
     listener.statsCollected(belowThreshold);
@@ -65,7 +65,7 @@ class ThresholdListenerTests {
    * Test remain above threshold.
    */
   @Test
-  void testRemainAboveThreshold() {
+  void remainAboveThresholdTest() {
     listener.reset();
     listener.statsCollected(aboveThreshold);
     listener.statsCollected(aboveThreshold);
@@ -76,7 +76,7 @@ class ThresholdListenerTests {
    * Test crossed below threshold.
    */
   @Test
-  void testCrossedBelowThreshold() {
+  void crossedBelowThresholdTest() {
     listener.reset();
     listener.statsCollected(aboveThreshold);
     listener.statsCollected(belowThreshold);
@@ -87,7 +87,7 @@ class ThresholdListenerTests {
    * Test crossed above threshold.
    */
   @Test
-  void testCrossedAboveThreshold() {
+  void crossedAboveThresholdTest() {
     listener.reset();
     listener.statsCollected(belowThreshold);
     listener.statsCollected(aboveThreshold);

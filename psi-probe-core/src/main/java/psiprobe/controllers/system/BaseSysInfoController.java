@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,14 +10,14 @@
  */
 package psiprobe.controllers.system;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.servlet.ModelAndView;
 
@@ -60,24 +60,6 @@ public class BaseSysInfoController extends AbstractTomcatContainerController {
   }
 
   /**
-   * Gets the runtime info accessor.
-   *
-   * @return the runtime info accessor
-   */
-  public RuntimeInfoAccessorBean getRuntimeInfoAccessor() {
-    return runtimeInfoAccessor;
-  }
-
-  /**
-   * Sets the runtime info accessor.
-   *
-   * @param runtimeInfoAccessor the new runtime info accessor
-   */
-  public void setRuntimeInfoAccessor(RuntimeInfoAccessorBean runtimeInfoAccessor) {
-    this.runtimeInfoAccessor = runtimeInfoAccessor;
-  }
-
-  /**
    * Gets the collection period.
    *
    * @return the collection period
@@ -101,8 +83,8 @@ public class BaseSysInfoController extends AbstractTomcatContainerController {
 
     SystemInformation systemInformation = new SystemInformation();
     systemInformation
-        .setAppBase(getContainerWrapper().getTomcatContainer().getAppBase().getAbsolutePath());
-    systemInformation.setConfigBase(getContainerWrapper().getTomcatContainer().getConfigBase());
+        .setAppBase(containerWrapper.getTomcatContainer().getAppBase().getAbsolutePath());
+    systemInformation.setConfigBase(containerWrapper.getTomcatContainer().getConfigBase());
 
     Map<String, String> sysProps = new HashMap<>();
     for (String propertyName : System.getProperties().stringPropertyNames()) {
@@ -110,7 +92,7 @@ public class BaseSysInfoController extends AbstractTomcatContainerController {
       sysProps.put(propertyName, propertyValue);
     }
 
-    if (!SecurityUtils.hasAttributeValueRole(getServletContext(), request)) {
+    if (!SecurityUtils.hasAttributeValueRole(getServletContext())) {
       for (String key : filterOutKeys) {
         sysProps.remove(key);
       }
@@ -120,7 +102,7 @@ public class BaseSysInfoController extends AbstractTomcatContainerController {
 
     ModelAndView mv = new ModelAndView(getViewName());
     mv.addObject("systemInformation", systemInformation);
-    mv.addObject("runtime", getRuntimeInfoAccessor().getRuntimeInformation());
+    mv.addObject("runtime", runtimeInfoAccessor.getRuntimeInformation());
     mv.addObject("collectionPeriod", getCollectionPeriod());
     return mv;
   }

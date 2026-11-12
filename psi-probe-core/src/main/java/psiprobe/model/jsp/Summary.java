@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,6 +11,7 @@
 package psiprobe.model.jsp;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -54,7 +55,7 @@ public class Summary implements Serializable {
    * @return the items
    */
   public Map<String, Item> getItems() {
-    return items;
+    return items == null ? new HashMap<>() : new HashMap<>(items);
   }
 
   /**
@@ -63,7 +64,20 @@ public class Summary implements Serializable {
    * @param items the items
    */
   public void setItems(Map<String, Item> items) {
-    this.items = items;
+    this.items = items == null ? new HashMap<>() : new HashMap<>(items);
+  }
+
+  /**
+   * Put the items.
+   *
+   * @param string the string
+   * @param item the item
+   */
+  public void putItem(String string, Item item) {
+    if (items == null) {
+      items = new HashMap<>();
+    }
+    items.put(string, item);
   }
 
   /**

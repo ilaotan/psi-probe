@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,6 +11,8 @@
 package psiprobe.model.certificates;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -54,7 +56,7 @@ public class ConnectorInfo implements Serializable {
    * @return the SslHostConfig infos
    */
   public List<SslHostConfigInfo> getSslHostConfigInfos() {
-    return sslHostConfigInfos;
+    return sslHostConfigInfos == null ? List.of() : new ArrayList<>(sslHostConfigInfos);
   }
 
   /**
@@ -62,8 +64,9 @@ public class ConnectorInfo implements Serializable {
    *
    * @param sslHostConfigInfos new SslHostConfig infos
    */
-  public void setSslHostConfigInfos(List<SslHostConfigInfo> sslHostConfigInfos) {
-    this.sslHostConfigInfos = sslHostConfigInfos;
+  public void setSslHostConfigInfos(Collection<SslHostConfigInfo> sslHostConfigInfos) {
+    this.sslHostConfigInfos =
+        sslHostConfigInfos == null ? List.of() : new ArrayList<>(sslHostConfigInfos);
   }
 
   /**

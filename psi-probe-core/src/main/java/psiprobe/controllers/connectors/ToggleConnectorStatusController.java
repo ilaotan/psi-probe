@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,9 +10,9 @@
  */
 package psiprobe.controllers.connectors;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,26 +41,9 @@ public class ToggleConnectorStatusController extends ParameterizableViewControll
   @Inject
   private ConnectorStatsCollectorBean collectorBean;
 
+  /** The container listener. */
   @Inject
   private ContainerListenerBean containerListener;
-
-  /**
-   * Gets the collector bean.
-   *
-   * @return the collector bean
-   */
-  public ConnectorStatsCollectorBean getCollectorBean() {
-    return collectorBean;
-  }
-
-  /**
-   * Sets the collector bean.
-   *
-   * @param collectorBean the new collector bean
-   */
-  public void setCollectorBean(ConnectorStatsCollectorBean collectorBean) {
-    this.collectorBean = collectorBean;
-  }
 
   @RequestMapping(path = "/app/connectorStatus.htm")
   @Override

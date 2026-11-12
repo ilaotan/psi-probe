@@ -1,14 +1,3 @@
-#
-# Licensed under the GPL License. You may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#   https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
-# WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR
-# PURPOSE.
-#
-
 name: Coverity
 
 on:
@@ -16,28 +5,41 @@ on:
     branches:
       - coverity_scan
 
+permissions: read-all
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UPSTREAM_OWNER: psi-probe
+  UPSTREAM_REPO: psi-probe
+
 jobs:
   build:
     if: github.repository_owner == 'psi-probe'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Java
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
         with:
-          java-version: 11
+          cache: maven
+          java-version: 21
+          distribution: zulu
       - name: Analyze with Coverity
         run: |
-          wget -q https://scan.coverity.com/download/linux64 --post-data "token=$COVERITY_TOKEN&project=psi-probe%2Fpsi-probe" -O coverity_tool.tgz
-          tar -xf coverity_tool.tgz
-          ./cov-analysis-linux64-*/bin/cov-build --dir cov-int ./mvnw -B -DskipTests=true verify
-          tar czvf psi-probe.tgz cov-int
-          curl --form token=$COVERITY_TOKEN \
-            --form email=$EMAIL \
-            --form file=@psi-probe.tgz \
-            --form version="psi-probe/coverity_scan" \
-            --form description="psi-probe Coverity Scan" \
-            https://scan.coverity.com/builds?project=psi-probe%2Fpsi-probe
+          wget --quiet https://scan.coverity.com/download/linux64 --post-data "token=${{ env.COVERITY_TOKEN }}&project=${{ env.UPSTREAM_OWNER }}%2F${{ env.UPSTREAM_REPO }}" --output-document=coverity_tool.tgz
+          tar --extract --file=coverity_tool.tgz
+          ./cov-analysis-linux64-*/bin/cov-build --dir cov-int ./mvnw verify --batch-mode --no-transfer-progress --show-version -Dlicense.skip=true -Dmaven.compiler.fork=true -DskipTests=true
+          tar --create --gzip --verbose --file=${{ env.UPSTREAM_REPO }}.tgz cov-int
+          curl --form token=${{ env.COVERITY_TOKEN }} \
+            --form email=${{ env.EMAIL }} \
+            --form file=@${{ env.UPSTREAM_REPO }}.tgz \
+            --form version="${{ env.UPSTREAM_REPO }}/coverity_scan" \
+            --form description="${{ env.UPSTREAM_OWNER }} Coverity Scan" \
+            https://scan.coverity.com/builds?project=${{ env.UPSTREAM_OWNER }}%2F${{ env.UPSTREAM_REPO }}
         env:
           COVERITY_TOKEN: ${{ secrets.COVERITY_TOKEN }}
           EMAIL: ${{ secrets.EMAIL }}

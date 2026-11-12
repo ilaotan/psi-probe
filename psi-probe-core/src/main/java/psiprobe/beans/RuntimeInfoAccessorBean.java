@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -13,6 +13,7 @@ package psiprobe.beans;
 import java.lang.management.ManagementFactory;
 
 import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 import org.slf4j.Logger;
@@ -33,49 +34,52 @@ public class RuntimeInfoAccessorBean {
    * Gets the runtime information.
    *
    * @return the runtime information
-   * @throws Exception the exception
    */
-  public RuntimeInformation getRuntimeInformation() throws Exception {
+  public RuntimeInformation getRuntimeInformation() {
     MBeanServer mbeanServer = ManagementFactory.getPlatformMBeanServer();
     RuntimeInformation ri = new RuntimeInformation();
 
     try {
-      ObjectName runtimeOName = new ObjectName("java.lang:type=Runtime");
-      ri.setStartTime(JmxTools.getLongAttr(mbeanServer, runtimeOName, "StartTime"));
-      ri.setUptime(JmxTools.getLongAttr(mbeanServer, runtimeOName, "Uptime"));
-      ri.setVmVendor(JmxTools.getStringAttr(mbeanServer, runtimeOName, "VmVendor"));
+      ObjectName objectNameRuntime = new ObjectName("java.lang:type=Runtime");
+      ri.setStartTime(JmxTools.getLongAttr(mbeanServer, objectNameRuntime, "StartTime"));
+      ri.setUptime(JmxTools.getLongAttr(mbeanServer, objectNameRuntime, "Uptime"));
+      ri.setVmVendor(JmxTools.getStringAttr(mbeanServer, objectNameRuntime, "VmVendor"));
 
-      ObjectName osOName = new ObjectName("java.lang:type=OperatingSystem");
-      ri.setOsName(JmxTools.getStringAttr(mbeanServer, osOName, "Name"));
-      ri.setOsVersion(JmxTools.getStringAttr(mbeanServer, osOName, "Version"));
+      ObjectName objectNameOperationSystem = new ObjectName("java.lang:type=OperatingSystem");
+      ri.setOsName(JmxTools.getStringAttr(mbeanServer, objectNameOperationSystem, "Name"));
+      ri.setOsVersion(JmxTools.getStringAttr(mbeanServer, objectNameOperationSystem, "Version"));
 
       if (!ri.getVmVendor().startsWith("IBM Corporation")) {
-        ri.setTotalPhysicalMemorySize(
-            JmxTools.getLongAttr(mbeanServer, osOName, "TotalPhysicalMemorySize"));
-        ri.setCommittedVirtualMemorySize(
-            JmxTools.getLongAttr(mbeanServer, osOName, "CommittedVirtualMemorySize"));
+        ri.setTotalPhysicalMemorySize(JmxTools.getLongAttr(mbeanServer, objectNameOperationSystem,
+            "TotalPhysicalMemorySize"));
+        ri.setCommittedVirtualMemorySize(JmxTools.getLongAttr(mbeanServer,
+            objectNameOperationSystem, "CommittedVirtualMemorySize"));
         ri.setFreePhysicalMemorySize(
-            JmxTools.getLongAttr(mbeanServer, osOName, "FreePhysicalMemorySize"));
-        ri.setFreeSwapSpaceSize(JmxTools.getLongAttr(mbeanServer, osOName, "FreeSwapSpaceSize"));
-        ri.setTotalSwapSpaceSize(JmxTools.getLongAttr(mbeanServer, osOName, "TotalSwapSpaceSize"));
-        ri.setProcessCpuTime(JmxTools.getLongAttr(mbeanServer, osOName, "ProcessCpuTime"));
+            JmxTools.getLongAttr(mbeanServer, objectNameOperationSystem, "FreePhysicalMemorySize"));
+        ri.setFreeSwapSpaceSize(
+            JmxTools.getLongAttr(mbeanServer, objectNameOperationSystem, "FreeSwapSpaceSize"));
+        ri.setTotalSwapSpaceSize(
+            JmxTools.getLongAttr(mbeanServer, objectNameOperationSystem, "TotalSwapSpaceSize"));
+        ri.setProcessCpuTime(
+            JmxTools.getLongAttr(mbeanServer, objectNameOperationSystem, "ProcessCpuTime"));
         ri.setAvailableProcessors(Runtime.getRuntime().availableProcessors());
       } else {
         ri.setTotalPhysicalMemorySize(
-            JmxTools.getLongAttr(mbeanServer, osOName, "TotalPhysicalMemory"));
+            JmxTools.getLongAttr(mbeanServer, objectNameOperationSystem, "TotalPhysicalMemory"));
       }
 
-      if (JmxTools.hasAttribute(mbeanServer, osOName, "OpenFileDescriptorCount")
-          && JmxTools.hasAttribute(mbeanServer, osOName, "MaxFileDescriptorCount")) {
+      if (JmxTools.hasAttribute(mbeanServer, objectNameOperationSystem, "OpenFileDescriptorCount")
+          && JmxTools.hasAttribute(mbeanServer, objectNameOperationSystem,
+              "MaxFileDescriptorCount")) {
 
-        ri.setOpenFileDescriptorCount(
-            JmxTools.getLongAttr(mbeanServer, osOName, "OpenFileDescriptorCount"));
+        ri.setOpenFileDescriptorCount(JmxTools.getLongAttr(mbeanServer, objectNameOperationSystem,
+            "OpenFileDescriptorCount"));
         ri.setMaxFileDescriptorCount(
-            JmxTools.getLongAttr(mbeanServer, osOName, "MaxFileDescriptorCount"));
+            JmxTools.getLongAttr(mbeanServer, objectNameOperationSystem, "MaxFileDescriptorCount"));
       }
 
       return ri;
-    } catch (Exception e) {
+    } catch (MalformedObjectNameException e) {
       logger.debug("OS information is unavailable");
       logger.trace("", e);
       return null;

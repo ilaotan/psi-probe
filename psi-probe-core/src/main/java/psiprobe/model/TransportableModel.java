@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -27,7 +27,7 @@ public class TransportableModel {
    * @return the items
    */
   public Map<String, Object> getItems() {
-    return items;
+    return items == null ? new HashMap<>() : new HashMap<>(items);
   }
 
   /**
@@ -36,7 +36,7 @@ public class TransportableModel {
    * @param items the items
    */
   public void setItems(Map<String, Object> items) {
-    this.items = items;
+    this.items = items == null ? new HashMap<>() : new HashMap<>(items);
   }
 
   /**
@@ -45,7 +45,9 @@ public class TransportableModel {
    * @param map the map
    */
   public void putAll(Map<String, Object> map) {
-    items.putAll(map);
+    if (map != null) {
+      items.putAll(new HashMap<>(map));
+    }
   }
 
 }

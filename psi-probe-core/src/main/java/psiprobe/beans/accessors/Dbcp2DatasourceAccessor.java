@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -20,7 +20,7 @@ import psiprobe.model.DataSourceInfo;
 public class Dbcp2DatasourceAccessor implements DatasourceAccessor {
 
   @Override
-  public DataSourceInfo getInfo(Object resource) throws Exception {
+  public DataSourceInfo getInfo(Object resource) {
     DataSourceInfo dataSourceInfo = null;
     if (canMap(resource)) {
       BasicDataSource source = (BasicDataSource) resource;
@@ -29,7 +29,7 @@ public class Dbcp2DatasourceAccessor implements DatasourceAccessor {
       dataSourceInfo.setEstablishedConnections(source.getNumIdle() + source.getNumActive());
       dataSourceInfo.setMaxConnections(source.getMaxTotal());
       dataSourceInfo.setJdbcUrl(source.getUrl());
-      dataSourceInfo.setUsername(source.getUsername());
+      dataSourceInfo.setUsername(source.getUserName());
       dataSourceInfo.setResettable(false);
       dataSourceInfo.setType("commons-dbcp2");
     }
@@ -37,7 +37,7 @@ public class Dbcp2DatasourceAccessor implements DatasourceAccessor {
   }
 
   @Override
-  public boolean reset(Object resource) throws Exception {
+  public boolean reset(Object resource) {
     return false;
   }
 

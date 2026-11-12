@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -9,6 +9,8 @@
  * PURPOSE.
  */
 package psiprobe.tools.logging.jdk;
+
+import com.google.common.base.Strings;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -73,7 +75,7 @@ public class Jdk14LoggerAccessor extends DefaultAccessor {
    * @return true, if is root
    */
   public boolean isRoot() {
-    return "".equals(getName()) || isJuliRoot();
+    return Strings.isNullOrEmpty(getName()) || isJuliRoot();
   }
 
   /**
@@ -98,6 +100,7 @@ public class Jdk14LoggerAccessor extends DefaultAccessor {
    * Gets the handler.
    *
    * @param logIndex the log index
+   *
    * @return the handler
    */
   public Jdk14HandlerAccessor getHandler(String logIndex) {
@@ -115,6 +118,7 @@ public class Jdk14LoggerAccessor extends DefaultAccessor {
    * Gets the handler.
    *
    * @param index the index
+   *
    * @return the handler
    */
   public Jdk14HandlerAccessor getHandler(int index) {
@@ -171,7 +175,9 @@ public class Jdk14LoggerAccessor extends DefaultAccessor {
    * Gets the level internal.
    *
    * @param target the target
+   *
    * @return the level internal
+   *
    * @throws Exception the exception
    */
   private Object getLevelInternal(Object target) throws Exception {
@@ -183,6 +189,7 @@ public class Jdk14LoggerAccessor extends DefaultAccessor {
    *
    * @param handler the handler
    * @param index the index
+   *
    * @return the jdk14 handler accessor
    */
   private Jdk14HandlerAccessor wrapHandler(Object handler, int index) {

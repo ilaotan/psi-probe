@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,7 +10,7 @@
  */
 package psiprobe.model;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * The Class IpInfo.
@@ -27,6 +27,7 @@ public class IpInfo {
    * Instantiates a new ip info.
    *
    * @param request the request
+   *
    * @return the ip info
    */
   public IpInfo builder(HttpServletRequest request) {
@@ -82,13 +83,14 @@ public class IpInfo {
    * Gets the client address.
    *
    * @param request the request
+   *
    * @return the client address
    */
   public static String getClientAddress(HttpServletRequest request) {
     String addr = request.getRemoteAddr();
     String fwdHeader = request.getHeader("X-Forwarded-For");
     if (fwdHeader != null) {
-      addr = fwdHeader.split(",")[0];
+      addr = fwdHeader.split(",", -1)[0];
     }
     return addr;
   }

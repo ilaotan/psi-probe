@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,13 +10,10 @@
  */
 package psiprobe.jsp;
 
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.tagext.TagSupport;
+
 import java.io.IOException;
-
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Silly JSP tag to display duration in milliseconds as hours:minutes:seconds.milliseconds
@@ -25,9 +22,6 @@ public class DurationTag extends TagSupport {
 
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 1L;
-
-  /** The Constant logger. */
-  private static final Logger logger = LoggerFactory.getLogger(DurationTag.class);
 
   /** The value. */
   private long value;
@@ -46,8 +40,7 @@ public class DurationTag extends TagSupport {
     try {
       pageContext.getOut().write(duration(value));
     } catch (IOException e) {
-      logger.debug("Exception writing duration to JspWriter", e);
-      throw new JspException(e);
+      throw new JspException("Exception writing duration to JspWriter", e);
     }
     return EVAL_BODY_INCLUDE;
   }
@@ -56,6 +49,7 @@ public class DurationTag extends TagSupport {
    * Duration.
    *
    * @param value the value
+   *
    * @return the string
    */
   public static String duration(long value) {
@@ -74,6 +68,7 @@ public class DurationTag extends TagSupport {
    * Long2 str.
    *
    * @param value the value
+   *
    * @return the string
    */
   private static String long2Str(long value) {
@@ -84,16 +79,17 @@ public class DurationTag extends TagSupport {
    * Long3 str.
    *
    * @param value the value
+   *
    * @return the string
    */
   private static String long3Str(long value) {
     if (value < 10) {
       return "00" + value;
-    } else if (value < 100) {
-      return "0" + value;
-    } else {
-      return Long.toString(value);
     }
+    if (value < 100) {
+      return "0" + value;
+    }
+    return Long.toString(value);
   }
 
 }

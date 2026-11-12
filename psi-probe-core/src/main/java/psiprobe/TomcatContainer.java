@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -13,7 +13,6 @@ package psiprobe;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -37,6 +36,7 @@ public interface TomcatContainer {
    * Finds a context based on its path.
    *
    * @param name the context path
+   *
    * @return the context deployed to that path
    */
   Context findContext(String name);
@@ -46,6 +46,7 @@ public interface TomcatContainer {
    * prepending a {@code /} character, although there is special behavior for the root context.
    *
    * @param name the context name
+   *
    * @return the context name formatted as the container expects
    */
   String formatContextName(String name);
@@ -56,6 +57,7 @@ public interface TomcatContainer {
    * is special behavior for the root context.
    *
    * @param contextName the context name
+   *
    * @return the filename stem for this context
    */
   String formatContextFilename(String contextName);
@@ -78,6 +80,7 @@ public interface TomcatContainer {
    * Stops the context with the given name.
    *
    * @param name the name of the context to stop
+   *
    * @throws Exception if stopping the context fails spectacularly
    */
   void stop(String name) throws Exception;
@@ -86,14 +89,16 @@ public interface TomcatContainer {
    * Starts the context with the given name.
    *
    * @param name the name of the context to start
+   *
    * @throws Exception if starting the context fails spectacularly
    */
   void start(String name) throws Exception;
 
   /**
    * Undeploys a context.
-   * 
+   *
    * @param name the context path
+   *
    * @throws Exception if undeployment fails spectacularly
    */
   void remove(String name) throws Exception;
@@ -102,10 +107,10 @@ public interface TomcatContainer {
    * Installs .war file at the given context name.
    *
    * @param name the name of the context
-   * @param url pointer to .war file to be deployed
+   *
    * @throws Exception if installing the .war fails spectacularly
    */
-  void installWar(String name, URL url) throws Exception;
+  void installWar(String name) throws Exception;
 
   /**
    * This method always returns absolute path, no matter what Tomcat is up to.
@@ -118,6 +123,7 @@ public interface TomcatContainer {
    * Returns the context descriptor filename for the given context.
    *
    * @param context the context
+   *
    * @return the context descriptor filename, or {@code null}
    */
   File getConfigFile(Context context);
@@ -140,15 +146,18 @@ public interface TomcatContainer {
    * Indicates whether this adapter can bind to the container.
    *
    * @param binding the ServerInfo of the container
+   *
    * @return true if binding is possible
    */
   boolean canBoundTo(String binding);
 
   /**
    * Deploys a context, assuming an context descriptor file exists on the server already.
-   * 
+   *
    * @param contextName the context path, which should match the filename
+   *
    * @return {@code true} if deployment was successful
+   *
    * @throws Exception if deployment fails spectacularly
    */
   boolean installContext(String contextName) throws Exception;
@@ -199,6 +208,7 @@ public interface TomcatContainer {
    *
    * @param context the context
    * @param jspName the JSP filename
+   *
    * @return the name of the JSP servlet
    */
   String getServletFileNameForJsp(Context context, String jspName);
@@ -207,6 +217,7 @@ public interface TomcatContainer {
    * Gets the application filter maps.
    *
    * @param context the context
+   *
    * @return the application filter maps
    */
   List<FilterMapping> getApplicationFilterMaps(Context context);
@@ -215,6 +226,7 @@ public interface TomcatContainer {
    * Gets the available.
    *
    * @param context the context
+   *
    * @return the available
    */
   boolean getAvailable(Context context);
@@ -224,25 +236,22 @@ public interface TomcatContainer {
    *
    * @param context the context
    * @param resourceList the resource list
-   * @param contextBound the context bound
    */
-  void addContextResource(Context context, List<ApplicationResource> resourceList,
-      boolean contextBound);
+  void addContextResource(Context context, List<ApplicationResource> resourceList);
 
   /**
    * Adds the context resource link.
    *
    * @param context the context
    * @param resourceList the resource list
-   * @param contextBound the context bound
    */
-  void addContextResourceLink(Context context, List<ApplicationResource> resourceList,
-      boolean contextBound);
+  void addContextResourceLink(Context context, List<ApplicationResource> resourceList);
 
   /**
    * Gets the application filters.
    *
    * @param context the context
+   *
    * @return the application filters
    */
   List<FilterInfo> getApplicationFilters(Context context);
@@ -251,6 +260,7 @@ public interface TomcatContainer {
    * Gets the application init params.
    *
    * @param context the context
+   *
    * @return the application init params
    */
   List<ApplicationParam> getApplicationInitParams(Context context);
@@ -260,6 +270,7 @@ public interface TomcatContainer {
    *
    * @param name the name
    * @param context the context
+   *
    * @return true, if successful
    */
   boolean resourceExists(String name, Context context);
@@ -269,7 +280,9 @@ public interface TomcatContainer {
    *
    * @param name the name
    * @param context the context
+   *
    * @return the resource stream
+   *
    * @throws IOException Signals that an I/O exception has occurred.
    */
   InputStream getResourceStream(String name, Context context) throws IOException;
@@ -279,6 +292,7 @@ public interface TomcatContainer {
    *
    * @param name the name
    * @param context the context
+   *
    * @return the resource attributes
    */
   Long[] getResourceAttributes(String name, Context context);
@@ -287,6 +301,7 @@ public interface TomcatContainer {
    * Binds a naming context to the current thread's classloader.
    *
    * @param context the catalina context
+   *
    * @throws NamingException if binding the classloader fails
    */
   void bindToContext(Context context) throws NamingException;
@@ -295,6 +310,7 @@ public interface TomcatContainer {
    * Unbinds a naming context from the current thread's classloader.
    *
    * @param context the catalina context
+   *
    * @throws NamingException if unbinding the classloader fails
    */
   void unbindFromContext(Context context) throws NamingException;

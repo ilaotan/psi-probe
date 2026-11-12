@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,6 +11,7 @@
 package psiprobe.model.jmx;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -198,14 +199,13 @@ public class Cluster {
     this.mcastClusterDomain = mcastClusterDomain;
   }
 
-
   /**
    * Gets the members.
    *
    * @return the members
    */
   public List<ClusterSender> getMembers() {
-    return members;
+    return members == null ? List.of() : new ArrayList<>(members);
   }
 
   /**
@@ -213,8 +213,8 @@ public class Cluster {
    *
    * @param members the new members
    */
-  public void setMembers(List<ClusterSender> members) {
-    this.members = members;
+  public void setMembers(Collection<ClusterSender> members) {
+    this.members = members == null ? List.of() : new ArrayList<>(members);
   }
 
   /**

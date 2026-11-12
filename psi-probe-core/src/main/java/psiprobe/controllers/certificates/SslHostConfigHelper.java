@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
+import org.apache.commons.beanutils2.BeanUtils;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 
@@ -34,25 +34,27 @@ public class SslHostConfigHelper {
    *
    * @param protocol the protocol
    * @param info the info
+   *
    * @throws IllegalAccessException the illegal access exception
    * @throws InvocationTargetException the invocation target exception
    */
-  public SslHostConfigHelper(AbstractHttp11JsseProtocol<?> protocol, ConnectorInfo info)
+  public SslHostConfigHelper(AbstractHttp11Protocol<?> protocol, ConnectorInfo info)
       throws IllegalAccessException, InvocationTargetException {
     SSLHostConfig[] sslHostConfigs = protocol.findSslHostConfigs();
     List<SslHostConfigInfo> sslHostConfigInfos = new ArrayList<>(sslHostConfigs.length);
-    info.setSslHostConfigInfos(sslHostConfigInfos);
-
     for (SSLHostConfig sslHostConfig : sslHostConfigs) {
       sslHostConfigInfos.add(toSslHostConfigInfo(sslHostConfig));
     }
+    info.setSslHostConfigInfos(sslHostConfigInfos);
   }
 
   /**
    * To SslHostConfig info.
-   * 
+   *
    * @param sslHostConfig the SslHostConfig
+   *
    * @return the SslHostConfig info
+   *
    * @throws IllegalAccessException the illegal access exception
    * @throws InvocationTargetException the invocation target exception
    */
@@ -63,19 +65,21 @@ public class SslHostConfigHelper {
 
     Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates();
     List<CertificateInfo> certificateInfos = new ArrayList<>(certificates.size());
-    sslHostConfigInfo.setCertificateInfos(certificateInfos);
     for (SSLHostConfigCertificate sslHostConfigCertificate : certificates) {
       certificateInfos.add(toCertificateInfo(sslHostConfigCertificate));
     }
+    sslHostConfigInfo.setCertificateInfos(certificateInfos);
 
     return sslHostConfigInfo;
   }
 
   /**
    * To certificate info.
-   * 
+   *
    * @param sslHostConfigCertificate the SslHostConfigCertificate
+   *
    * @return the certificate info
+   *
    * @throws IllegalAccessException the illegal access exception
    * @throws InvocationTargetException the invocation target exception
    */

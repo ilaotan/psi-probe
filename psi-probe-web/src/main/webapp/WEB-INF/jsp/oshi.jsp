@@ -12,28 +12,30 @@
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="false"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 
-<html>
-	<head>
-		<title><spring:message code="probe.jsp.sysinfo.oshi.title"/></title>
-	</head>
+<!DOCTYPE html>
+<html lang="${lang}">
+    <head>
+        <title><spring:message code="probe.jsp.sysinfo.oshi.title"/></title>
+        <script src="<c:url value='/js/prototype.js'/>"></script>
+    </head>
 
-	<c:set var="navTabSystem" value="active" scope="request"/>
-	<c:set var="systemTabOshi" value="active" scope="request"/>
-	<c:set var="use_decorator" value="system" scope="request"/>
+    <c:set var="navTabSystem" value="active" scope="request"/>
+    <c:set var="systemTabOshi" value="active" scope="request"/>
+    <c:set var="use_decorator" value="system" scope="request"/>
 
-	<body>
-		<div id="oshi">
-			<h3><spring:message code="probe.jsp.sysinfo.oshi.title"/></h3>
-			<table>
-				<c:forEach items="${oshi}" var="oshi">
-					<tr>
-						<td style="white-space: pre"><c:out value="${oshi}" /></td>
-					</tr>
-				</c:forEach>
-			</table>
-		</div>
-	</body>
+    <body>
+        <div id="oshi">
+            <h3><spring:message code="probe.jsp.sysinfo.oshi.title"/></h3>
+            <table>
+                <c:forEach items="${oshi}" var="oshi">
+                    <tr>
+                        <td style="white-space: pre"><c:out value="${oshi}" /></td>
+                    </tr>
+                </c:forEach>
+            </table>
+        </div>
+    </body>
 </html>

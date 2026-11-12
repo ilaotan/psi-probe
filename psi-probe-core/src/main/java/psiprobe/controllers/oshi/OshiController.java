@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -9,7 +9,7 @@
  * PURPOSE.
  */
 
-/**
+/*
  * MIT License
  *
  * Copyright (c) 2010 - 2020 The OSHI Project Contributors: https://github.com/oshi/oshi/graphs/contributors
@@ -34,13 +34,14 @@
  */
 package psiprobe.controllers.oshi;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +50,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import oshi.PlatformEnum;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
+import oshi.hardware.CentralProcessor.PhysicalProcessor;
 import oshi.hardware.CentralProcessor.TickType;
 import oshi.hardware.ComputerSystem;
 import oshi.hardware.Display;
@@ -60,6 +61,7 @@ import oshi.hardware.GraphicsCard;
 import oshi.hardware.HWDiskStore;
 import oshi.hardware.HWPartition;
 import oshi.hardware.HardwareAbstractionLayer;
+import oshi.hardware.LogicalVolumeGroup;
 import oshi.hardware.NetworkIF;
 import oshi.hardware.PhysicalMemory;
 import oshi.hardware.PowerSource;
@@ -75,8 +77,10 @@ import oshi.software.os.OSProcess;
 import oshi.software.os.OSService;
 import oshi.software.os.OSSession;
 import oshi.software.os.OperatingSystem;
-import oshi.software.os.OperatingSystem.ProcessSort;
+import oshi.software.os.OperatingSystem.ProcessFiltering;
+import oshi.software.os.OperatingSystem.ProcessSorting;
 import oshi.util.FormatUtil;
+import oshi.util.PlatformEnum;
 import oshi.util.Util;
 
 import psiprobe.controllers.AbstractTomcatContainerController;
@@ -136,15 +140,28 @@ public class OshiController extends AbstractTomcatContainerController {
   }
 
   /**
-   * Process initialization using Oshi System Info Test (code copied from Oshi SystemInfoTest.main).
+   * Process initialization using Oshi System Info Test.
    * <p>
-   * Logging switched from 'info' to 'debug' for psi probe usage.
+   * Code copied and adjusted for Psi Probem from Oshi SystemInfoTest.main at revision
+   *
+   * <pre>
+   * https://github.com/oshi/oshi/blob/cf45b1f528f99ca353655dea5f154940c76c0bdb/oshi-core/src/test/java/oshi/SystemInfoTest.java
+   * </pre>
+   *
+   * <pre>
+   * Psi Probe differences
+   * - Noted directly in area of change as possible
+   * - Logging switched from 'info' to 'debug'
+   * - Javadocs throughout
+   * - Formatting differences (2 vs 4 spaces)
+   * </pre>
    */
   private void initialize() {
     logger.debug("Initializing System...");
     SystemInfo si = new SystemInfo();
 
-    if (PlatformEnum.UNKNOWN.equals(SystemInfo.getCurrentPlatformEnum())) {
+    // Psi Probe adjusted oshi initial test to confirm platform supported before attempting to run
+    if (PlatformEnum.UNKNOWN.equals(PlatformEnum.getCurrentPlatform())) {
       logger.error("Oshi not supported on current platform");
       oshi.add("Oshi not supported on current platform");
       oshi.add("");
@@ -183,6 +200,9 @@ public class OshiController extends AbstractTomcatContainerController {
     logger.debug("Checking Disks...");
     printDisks(hal.getDiskStores());
 
+    logger.debug("Checking Logical Volume Groups ...");
+    printLogicalVolumegroups(hal.getLogicalVolumeGroups());
+
     logger.debug("Checking File System...");
     printFileSystem(os.getFileSystem());
 
@@ -207,12 +227,14 @@ public class OshiController extends AbstractTomcatContainerController {
     logger.debug("Checking Graphics Cards...");
     printGraphicsCards(hal.getGraphicsCards());
 
+    // Psi Probe addition to note finished
     oshi.add("Finished Operating System and Hardware Info Dump");
 
     StringBuilder output = new StringBuilder();
-    for (int i = 0; i < oshi.size(); i++) {
-      output.append(oshi.get(i));
-      if (oshi.get(i) != null && !oshi.get(i).equals("\n")) {
+    for (String element : oshi) {
+      output.append(element);
+      // Psi Probe fix as output check 'endsWith' was wrong
+      if (!"\n".equals(element)) {
         output.append('\n');
       }
     }
@@ -254,6 +276,13 @@ public class OshiController extends AbstractTomcatContainerController {
    */
   private static void printProcessor(CentralProcessor processor) {
     oshi.add(processor.toString());
+    oshi.add(" Cores:");
+    for (PhysicalProcessor p : processor.getPhysicalProcessors()) {
+      oshi.add(
+          "  " + (processor.getPhysicalPackageCount() > 1 ? p.getPhysicalPackageNumber() + "," : "")
+              + p.getPhysicalProcessorNumber() + ": efficiency=" + p.getEfficiency() + ", id="
+              + p.getIdString());
+    }
   }
 
   /**
@@ -284,7 +313,6 @@ public class OshiController extends AbstractTomcatContainerController {
         + processor.getInterrupts());
 
     long[] prevTicks = processor.getSystemCpuLoadTicks();
-    long[][] prevProcTicks = processor.getProcessorCpuLoadTicks();
     oshi.add("CPU, IOWait, and IRQ ticks @ 0 sec:" + Arrays.toString(prevTicks));
     // Wait a second...
     Util.sleep(1000);
@@ -300,23 +328,23 @@ public class OshiController extends AbstractTomcatContainerController {
     long steal = ticks[TickType.STEAL.getIndex()] - prevTicks[TickType.STEAL.getIndex()];
     long totalCpu = user + nice + sys + idle + iowait + irq + softirq + steal;
 
-    oshi.add(String.format(
-        "User: %.1f%% Nice: %.1f%% System: %.1f%% Idle: %.1f%% IOwait: %.1f%% IRQ: %.1f%% SoftIRQ: %.1f%% Steal: %.1f%%",
-        100d * user / totalCpu, 100d * nice / totalCpu, 100d * sys / totalCpu,
-        100d * idle / totalCpu, 100d * iowait / totalCpu, 100d * irq / totalCpu,
-        100d * softirq / totalCpu, 100d * steal / totalCpu));
     oshi.add(
-        String.format("CPU load: %.1f%%", processor.getSystemCpuLoadBetweenTicks(prevTicks) * 100));
+        "User: %.1f%% Nice: %.1f%% System: %.1f%% Idle: %.1f%% IOwait: %.1f%% IRQ: %.1f%% SoftIRQ: %.1f%% Steal: %.1f%%"
+            .formatted(100d * user / totalCpu, 100d * nice / totalCpu, 100d * sys / totalCpu,
+                100d * idle / totalCpu, 100d * iowait / totalCpu, 100d * irq / totalCpu,
+                100d * softirq / totalCpu, 100d * steal / totalCpu));
+    oshi.add("CPU load: %.1f%%".formatted(processor.getSystemCpuLoadBetweenTicks(prevTicks) * 100));
     double[] loadAverage = processor.getSystemLoadAverage(3);
-    oshi.add("CPU load averages:"
-        + (loadAverage[0] < 0 ? " N/A" : String.format(" %.2f", loadAverage[0]))
-        + (loadAverage[1] < 0 ? " N/A" : String.format(" %.2f", loadAverage[1]))
-        + (loadAverage[2] < 0 ? " N/A" : String.format(" %.2f", loadAverage[2])));
+    oshi.add(
+        "CPU load averages:" + (loadAverage[0] < 0 ? " N/A" : " %.2f".formatted(loadAverage[0]))
+            + (loadAverage[1] < 0 ? " N/A" : " %.2f".formatted(loadAverage[1]))
+            + (loadAverage[2] < 0 ? " N/A" : " %.2f".formatted(loadAverage[2])));
     // per core CPU
     StringBuilder procCpu = new StringBuilder("CPU load per processor:");
+    long[][] prevProcTicks = processor.getProcessorCpuLoadTicks();
     double[] load = processor.getProcessorCpuLoadBetweenTicks(prevProcTicks);
     for (double avg : load) {
-      procCpu.append(String.format(" %.1f%%", avg * 100));
+      procCpu.append(" %.1f%%".formatted(avg * 100));
     }
     oshi.add(procCpu.toString());
     long freq = processor.getProcessorIdentifier().getVendorFreq();
@@ -353,15 +381,25 @@ public class OshiController extends AbstractTomcatContainerController {
         + Long.toBinaryString(myProc.getAffinityMask()));
     oshi.add("Processes: " + os.getProcessCount() + ", Threads: " + os.getThreadCount());
     // Sort by highest CPU
-    List<OSProcess> procs = os.getProcesses(5, ProcessSort.CPU);
+    List<OSProcess> procs =
+        os.getProcesses(ProcessFiltering.ALL_PROCESSES, ProcessSorting.CPU_DESC, 5);
     oshi.add("   PID  %CPU %MEM       VSZ       RSS Name");
     for (int i = 0; i < procs.size() && i < 5; i++) {
       OSProcess p = procs.get(i);
-      oshi.add(String.format(" %5d %5.1f %4.1f %9s %9s %s", p.getProcessID(),
+      oshi.add(" %5d %5.1f %4.1f %9s %9s %s".formatted(p.getProcessID(),
           100d * (p.getKernelTime() + p.getUserTime()) / p.getUpTime(),
-          100d * p.getResidentSetSize() / memory.getTotal(),
-          FormatUtil.formatBytes(p.getVirtualSize()),
-          FormatUtil.formatBytes(p.getResidentSetSize()), p.getName()));
+          100d * p.getResidentMemory() / memory.getTotal(),
+          FormatUtil.formatBytes(p.getVirtualSize()), FormatUtil.formatBytes(p.getResidentMemory()),
+          p.getName()));
+    }
+    OSProcess p = os.getProcess(os.getProcessId());
+    oshi.add("Current process arguments: ");
+    for (String s : p.getArguments()) {
+      oshi.add("  " + s);
+    }
+    oshi.add("Current process environment: ");
+    for (Entry<String, String> e : p.getEnvironmentVariables().entrySet()) {
+      oshi.add("  " + e.getKey() + '=' + e.getValue());
     }
   }
 
@@ -377,13 +415,13 @@ public class OshiController extends AbstractTomcatContainerController {
     int i = 0;
     for (OSService s : os.getServices()) {
       if (s.getState().equals(OSService.State.RUNNING) && i++ < 5) {
-        oshi.add(String.format(" %5d  %7s  %s", s.getProcessID(), s.getState(), s.getName()));
+        oshi.add(" %5d  %7s  %s".formatted(s.getProcessID(), s.getState(), s.getName()));
       }
     }
     i = 0;
     for (OSService s : os.getServices()) {
       if (s.getState().equals(OSService.State.STOPPED) && i++ < 5) {
-        oshi.add(String.format(" %5d  %7s  %s", s.getProcessID(), s.getState(), s.getName()));
+        oshi.add(" %5d  %7s  %s".formatted(s.getProcessID(), s.getState(), s.getName()));
       }
     }
   }
@@ -432,6 +470,20 @@ public class OshiController extends AbstractTomcatContainerController {
   }
 
   /**
+   * Prints the logical volume groups.
+   *
+   * @param list the logical volume groups
+   */
+  private static void printLogicalVolumegroups(List<LogicalVolumeGroup> list) {
+    if (!list.isEmpty()) {
+      oshi.add("Logical Volume Groups:");
+      for (LogicalVolumeGroup lvg : list) {
+        oshi.add(" " + lvg.toString());
+      }
+    }
+  }
+
+  /**
    * Prints the file system.
    *
    * @param fileSystem the file system
@@ -439,23 +491,21 @@ public class OshiController extends AbstractTomcatContainerController {
   private static void printFileSystem(FileSystem fileSystem) {
     oshi.add("File System:");
 
-    oshi.add(String.format(" File Descriptors: %d/%d", fileSystem.getOpenFileDescriptors(),
+    oshi.add(" File Descriptors: %d/%d".formatted(fileSystem.getOpenFileDescriptors(),
         fileSystem.getMaxFileDescriptors()));
 
     for (OSFileStore fs : fileSystem.getFileStores()) {
       long usable = fs.getUsableSpace();
       long total = fs.getTotalSpace();
-      oshi.add(String.format(
-          " %s (%s) [%s] %s of %s free (%.1f%%), %s of %s files free (%.1f%%) is %s "
-              + (fs.getLogicalVolume() != null && fs.getLogicalVolume().length() > 0 ? "[%s]"
-                  : "%s")
-              + " and is mounted at %s",
-          fs.getName(), fs.getDescription().isEmpty() ? "file system" : fs.getDescription(),
-          fs.getType(), FormatUtil.formatBytes(usable), FormatUtil.formatBytes(fs.getTotalSpace()),
-          100d * usable / total, FormatUtil.formatValue(fs.getFreeInodes(), ""),
-          FormatUtil.formatValue(fs.getTotalInodes(), ""),
-          100d * fs.getFreeInodes() / fs.getTotalInodes(), fs.getVolume(), fs.getLogicalVolume(),
-          fs.getMount()));
+      oshi.add((" %s (%s) [%s] %s of %s free (%.1f%%), %s of %s files free (%.1f%%) is %s "
+          + (fs.getLogicalVolume() != null && !fs.getLogicalVolume().isEmpty() ? "[%s]" : "%s")
+          + " and is mounted at %s").formatted(fs.getName(),
+              fs.getDescription().isEmpty() ? "file system" : fs.getDescription(), fs.getType(),
+              FormatUtil.formatBytes(usable), FormatUtil.formatBytes(fs.getTotalSpace()),
+              100d * usable / total, FormatUtil.formatValue(fs.getFreeInodes(), ""),
+              FormatUtil.formatValue(fs.getTotalInodes(), ""),
+              100d * fs.getFreeInodes() / fs.getTotalInodes(), fs.getVolume(),
+              fs.getLogicalVolume(), fs.getMount()));
     }
   }
 
@@ -533,7 +583,7 @@ public class OshiController extends AbstractTomcatContainerController {
   private static void printSoundCards(List<SoundCard> list) {
     oshi.add("Sound Cards:");
     for (SoundCard card : list) {
-      oshi.add(" " + card);
+      oshi.add(" " + String.valueOf(card));
     }
   }
 
@@ -548,7 +598,7 @@ public class OshiController extends AbstractTomcatContainerController {
       oshi.add(" None detected.");
     } else {
       for (GraphicsCard card : list) {
-        oshi.add(" " + card);
+        oshi.add(" " + String.valueOf(card));
       }
     }
   }

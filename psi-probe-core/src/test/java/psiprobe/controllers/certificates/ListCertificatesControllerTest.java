@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -14,10 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.codebox.bean.JavaBeanTester;
 
+import jakarta.inject.Inject;
+
 import java.io.File;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,7 +56,7 @@ class ListCertificatesControllerTest {
    * @throws Exception the exception
    */
   @Test
-  void testGetCertificates() throws Exception {
+  void certificatesTest() throws Exception {
     ListCertificatesController controller = new ListCertificatesController();
 
     String storeType = "jks";
@@ -65,8 +65,7 @@ class ListCertificatesControllerTest {
 
     List<Cert> certs = controller.getCertificates(storeType, storeFile.toString(), storePassword);
 
-    assertThat(certs).doesNotContainNull();
-    assertThat(certs.size()).isEqualTo(2);
+    assertThat(certs).doesNotContainNull().hasSize(2);
     assertThat(certs.get(0).getAlias()).isEqualTo("*.google.com");
     assertThat(certs.get(1).getAlias()).isEqualTo("google_g2_2017");
   }
@@ -77,7 +76,7 @@ class ListCertificatesControllerTest {
    * @throws Exception the exception
    */
   @Test
-  void testGetCertificatesRelative() throws Exception {
+  void certificatesRelativeTest() throws Exception {
     ListCertificatesController controller = new ListCertificatesController();
 
     String storeType = "jks";
@@ -89,8 +88,7 @@ class ListCertificatesControllerTest {
     List<Cert> certs =
         controller.getCertificates(storeType, "localhost-truststore.jks", storePassword);
 
-    assertThat(certs).doesNotContainNull();
-    assertThat(certs.size()).isEqualTo(2);
+    assertThat(certs).doesNotContainNull().hasSize(2);
     assertThat(certs.get(0).getAlias()).isEqualTo("*.google.com");
     assertThat(certs.get(1).getAlias()).isEqualTo("google_g2_2017");
   }
@@ -101,7 +99,7 @@ class ListCertificatesControllerTest {
    * @throws Exception the exception
    */
   @Test
-  void testGetCertificatesRelativeUri() throws Exception {
+  void certificatesRelativeUriTest() throws Exception {
     ListCertificatesController controller = new ListCertificatesController();
 
     String storeType = "jks";
@@ -111,11 +109,9 @@ class ListCertificatesControllerTest {
 
     String storePassword = "123456";
 
-    List<Cert> certs =
-        controller.getCertificates(storeType, storeFile.toURI().toString(), storePassword);
+    List<Cert> certs = controller.getCertificates(storeType, storeFile.getPath(), storePassword);
 
-    assertThat(certs).doesNotContainNull();
-    assertThat(certs.size()).isEqualTo(2);
+    assertThat(certs).doesNotContainNull().hasSize(2);
     assertThat(certs.get(0).getAlias()).isEqualTo("*.google.com");
     assertThat(certs.get(1).getAlias()).isEqualTo("google_g2_2017");
   }
@@ -126,7 +122,7 @@ class ListCertificatesControllerTest {
    * @throws Exception the exception
    */
   @Test
-  void testGetCertificatesAbsoluteUri() throws Exception {
+  void certificatesAbsoluteUriTest() throws Exception {
     ListCertificatesController controller = new ListCertificatesController();
 
     String storeType = "jks";
@@ -138,8 +134,7 @@ class ListCertificatesControllerTest {
     List<Cert> certs =
         controller.getCertificates(storeType, "./localhost-truststore.jks", storePassword);
 
-    assertThat(certs).doesNotContainNull();
-    assertThat(certs.size()).isEqualTo(2);
+    assertThat(certs).doesNotContainNull().hasSize(2);
     assertThat(certs.get(0).getAlias()).isEqualTo("*.google.com");
     assertThat(certs.get(1).getAlias()).isEqualTo("google_g2_2017");
   }

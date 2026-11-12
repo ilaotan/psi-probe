@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,18 +10,19 @@
  */
 package psiprobe.controllers.quickcheck;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.springframework.web.servlet.ModelAndView;
@@ -39,25 +40,7 @@ public class BaseTomcatAvailabilityController extends AbstractTomcatContainerCon
 
   /** The container listener bean. */
   @Inject
-  private ContainerListenerBean containerListenerBean;
-
-  /**
-   * Gets the container listener bean.
-   *
-   * @return the container listener bean
-   */
-  public ContainerListenerBean getContainerListenerBean() {
-    return containerListenerBean;
-  }
-
-  /**
-   * Sets the container listener bean.
-   *
-   * @param containerListenerBean the new container listener bean
-   */
-  public void setContainerListenerBean(ContainerListenerBean containerListenerBean) {
-    this.containerListenerBean = containerListenerBean;
-  }
+  protected ContainerListenerBean containerListenerBean;
 
   @Override
   public ModelAndView handleRequestInternal(HttpServletRequest request,
@@ -70,13 +53,13 @@ public class BaseTomcatAvailabilityController extends AbstractTomcatContainerCon
     tomcatTestReport.setDatasourceUsageScore(0);
 
     boolean allContextsAvailable = true;
-    if (getContainerWrapper().getResourceResolver().supportsPrivateResources()) {
-      for (Context appContext : getContainerWrapper().getTomcatContainer().findContexts()) {
-        allContextsAvailable = allContextsAvailable
-            && getContainerWrapper().getTomcatContainer().getAvailable(appContext);
+    if (containerWrapper.getResourceResolver().supportsPrivateResources()) {
+      for (Context appContext : containerWrapper.getTomcatContainer().findContexts()) {
+        allContextsAvailable =
+            allContextsAvailable && containerWrapper.getTomcatContainer().getAvailable(appContext);
 
-        List<ApplicationResource> applicationResources = getContainerWrapper().getResourceResolver()
-            .getApplicationResources(appContext, getContainerWrapper());
+        List<ApplicationResource> applicationResources = containerWrapper.getResourceResolver()
+            .getApplicationResources(appContext, containerWrapper);
 
         for (ApplicationResource appResource : applicationResources) {
           DataSourceInfo dsi = appResource.getDataSourceInfo();
@@ -93,7 +76,7 @@ public class BaseTomcatAvailabilityController extends AbstractTomcatContainerCon
 
     } else {
       List<ApplicationResource> resources =
-          getContainerWrapper().getResourceResolver().getApplicationResources();
+          containerWrapper.getResourceResolver().getApplicationResources();
       for (ApplicationResource resource : resources) {
         DataSourceInfo dsi = resource.getDataSourceInfo();
         if (dsi != null && dsi.getBusyScore() > tomcatTestReport.getDatasourceUsageScore()) {
@@ -120,14 +103,13 @@ public class BaseTomcatAvailabilityController extends AbstractTomcatContainerCon
     }
 
     // try to open some files
-    File tmpDir = new File(System.getProperty("java.io.tmpdir"));
     int fileCount = tomcatTestReport.getDefaultFileCount();
     List<File> files = new ArrayList<>();
     List<OutputStream> fileStreams = new ArrayList<>();
 
     try {
       for (; fileCount > 0; fileCount--) {
-        File file = new File(tmpDir, "tctest_" + fileCount);
+        File file = Path.of(System.getProperty("java.io.tmpdir"), "tctest_" + fileCount).toFile();
         try (OutputStream fos = Files.newOutputStream(file.toPath())) {
           files.add(file);
           fileStreams.add(fos);
@@ -153,23 +135,8 @@ public class BaseTomcatAvailabilityController extends AbstractTomcatContainerCon
 
     tomcatTestReport.setTestDuration(System.currentTimeMillis() - start);
 
+    // TODO JWL 9/19/2026 - implement a real service time test or remove this from the report
     long maxServiceTime = 0;
-
-    // TODO JWL 12/11/2016 - Why is this commented out? If not needed, delete it.
-    // check the maximum execution time
-    // List<ThreadPool> pools = containerListenerBean.getThreadPools();
-    // for (int iPool = 0; iPool < pools.size(); iPool++) {
-    // ThreadPool threadPool = (ThreadPool) pools.get(iPool);
-    // List<RequestProcessor> threads = threadPool.getRequestProcessors();
-    // for (int iThread = 0; iThread < threads.size(); iThread++) {
-    // RequestProcessor rp = (RequestProcessor) threads.get(iThread);
-    // if (rp.getStage() == 3) {
-    // // the request processor is in SERVICE state
-    // maxServiceTime = Math.max(maxServiceTime, rp.getProcessingTime());
-    // }
-    // }
-    // }
-
     tomcatTestReport.setMaxServiceTime(maxServiceTime);
 
     return new ModelAndView(getViewName(), "testReport", tomcatTestReport);

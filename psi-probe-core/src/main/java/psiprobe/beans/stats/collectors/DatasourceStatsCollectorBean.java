@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,7 +10,9 @@
  */
 package psiprobe.beans.stats.collectors;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
+import javax.naming.NamingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,31 +41,13 @@ public class DatasourceStatsCollectorBean extends AbstractStatsCollectorBean {
   @Inject
   private ContainerWrapperBean containerWrapper;
 
-  /**
-   * Gets the container wrapper.
-   *
-   * @return the container wrapper
-   */
-  public ContainerWrapperBean getContainerWrapper() {
-    return containerWrapper;
-  }
-
-  /**
-   * Sets the container wrapper.
-   *
-   * @param containerWrapper the new container wrapper
-   */
-  public void setContainerWrapper(ContainerWrapperBean containerWrapper) {
-    this.containerWrapper = containerWrapper;
-  }
-
   @Override
-  public void collect() throws Exception {
+  public void collect() throws NamingException, InterruptedException {
     long currentTime = System.currentTimeMillis();
     if (containerWrapper == null) {
       logger.error("Cannot collect data source stats. Container wrapper is not set.");
     } else {
-      for (ApplicationResource ds : getContainerWrapper().getDataSources()) {
+      for (ApplicationResource ds : containerWrapper.getDataSources()) {
         String appName = ds.getApplicationName();
         String name = (appName == null ? "" : appName) + '/' + ds.getName();
         DataSourceInfo dsi = ds.getDataSourceInfo();
@@ -80,13 +64,13 @@ public class DatasourceStatsCollectorBean extends AbstractStatsCollectorBean {
   /**
    * Reset.
    *
-   * @throws Exception the exception
+   * @throws NamingException the naming exception
    */
-  public void reset() throws Exception {
+  public void reset() throws NamingException {
     if (containerWrapper == null) {
       logger.error("Cannot reset application stats. Container wrapper is not set.");
     } else {
-      for (ApplicationResource ds : getContainerWrapper().getDataSources()) {
+      for (ApplicationResource ds : containerWrapper.getDataSources()) {
         reset(ds.getName());
       }
     }
@@ -96,9 +80,8 @@ public class DatasourceStatsCollectorBean extends AbstractStatsCollectorBean {
    * Reset.
    *
    * @param name the name
-   * @throws Exception the exception
    */
-  public void reset(String name) throws Exception {
+  public void reset(String name) {
     resetStats(PREFIX_ESTABLISHED + name);
     resetStats(PREFIX_BUSY + name);
   }
@@ -110,8 +93,8 @@ public class DatasourceStatsCollectorBean extends AbstractStatsCollectorBean {
    * @param span the span
    */
   public void setMaxSeries(
-      @Value("${psiprobe.beans.stats.collectors.datasource.period}") long period,
-      @Value("${psiprobe.beans.stats.collectors.datasource.span}") long span) {
+      @Value("${psiprobe.beans.stats.collectors.datasource.period}") String period,
+      @Value("${psiprobe.beans.stats.collectors.datasource.span}") String span) {
     super.setMaxSeries((int) TimeExpression.dataPoints(period, span));
   }
 

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,13 +10,13 @@
  */
 package psiprobe.controllers.threads;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +49,7 @@ public class ListThreadsController extends AbstractTomcatContainerController {
      * Create a list of webapp classloaders. This will help us to associate threads with
      * applications.
      */
-    List<Context> contexts = getContainerWrapper().getTomcatContainer().findContexts();
+    List<Context> contexts = containerWrapper.getTomcatContainer().findContexts();
     Map<String, String> classLoaderMap = new TreeMap<>();
     for (Context context : contexts) {
       if (context.getLoader() != null && context.getLoader().getClassLoader() != null) {
@@ -64,6 +64,7 @@ public class ListThreadsController extends AbstractTomcatContainerController {
    * Enumerate threads.
    *
    * @param classLoaderMap the class loader map
+   *
    * @return the list
    */
   private List<ThreadModel> enumerateThreads(final Map<String, String> classLoaderMap) {
@@ -111,6 +112,7 @@ public class ListThreadsController extends AbstractTomcatContainerController {
    * To uid.
    *
    * @param obj the obj
+   *
    * @return the string
    */
   private static String toUid(Object obj) {

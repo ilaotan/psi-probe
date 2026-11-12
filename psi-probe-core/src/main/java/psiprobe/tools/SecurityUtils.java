@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,10 +10,9 @@
  */
 package psiprobe.tools;
 
-import java.util.Collection;
+import jakarta.servlet.ServletContext;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 /**
  * The Class SecurityUtils.
  */
-public class SecurityUtils {
+public final class SecurityUtils {
 
   /**
    * Prevent Instantiation of security utils.
@@ -34,13 +33,12 @@ public class SecurityUtils {
    * Checks for attribute value role.
    *
    * @param servletContext the servlet context
-   * @param request the request
+   *
    * @return true, if successful
    */
-  public static boolean hasAttributeValueRole(ServletContext servletContext,
-      HttpServletRequest request) {
+  public static boolean hasAttributeValueRole(ServletContext servletContext) {
 
-    String[] privilegedRoles = getPrivilegedRoles(servletContext).split(",");
+    String[] privilegedRoles = getPrivilegedRoles(servletContext).split(",", -1);
     for (String privilegedRole : privilegedRoles) {
       if (userHasRole(privilegedRole)) {
         return true;
@@ -53,6 +51,7 @@ public class SecurityUtils {
    * User has role.
    *
    * @param privilegedRole the privileged role
+   *
    * @return true, if successful
    */
   private static boolean userHasRole(String privilegedRole) {
@@ -70,22 +69,10 @@ public class SecurityUtils {
   }
 
   /**
-   * User has role.
-   *
-   * @param privilegedRole the privileged role
-   * @param request the request
-   * @return true, if successful
-   */
-  // TODO 12/10/2016 JWL Do we need this?
-  @SuppressWarnings("unused")
-  private static boolean userHasRole(String privilegedRole, HttpServletRequest request) {
-    return request.isUserInRole(privilegedRole);
-  }
-
-  /**
    * Gets the privileged roles.
    *
    * @param servletContext the servlet context
+   *
    * @return the privileged roles
    */
   private static String getPrivilegedRoles(ServletContext servletContext) {

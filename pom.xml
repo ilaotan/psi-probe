@@ -12,17 +12,16 @@
 
 -->
 <project xmlns="https://maven.apache.org/POM/4.0.0" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.psi-probe</groupId>
     <artifactId>psi-probe</artifactId>
-    <version>3.5.4-SNAPSHOT</version>
+    <version>5.5.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>psi-probe</name>
-    <description>
-        Psi Probe - Advanced manager and monitor for Tomcat, forked from Lambda Probe
-    </description>
+    <description>Psi Probe - Advanced manager and monitor for Tomcat, forked from Lambda Probe</description>
     <url>https://github.com/psi-probe/psi-probe/</url>
     <inceptionYear>2009</inceptionYear>
     <organization>
@@ -75,190 +74,208 @@
     <modules>
         <module>psi-probe-core</module>
         <module>psi-probe-rest</module>
-        <module>psi-probe-tomcat7</module>
-        <module>psi-probe-tomcat85</module>
-        <module>psi-probe-tomcat9</module>
-        <!-- <module>psi-probe-tomcat10</module> -->
+        <module>psi-probe-tomcat10</module>
+        <module>psi-probe-tomcat11</module>
         <module>psi-probe-web</module>
     </modules>
 
     <scm>
         <connection>scm:git:ssh://git@github.com/psi-probe/psi-probe.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/psi-probe/psi-probe.git</developerConnection>
-        <url>https://github.com/psi-probe/psi-probe/</url>
         <tag>HEAD</tag>
+        <url>https://github.com/psi-probe/psi-probe/</url>
     </scm>
     <issueManagement>
         <system>GitHub Issues</system>
         <url>https://github.com/psi-probe/psi-probe/issues/</url>
     </issueManagement>
     <ciManagement>
-        <system>Travis</system>
-        <url>https://travis-ci.org/psi-probe/psi-probe/</url>
+        <system>GitHub Actions</system>
+        <url>https://github.com/psi-probe/psi-probe/actions/</url>
     </ciManagement>
     <distributionManagement>
-        <site>
-            <id>gh-pages</id>
-            <name>Psi-Probe GitHub Pages</name>
-            <url>github:https://psi-probe.github.io/psi-probe/</url>
-        </site>
         <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>central</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
         </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
+        <site>
+            <id>gh-pages-scm</id>
+            <name>Psi-Probe GitHub Pages</name>
+            <url>scm:git:ssh://git@github.com/psi-probe/psi-probe.git</url>
+        </site>
     </distributionManagement>
 
     <properties>
         <!-- Java Settings -->
-        <java.version>1.8</java.version>
-        <java.release.version>8</java.release.version>
+        <java.version>17</java.version>
+        <java.release.version>17</java.release.version>
         <java.test.version>${java.version}</java.test.version>
         <java.test.release.version>${java.release.version}</java.test.release.version>
 
-        <maven.compiler.compilerVersion>${java.version}</maven.compiler.compilerVersion>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.testSource>${java.test.version}</maven.compiler.testSource>
         <maven.compiler.testTarget>${java.test.version}</maven.compiler.testTarget>
 
-        <!-- Checkstyle / Copyright -->
-        <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
-        <copyright>2020</copyright>
+        <maven.compiler.release>${java.release.version}</maven.compiler.release>
+        <maven.compiler.testRelease>${java.test.release.version}</maven.compiler.testRelease>
+
+        <!-- Maven minimum version -->
+        <maven.min-version>3.9.16</maven.min-version>
+
+        <!-- Copyright -->
+        <copyright>2026</copyright>
 
         <!-- Github Settings -->
         <github.global.server>github</github.global.server>
 
+        <!-- Maven date configuration -->
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+
         <!-- Probe version settings -->
-        <probe.version>${project.version} (built at ${maven.build.timestamp})</probe.version>
+        <probe.version>${project.version} (built at ${maven.build.timestamp} from commit ${git.commit.id})</probe.version>
 
         <!-- Project build settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <!-- Reproducible Builds -->
+        <project.build.outputTimestamp>1789930640</project.build.outputTimestamp>
+
+        <!-- Checkstyle -->
+        <checkstyle.configLocation>checkstyle.xml</checkstyle.configLocation>
+
         <!-- Surefire Settings -->
-        <argLine>-javaagent:${settings.localRepository}/com/github/hazendaz/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar</argLine>
+        <argLine>-javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/${byte-buddy.version}/byte-buddy-agent-${byte-buddy.version}.jar</argLine>
+
+        <!-- Jacoco minimum code coverage -->
+        <jacoco.minimum.coverage>1.00</jacoco.minimum.coverage>
 
         <!-- Dependency Versions -->
-        <activation.version>1.2.2</activation.version>
-        <animal-sniffer.version>1.19</animal-sniffer.version>
-        <assertj.version>3.18.1</assertj.version>
-        <beanutils.version>1.9.4</beanutils.version>
-        <bonecp.version>0.8.0.RELEASE</bonecp.version>
-        <c3p0.version>0.9.5.5</c3p0.version>
-        <checker.version>3.9.0</checker.version>
-        <collections.version>3.2.2</collections.version>
-        <dbcp.version>1.4</dbcp.version>
-        <dbcp2.version>2.8.0</dbcp2.version>
-        <displaytag.version>2.4.0</displaytag.version>
-        <el-api.version>3.0.3</el-api.version>
-        <error-prone.version>2.4.0</error-prone.version>
-        <geoip2.version>2.15.0</geoip2.version>
-        <guava.version>30.1-jre</guava.version>
-        <hateoas.version>1.2.2</hateoas.version>
-        <hikaricp.version>3.4.5</hikaricp.version>
-        <inject.version>1.0.3</inject.version>
-        <io.version>2.8.0</io.version>
-        <j2objc.version>1.3</j2objc.version>
-        <jackson.version>2.12.0</jackson.version>
-        <javabean-tester.version>2.3.1</javabean-tester.version>
-        <jfreechart.version>1.5.2</jfreechart.version>
-        <jhighlight.version>1.0.3</jhighlight.version>
-        <jmockit.version>1.49.1</jmockit.version>
-        <jna.version>5.6.0</jna.version>
-        <jsp-api.version>2.3.6</jsp-api.version>
-        <jsr305.version>3.0.2</jsr305.version>
-        <jstl-api.version>1.2.7</jstl-api.version>
-        <jstl.version>1.2.6</jstl.version>
-        <junit.version>5.7.0</junit.version>
-        <lang3.version>3.11</lang3.version>
-        <logback.version>1.2.3</logback.version>
-        <mail.version>1.6.5</mail.version>
-        <oshi.version>5.3.7</oshi.version>
-        <openejb.version>4.7.5</openejb.version>
-        <persistence.version>2.2.3</persistence.version>
-        <pool.version>1.6</pool.version>
-        <probe-ojdbc.version>3.1.3</probe-ojdbc.version>
-        <quartz.version>2.3.2</quartz.version>
-        <servlet-api.version>4.0.4</servlet-api.version>
-        <sitemesh.version>2.4.2</sitemesh.version>
-        <slf4j.version>1.7.30</slf4j.version>
-        <spring.version>5.3.2</spring.version>
-        <spring-security.version>5.4.2</spring-security.version>
-        <text.version>1.9</text.version>
-        <transaction-api.version>1.3.3</transaction-api.version>
-        <tomcat.version>9.0.41</tomcat.version>
+        <activation.version>2.1.4</activation.version>
+        <angus-activation.version>2.0.3</angus-activation.version>
+        <assertj.version>3.27.7</assertj.version>
+        <beanutils.version>2.0.0-M2</beanutils.version>
+        <byte-buddy.version>1.18.17</byte-buddy.version>
+        <caffeine.version>3.3.1</caffeine.version>
+        <c3p0.version>0.15.1</c3p0.version>
+        <checker.version>4.4.0</checker.version>
+        <collections.version>4.6.0</collections.version>
+        <dbcp2.version>2.14.0</dbcp2.version>
+        <displaytag.version>3.8.0</displaytag.version>
+        <el-api.version>6.0.1</el-api.version>
+        <error-prone.version>2.52.0</error-prone.version>
+        <geoip2.version>5.2.0</geoip2.version>
+        <guava.version>33.8.0-jre</guava.version>
+        <hateoas.version>3.1.3</hateoas.version>
+        <hikaricp.version>7.1.0</hikaricp.version>
+        <inject.version>2.0.1</inject.version>
+        <io.version>2.22.0</io.version>
+        <j2objc.version>3.1</j2objc.version>
+        <jackson.version>2.23.0</jackson.version>
+        <javabean-tester.version>2.13.0</javabean-tester.version>
+        <jfreechart.version>1.5.6</jfreechart.version>
+        <jhighlight.version>2.0.0</jhighlight.version>
+        <jna.version>5.19.1</jna.version>
+        <jsp-api.version>4.0.0</jsp-api.version>
+        <jstl-api.version>3.0.2</jstl-api.version>
+        <jstl.version>3.0.1</jstl.version>
+        <junit.version>6.1.3</junit.version>
+        <lang3.version>3.22.0</lang3.version>
+        <logback.version>1.6.6</logback.version>
+        <logging.version>1.4.0</logging.version>
+        <mail.version>2.0.5</mail.version>
+        <mchange.version>0.7.1</mchange.version>
+        <mockito.version>5.24.0</mockito.version>
+        <ojdbc.version>19.33.0.0</ojdbc.version>
+        <oshi.version>7.7.3</oshi.version>
+        <quartz.version>2.5.2</quartz.version>
+        <servlet-api.version>6.1.0</servlet-api.version>
+        <sitemesh.version>2.7.0</sitemesh.version>
+        <slf4j.version>2.0.20</slf4j.version>
+        <spotbugs.version>4.10.5</spotbugs.version>
+        <spring.version>7.0.10</spring.version>
+        <spring-security.version>7.1.2</spring-security.version>
+        <text.version>1.15.0</text.version>
+        <tomcat.version>10.1.61</tomcat.version>
+        <tomee.version>10.3.0</tomee.version>
+        <transaction-api.version>2.0.1</transaction-api.version>
+        <ucp.version>21.24.0.0</ucp.version>
         <wrapper.version>3.2.3</wrapper.version>
-        <xpp3_min.version>1.1.4c</xpp3_min.version>
-        <xstream.version>1.4.15</xstream.version>
-        <vibur-dbcp.version>25.0</vibur-dbcp.version>
+        <xstream.version>1.4.21</xstream.version>
+        <vibur-dbcp.version>26.0</vibur-dbcp.version>
 
         <!-- Plugin Versions -->
-        <antrun.plugin>3.0.0</antrun.plugin>
-        <assembly.plugin>3.3.0</assembly.plugin>
-        <build-helper.plugin>3.2.0</build-helper.plugin>
-        <checkstyle.plugin>3.1.1</checkstyle.plugin>
-        <changelog.plugin>2.3</changelog.plugin>
-        <clean.plugin>3.1.0</clean.plugin>
-        <compiler.plugin>3.8.1</compiler.plugin>
-        <coveralls.plugin>4.3.0</coveralls.plugin>
-        <dependency.plugin>3.1.2</dependency.plugin>
-        <dependency-check.plugin>6.0.4</dependency-check.plugin>
-        <deploy.plugin>3.0.0-M1</deploy.plugin>
-        <formatter.plugin>2.13.0</formatter.plugin>
-        <git-commit.plugin>4.0.3</git-commit.plugin>
-        <gpg.plugin>1.6</gpg.plugin>
-        <impsort.plugin>1.4.1</impsort.plugin>
-        <install.plugin>3.0.0-M1</install.plugin>
-        <jacoco.plugin>0.8.6</jacoco.plugin>
-        <jar.plugin>3.2.0</jar.plugin>
-        <javadoc.plugin>3.2.0</javadoc.plugin>
-        <jdeps.plugin>3.1.2</jdeps.plugin>
-        <jspc.plugin>9.4.35.v20201120</jspc.plugin>
-        <jxr.plugin>3.0.0</jxr.plugin>
-        <l10n.plugin>1.8</l10n.plugin>
-        <license.plugin>3.0</license.plugin>
+        <antrun.plugin>3.2.0</antrun.plugin>
+        <assembly.plugin>3.8.0</assembly.plugin>
+        <build-helper.plugin>3.8.0</build-helper.plugin>
+        <checkstyle.plugin>3.6.0</checkstyle.plugin>
+        <clean.plugin>3.5.0</clean.plugin>
+        <compiler.plugin>3.16.0</compiler.plugin>
+        <coveralls.plugin>5.1.0</coveralls.plugin>
+        <dependency.plugin>3.11.0</dependency.plugin>
+        <dependency-check.plugin>13.0.0</dependency-check.plugin>
+        <deploy.plugin>3.2.0</deploy.plugin>
+        <enforcer.plugin>3.7.0</enforcer.plugin>
+        <formatter.plugin>2.29.0</formatter.plugin>
+        <git-commit.plugin>10.0.1</git-commit.plugin>
+        <gpg.plugin>3.2.8</gpg.plugin>
+        <impsort.plugin>1.13.0</impsort.plugin>
+        <install.plugin>3.2.0</install.plugin>
+        <jacoco.plugin>0.8.16</jacoco.plugin>
+        <jar.plugin>3.5.1</jar.plugin>
+        <javadoc.plugin>3.12.0</javadoc.plugin>
+        <jdeps.plugin>3.2.0</jdeps.plugin>
+        <jspc.plugin>12.1.15</jspc.plugin>
+        <jxr.plugin>3.6.0</jxr.plugin>
+        <l10n.plugin>1.3.0</l10n.plugin>
+        <license.plugin>5.1.2</license.plugin>
         <lifecycle-mapping.plugin>1.0.0</lifecycle-mapping.plugin>
-        <modernizer.plugin>2.1.0</modernizer.plugin>
-        <pmd.plugin>3.14.0</pmd.plugin>
-        <project-info.plugin>3.1.1</project-info.plugin>
-        <release.plugin>2.5.3</release.plugin>
-        <resources.plugin>3.2.0</resources.plugin>
-        <site.plugin>3.9.1</site.plugin>
-        <sonar.plugin>3.7.0.1746</sonar.plugin>
-        <source.plugin>3.2.1</source.plugin>
-        <spotbugs.plugin>4.2.0</spotbugs.plugin>
-        <surefire.plugin>3.0.0-M5</surefire.plugin>
-        <tidy.plugin>1.1.0</tidy.plugin>
-        <versions.plugin>2.8.1</versions.plugin>
-        <war.plugin>3.3.1</war.plugin>
+        <modernizer.plugin>3.5.0</modernizer.plugin>
+        <pmd.plugin>3.28.0</pmd.plugin>
+        <project-info.plugin>3.9.0</project-info.plugin>
+        <release.plugin>3.3.1</release.plugin>
+        <resources.plugin>3.5.0</resources.plugin>
+        <rewrite.plugin>6.46.1</rewrite.plugin>
+        <scm-publish.plugin>3.3.0</scm-publish.plugin>
+        <site.plugin>3.22.0</site.plugin>
+        <sonar.plugin>5.8.0.7211</sonar.plugin>
+        <sortpom.plugin>4.0.0</sortpom.plugin>
+        <source.plugin>3.4.0</source.plugin>
+        <spotbugs.plugin>4.10.5.0</spotbugs.plugin>
+        <spotless.plugin>3.11.0</spotless.plugin>
+        <surefire.plugin>3.6.1</surefire.plugin>
+        <versions.plugin>2.25.1</versions.plugin>
+        <war.plugin>3.5.1</war.plugin>
+        <whitespace.plugin>1.7.0</whitespace.plugin>
 
         <!-- Plugin Dependency Versions -->
-        <build-tools.version>1.2.5</build-tools.version>
+        <build-tools.version>1.6.0</build-tools.version>
         <bugpattern.version>1.5.0</bugpattern.version>
-        <checkstyle.version>8.39</checkstyle.version>
-        <doxia.version>1.9.1</doxia.version>
-        <ecj.version>3.24.0</ecj.version>
-        <sb-contrib.version>7.4.7</sb-contrib.version>
-        <findsecbugs.version>1.11.0</findsecbugs.version>
-        <javac.version>9+181-r4173-1</javac.version>
-        <wagon-git.version note="Do not use 2.0.4 as it does not work with ssh">2.0.3</wagon-git.version>
+        <checkstyle.version>14.4.0</checkstyle.version>
+        <ecj.version>3.46.100</ecj.version>
+        <extra-enforcer-rules.version>1.12.1</extra-enforcer-rules.version>
+        <sb-contrib.version>7.7.4</sb-contrib.version>
+        <findsecbugs.version>1.14.0</findsecbugs.version>
 
-        <!-- Plugin Extensions -->
-        <wagon-ssh.version>3.4.2</wagon-ssh.version>
+        <!-- Verification Checks -->
+        <error-prone.failOnViolations>-XepAllErrorsAsWarnings</error-prone.failOnViolations>
+        <error-prone.skipGeneratedCode>-XepDisableWarningsInGeneratedCode -XepExcludedPaths:.*target/generated-sources/.*</error-prone.skipGeneratedCode>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <!-- Sonar Needs Following for Scans -->
             <dependency>
-                <groupId>com.google.code.findbugs</groupId>
-                <artifactId>jsr305</artifactId>
-                <version>${jsr305.version}</version>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-annotations</artifactId>
+                <version>${spotbugs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.gaul</groupId>
+                <artifactId>modernizer-maven-annotations</artifactId>
+                <version>${modernizer.plugin}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.errorprone</groupId>
@@ -278,14 +295,28 @@
                 <version>${assertj.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.github.hazendaz.jmockit</groupId>
-                <artifactId>jmockit</artifactId>
-                <version>${jmockit.version}</version>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-engine</artifactId>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-bom</artifactId>
+                <version>${mockito.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
                 <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>com.github.hazendaz</groupId>
@@ -300,9 +331,9 @@
                 <version>${activation.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.sun.activation</groupId>
-                <artifactId>jakarta.activation</artifactId>
-                <version>${activation.version}</version>
+                <groupId>org.eclipse.angus</groupId>
+                <artifactId>angus-activation</artifactId>
+                <version>${angus-activation.version}</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.inject</groupId>
@@ -325,8 +356,8 @@
                 <version>${jstl-api.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.sun.mail</groupId>
-                <artifactId>jakarta.mail</artifactId>
+                <groupId>org.eclipse.angus</groupId>
+                <artifactId>angus-mail</artifactId>
                 <version>${mail.version}</version>
             </dependency>
             <dependency>
@@ -344,11 +375,6 @@
                 <artifactId>jakarta.transaction-api</artifactId>
                 <version>${transaction-api.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.eclipse.persistence</groupId>
-                <artifactId>jakarta.persistence</artifactId>
-                <version>${persistence.version}</version>
-            </dependency>
 
             <!-- JDBC / Connection Pools -->
             <dependency>
@@ -357,35 +383,54 @@
                 <version>${c3p0.version}</version>
             </dependency>
             <dependency>
-                <groupId>commons-dbcp</groupId>
-                <artifactId>commons-dbcp</artifactId>
-                <version>${dbcp.version}</version>
+                <groupId>com.mchange</groupId>
+                <artifactId>mchange-commons-java</artifactId>
+                <version>${mchange.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.oracle.database.jdbc</groupId>
+                <artifactId>ojdbc10</artifactId>
+                <version>${ojdbc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.oracle.database.jdbc</groupId>
+                <artifactId>ucp</artifactId>
+                <version>${ucp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikaricp.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-dbcp2</artifactId>
                 <version>${dbcp2.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.tomcat</groupId>
                 <artifactId>tomcat-jdbc</artifactId>
                 <version>${tomcat.version}</version>
             </dependency>
-            <dependency> <!-- TODO: Override for commons-dbcp -->
-                <groupId>commons-pool</groupId>
-                <artifactId>commons-pool</artifactId>
-                <version>${pool.version}</version>
+            <dependency>
+                <groupId>org.apache.tomee</groupId>
+                <artifactId>openejb-api</artifactId>
+                <version>${tomee.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.tomee</groupId>
+                        <artifactId>mbean-annotation-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.tomee</groupId>
+                        <artifactId>jakartaee-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.apache.openejb</groupId>
+                <groupId>org.apache.tomee</groupId>
                 <artifactId>openejb-core</artifactId>
-                <version>${openejb.version}</version>
+                <version>${tomee.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>*</groupId>
@@ -394,20 +439,14 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.jolbox</groupId>
-                <artifactId>bonecp</artifactId>
-                <version>${bonecp.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.google.guava</groupId>
-                        <artifactId>guava</artifactId>
-                    </exclusion>
-                </exclusions>
+                <groupId>org.apache.tomee</groupId>
+                <artifactId>openejb-loader</artifactId>
+                <version>${tomee.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.zaxxer</groupId>
-                <artifactId>HikariCP</artifactId>
-                <version>${hikaricp.version}</version>
+                <groupId>org.apache.tomee</groupId>
+                <artifactId>tomee-jdbc</artifactId>
+                <version>${tomee.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.vibur</groupId>
@@ -421,12 +460,8 @@
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
             </dependency>
-            <dependency> <!-- Override while guava is behind -->
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>animal-sniffer-annotations</artifactId>
-                <version>${animal-sniffer.version}</version>
-            </dependency>
-            <dependency> <!-- Override while guava is behind -->
+            <!-- Override while guava is behind -->
+            <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
                 <version>${checker.version}</version>
@@ -434,19 +469,13 @@
 
             <!-- Commons -->
             <dependency>
-                <groupId>commons-beanutils</groupId>
-                <artifactId>commons-beanutils</artifactId>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-beanutils2</artifactId>
                 <version>${beanutils.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
-                <groupId>commons-collections</groupId>
-                <artifactId>commons-collections</artifactId>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
                 <version>${collections.version}</version>
             </dependency>
             <dependency>
@@ -458,6 +487,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${logging.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -475,77 +509,44 @@
             <!-- Logging -->
             <dependency>
                 <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
+                <artifactId>slf4j-bom</artifactId>
                 <version>${slf4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.sun.mail</groupId>
-                        <artifactId>javax.mail</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- Spring -->
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>spring-beans</artifactId>
+                <artifactId>spring-framework-bom</artifactId>
                 <version>${spring.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                </exclusions>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context-support</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.springframework.hateoas</groupId>
                 <artifactId>spring-hateoas</artifactId>
                 <version>${hateoas.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-jcl</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-tx</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-test</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-config</artifactId>
+                <artifactId>spring-security-bom</artifactId>
                 <version>${spring-security.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-core</artifactId>
-                <version>${spring-security.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-web</artifactId>
-                <version>${spring-security.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- Geo IP -->
@@ -553,32 +554,15 @@
                 <groupId>com.maxmind.geoip2</groupId>
                 <artifactId>geoip2</artifactId>
                 <version>${geoip2.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-logging</groupId>
-                        <artifactId>commons-logging</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpclient</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
+
             <!-- Override Jackson used in geoip2 -->
             <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
                 <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- Quartz -->
@@ -586,32 +570,13 @@
                 <groupId>org.quartz-scheduler</groupId>
                 <artifactId>quartz</artifactId>
                 <version>${quartz.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.mchange</groupId>
-                        <artifactId>c3p0</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.mchange</groupId>
-                        <artifactId>mchange-commons-java</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.zaxxer</groupId>
-                        <artifactId>HikariCP-java6</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- XML -->
             <dependency>
-                <groupId>opensymphony</groupId>
+                <groupId>com.github.hazendaz</groupId>
                 <artifactId>sitemesh</artifactId>
                 <version>${sitemesh.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>xpp3</groupId>
-                <artifactId>xpp3_min</artifactId>
-                <version>${xpp3_min.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.thoughtworks.xstream</groupId>
@@ -624,12 +589,6 @@
                 <groupId>org.codelibs</groupId>
                 <artifactId>jhighlight</artifactId>
                 <version>${jhighlight.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>servlet-api</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.jfree</groupId>
@@ -650,6 +609,7 @@
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi.version}</version>
             </dependency>
+
             <!-- Override jna used in oshi -->
             <dependency>
                 <groupId>net.java.dev.jna</groupId>
@@ -667,8 +627,13 @@
     <dependencies>
         <!-- Sonar Needs Following for Scans -->
         <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.gaul</groupId>
+            <artifactId>modernizer-maven-annotations</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -689,13 +654,23 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.hazendaz.jmockit</groupId>
-            <artifactId>jmockit</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -704,15 +679,15 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Java 9 needs -->
+        <!-- Jakarta EE Activation Apis -->
         <dependency>
             <groupId>jakarta.activation</groupId>
             <artifactId>jakarta.activation-api</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.activation</groupId>
-            <artifactId>jakarta.activation</artifactId>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>angus-activation</artifactId>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -736,6 +711,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>${clean.plugin}</version>
+                    <configuration>
+                        <force>true</force>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -771,6 +749,19 @@
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-scm-publish-plugin</artifactId>
+                    <version>${scm-publish.plugin}</version>
+                    <configuration>
+                        <checkoutDirectory>${user.home}/maven-sites/${project.name}</checkoutDirectory>
+                        <!-- no need for site:stage, use target/site or target/checkout/target/site on release -->
+                        <content>${project.reporting.outputDirectory}</content>
+                        <scmBranch>gh-pages</scmBranch>
+                        <tryUpdate>true</tryUpdate>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
                     <version>${site.plugin}</version>
                     <configuration>
@@ -780,43 +771,29 @@
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             </manifest>
                             <manifestEntries>
-                                <Build-Time>${maven.build.timestamp}</Build-Time>
                                 <Copyright>${copyright}</Copyright>
                                 <Git-Revision>${git.commit.id}</Git-Revision>
-                                <Os-Name>${os.name}</Os-Name>
-                                <Os-Arch>${os.arch}</Os-Arch>
-                                <Os-Version>${os.version}</Os-Version>
                                 <X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
                                 <X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
+                                <X-Compile-Release-JDK>${maven.compiler.release}</X-Compile-Release-JDK>
                             </manifestEntries>
                         </archive>
+                        <!-- don't deploy site with maven-site-plugin (instead use scm publish during release) -->
+                        <skipDeploy>true</skipDeploy>
                     </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.maven.doxia</groupId>
-                            <artifactId>doxia-module-markdown</artifactId>
-                            <version>${doxia.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>net.trajano.wagon</groupId>
-                            <artifactId>wagon-git</artifactId>
-                            <version>${wagon-git.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.apache.maven.wagon</groupId>
-                            <artifactId>wagon-ssh</artifactId>
-                            <version>${wagon-ssh.version}</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
                     <version>${dependency-check.plugin}</version>
+                    <configuration>
+                        <failOnError>false</failOnError>
+                        <nvdApiServerId>nvd</nvdApiServerId>
+                    </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>pl.project13.maven</groupId>
-                    <artifactId>git-commit-id-plugin</artifactId>
+                    <groupId>io.github.git-commit-id</groupId>
+                    <artifactId>git-commit-id-maven-plugin</artifactId>
                     <version>${git-commit.plugin}</version>
                     <configuration>
                         <failOnNoGitDirectory>false</failOnNoGitDirectory>
@@ -825,11 +802,6 @@
                             <always>true</always>
                         </gitDescribe>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-changelog-plugin</artifactId>
-                    <version>${changelog.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -845,11 +817,20 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>${checkstyle.plugin}</version>
+                    <configuration>
+                        <configLocation>${checkstyle.configLocation}</configLocation>
+                        <failOnViolation>false</failOnViolation>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <violationSeverity>info</violationSeverity>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${surefire.plugin}</version>
+                    <configuration>
+                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -860,12 +841,42 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco.plugin}</version>
+                    <configuration>
+                        <rules>
+                            <rule>
+                                <element>BUNDLE</element>
+                                <limits>
+                                    <limit>
+                                        <counter>COMPLEXITY</counter>
+                                        <value>COVEREDRATIO</value>
+                                        <minimum>${jacoco.minimum.coverage}</minimum>
+                                    </limit>
+                                </limits>
+                            </rule>
+                        </rules>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${compiler.plugin}</version>
                     <configuration>
+                        <annotationProcessorPaths>
+                            <annotationProcessorPath>
+                                <groupId>com.google.errorprone</groupId>
+                                <artifactId>error_prone_core</artifactId>
+                                <version>${error-prone.version}</version>
+                            </annotationProcessorPath>
+                        </annotationProcessorPaths>
+
+                        <compilerArgs>
+                            <compilerArg>-XDaddTypeAnnotationsToSymbol=true</compilerArg>
+                            <compilerArg>-XDcompilePolicy=simple</compilerArg>
+                            <compilerArg>--should-stop=ifError=FLOW</compilerArg>
+                            <compilerArg>-Xplugin:ErrorProne ${error-prone.failOnViolations} ${error-prone.skipGeneratedCode}</compilerArg>
+                        </compilerArgs>
+
+                        <parameters>true</parameters>
                         <showDeprecation>true</showDeprecation>
                         <showWarnings>true</showWarnings>
 
@@ -878,6 +889,9 @@
                     <artifactId>spotbugs-maven-plugin</artifactId>
                     <version>${spotbugs.plugin}</version>
                     <configuration>
+                        <effort>Max</effort>
+                        <includeTests>true</includeTests>
+                        <failOnError>false</failOnError>
                         <plugins>
                             <plugin>
                                 <groupId>com.mebigfatguy.sb-contrib</groupId>
@@ -896,6 +910,13 @@
                             </plugin>
                         </plugins>
                     </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.github.spotbugs</groupId>
+                            <artifactId>spotbugs</artifactId>
+                            <version>${spotbugs.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -903,10 +924,12 @@
                     <version>${pmd.plugin}</version>
                     <configuration>
                         <analysisCache>true</analysisCache>
+                        <failOnViolation>false</failOnViolation>
+                        <printFailingErrors>true</printFailingErrors>
                     </configuration>
                 </plugin>
                 <plugin>
-                    <groupId>com.googlecode.l10n-maven-plugin</groupId>
+                    <groupId>org.codehaus.mojo</groupId>
                     <artifactId>l10n-maven-plugin</artifactId>
                     <version>${l10n.plugin}</version>
                 </plugin>
@@ -914,6 +937,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>${resources.plugin}</version>
+                    <configuration>
+                        <propertiesEncoding>${project.build.resourceEncoding}</propertiesEncoding>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -922,19 +948,15 @@
                     <configuration>
                         <archive>
                             <manifest>
-                                <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
                                 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             </manifest>
                             <manifestEntries>
-                                <Build-Time>${maven.build.timestamp}</Build-Time>
                                 <Copyright>${copyright}</Copyright>
                                 <Git-Revision>${git.commit.id}</Git-Revision>
-                                <Os-Name>${os.name}</Os-Name>
-                                <Os-Arch>${os.arch}</Os-Arch>
-                                <Os-Version>${os.version}</Os-Version>
                                 <X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
                                 <X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
+                                <X-Compile-Release-JDK>${maven.compiler.release}</X-Compile-Release-JDK>
                             </manifestEntries>
                         </archive>
                         <skipIfEmpty>true</skipIfEmpty>
@@ -945,22 +967,24 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${javadoc.plugin}</version>
                     <configuration>
+                        <additionalOptions>
+                            <additionalOption>-html5</additionalOption>
+                        </additionalOptions>
                         <archive>
                             <manifest>
                                 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             </manifest>
                             <manifestEntries>
-                                <Build-Time>${maven.build.timestamp}</Build-Time>
                                 <Copyright>${copyright}</Copyright>
                                 <Git-Revision>${git.commit.id}</Git-Revision>
-                                <Os-Name>${os.name}</Os-Name>
-                                <Os-Arch>${os.arch}</Os-Arch>
-                                <Os-Version>${os.version}</Os-Version>
                                 <X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
                                 <X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
+                                <X-Compile-Release-JDK>${maven.compiler.release}</X-Compile-Release-JDK>
                             </manifestEntries>
                         </archive>
+                        <legacyMode>true</legacyMode>
+                        <notimestamp>true</notimestamp>
                         <show>private</show>
                     </configuration>
                 </plugin>
@@ -971,19 +995,15 @@
                     <configuration>
                         <archive>
                             <manifest>
-                                <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
                                 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             </manifest>
                             <manifestEntries>
-                                <Build-Time>${maven.build.timestamp}</Build-Time>
                                 <Copyright>${copyright}</Copyright>
                                 <Git-Revision>${git.commit.id}</Git-Revision>
-                                <Os-Name>${os.name}</Os-Name>
-                                <Os-Arch>${os.arch}</Os-Arch>
-                                <Os-Version>${os.version}</Os-Version>
                                 <X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
                                 <X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
+                                <X-Compile-Release-JDK>${maven.compiler.release}</X-Compile-Release-JDK>
                             </manifestEntries>
                         </archive>
                     </configuration>
@@ -995,18 +1015,14 @@
                     <configuration>
                         <archive>
                             <manifestEntries>
-                                <Build-Time>${maven.build.timestamp}</Build-Time>
                                 <Copyright>${copyright}</Copyright>
                                 <Git-Revision>${git.commit.id}</Git-Revision>
-                                <Os-Name>${os.name}</Os-Name>
-                                <Os-Arch>${os.arch}</Os-Arch>
-                                <Os-Version>${os.version}</Os-Version>
                                 <X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
                                 <X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
+                                <X-Compile-Release-JDK>${maven.compiler.release}</X-Compile-Release-JDK>
                             </manifestEntries>
                             <manifest>
                                 <addClasspath>true</addClasspath>
-                                <addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
                                 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                                 <classpathPrefix>lib/</classpathPrefix>
@@ -1020,8 +1036,8 @@
                     <version>${versions.plugin}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-jspc-maven-plugin</artifactId>
+                    <groupId>org.eclipse.jetty.ee10</groupId>
+                    <artifactId>jetty-ee10-jspc-maven-plugin</artifactId>
                     <version>${jspc.plugin}</version>
                     <configuration>
                         <mergeFragment>false</mergeFragment>
@@ -1029,13 +1045,6 @@
                         <sourceVersion>${maven.compiler.source}</sourceVersion>
                         <targetVersion>${maven.compiler.target}</targetVersion>
                     </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>jspc</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.tomcat</groupId>
@@ -1056,7 +1065,7 @@
                     </dependencies>
                 </plugin>
                 <plugin>
-                    <groupId>org.eluder.coveralls</groupId>
+                    <groupId>com.github.hazendaz.maven</groupId>
                     <artifactId>coveralls-maven-plugin</artifactId>
                     <version>${coveralls.plugin}</version>
                 </plugin>
@@ -1070,10 +1079,85 @@
                     <artifactId>impsort-maven-plugin</artifactId>
                     <version>${impsort.plugin}</version>
                     <configuration>
-                        <groups>ch,com,jakarta,java,javax,mockit,org,oshi,psiprobe</groups>
+                        <groups>ch,com,jakarta,java,javax,mockit,oracle,org,oshi,psiprobe</groups>
                         <staticGroups>java,*</staticGroups>
                         <removeUnused>true</removeUnused>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.openrewrite.maven</groupId>
+                    <artifactId>rewrite-maven-plugin</artifactId>
+                    <version>${rewrite.plugin}</version>
+                    <configuration>
+                        <activeRecipes>
+                            <recipe>org.openrewrite.java.RemoveUnusedImports</recipe>
+                        </activeRecipes>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.github.ben-manes.caffeine</groupId>
+                            <artifactId>caffeine</artifactId>
+                            <version>${caffeine.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.ekryd.sortpom</groupId>
+                    <artifactId>sortpom-maven-plugin</artifactId>
+                    <version>${sortpom.plugin}</version>
+                    <configuration>
+                        <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
+                        <createBackupFile>false</createBackupFile>
+                        <expandEmptyElements>false</expandEmptyElements>
+                        <keepBlankLines>true</keepBlankLines>
+                        <nrOfIndentSpace>4</nrOfIndentSpace>
+                        <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>${spotless.plugin}</version>
+                    <configuration>
+                        <formats>
+                            <format>
+                                <includes>
+                                    <include>**/*.sh</include>
+                                    <include>**/*.yml</include>
+                                    <include>**/*.yaml</include>
+                                </includes>
+                                <excludes>
+                                    <exclude>**/target/**</exclude>
+                                </excludes>
+                                <trimTrailingWhitespace />
+                                <endWithNewline />
+                                <indent>
+                                    <spaces>true</spaces>
+                                    <spacesPerTab>2</spacesPerTab>
+                                </indent>
+                            </format>
+                            <format>
+                                <includes>
+                                    <include>**/*.jsp</include>
+                                    <include>**/*.xml</include>
+                                </includes>
+                                <excludes>
+                                    <exclude>**/target/**</exclude>
+                                </excludes>
+                                <trimTrailingWhitespace />
+                                <endWithNewline />
+                                <indent>
+                                    <spaces>true</spaces>
+                                    <spacesPerTab>4</spacesPerTab>
+                                </indent>
+                            </format>
+                        </formats>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.hazendaz.maven</groupId>
+                    <artifactId>whitespace-maven-plugin</artifactId>
+                    <version>${whitespace.plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1081,31 +1165,61 @@
                     <version>${build-helper.plugin}</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${enforcer.plugin}</version>
+                    <configuration>
+                        <rules>
+                            <bannedDependencies>
+                                <message>Do not use obsolete logging libraries.  Prefer slf4j/logback and override slf4j libraries for replacements.  Use only commons-logging when needed and no overrides from any of the major logging providers.</message>
+                                <excludes>
+                                    <exclude>log4j:log4j</exclude>
+                                    <exclude>org.apache.logging.log4j:log4j-jcl</exclude>
+                                    <exclude>org.slf4j:jcl-over-slf4j</exclude>
+                                    <exclude>org.slf4j:slf4j-log4j12</exclude>
+                                    <exclude>org.springframework:spring-jcl</exclude>
+                                </excludes>
+                            </bannedDependencies>
+                            <enforceBytecodeVersion>
+                                <maxJdkVersion>${java.version}</maxJdkVersion>
+                                <ignoredScopes>test</ignoredScopes>
+                                <excludes>
+                                    <!-- Openssl contains panama for jdk 22 or higher if enabled via listener 'org.apache.catalina.core.OpenSSLLifecycleListener' -->
+                                    <exclude>org.apache.tomcat:tomcat-coyote</exclude>
+                                </excludes>
+                            </enforceBytecodeVersion>
+                            <requireJavaVersion>
+                                <version>[21,22),[25,26),[26,27),[27,28),[28,29)</version>
+                            </requireJavaVersion>
+                            <requireMavenVersion>
+                                <version>[${maven.min-version},)</version>
+                            </requireMavenVersion>
+                        </rules>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>extra-enforcer-rules</artifactId>
+                            <version>${extra-enforcer-rules.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
                     <version>${license.plugin}</version>
                     <configuration>
-                        <header>${main.basedir}/LICENSE_HEADER</header>
-                        <excludes>
-                            <exclude>**/*.jks</exclude>
-                            <exclude>.gitattributes</exclude>
-                            <exclude>LICENSE</exclude>
-                            <exclude>LICENSE_HEADER</exclude>
-                            <exclude>NOTICE</exclude>
-                            <exclude>mvnw.cmd</exclude>
-                            <exclude>mvnw</exclude>
-                            <exclude>**/*GeoLite2-Country.mmdb</exclude>
-                            <exclude>**/*maven-wrapper.properties</exclude>
-                            <exclude>**/*MavenWrapperDownloader.java</exclude>
-                        </excludes>
+                        <licenseSets>
+                            <licenseSet>
+                                <header>${main.basedir}/LICENSE_HEADER</header>
+                                <excludes>
+                                    <!-- Default excludes located at https://github.com/mathieucarbou/license-maven-plugin/blob/master/license-maven-plugin/src/main/java/com/mycila/maven/plugin/license/Default.java -->
+                                    <exclude>NOTICE</exclude>
+                                    <exclude>**/*GeoLite2-Country.mmdb</exclude>
+                                </excludes>
+                            </licenseSet>
+                        </licenseSets>
                     </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.mycila</groupId>
-                            <artifactId>license-maven-plugin-git</artifactId>
-                            <version>${license.plugin}</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1123,7 +1237,17 @@
                     <artifactId>modernizer-maven-plugin</artifactId>
                     <version>${modernizer.plugin}</version>
                     <configuration>
-                        <javaVersion>${maven.compiler.target}</javaVersion>
+                        <javaVersion>${maven.compiler.release}</javaVersion>
+                    </configuration>
+                </plugin>
+                <!-- Sonatype Provided Plugins -->
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.12.0</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <publishingServerId>central</publishingServerId>
                     </configuration>
                 </plugin>
             </plugins>
@@ -1146,11 +1270,17 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
-                <groupId>pl.project13.maven</groupId>
-                <artifactId>git-commit-id-plugin</artifactId>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>git-commit-id</id>
@@ -1177,6 +1307,32 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>enforce-clean</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <phase>pre-clean</phase>
+                    </execution>
+                    <execution>
+                        <id>enforce-site</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <phase>pre-site</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <executions>
@@ -1187,11 +1343,6 @@
                         <phase>compile</phase>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>tidy-maven-plugin</artifactId>
-                <version>${tidy.plugin}</version>
             </plugin>
             <!-- Checkstyle dependencies required here or they won't be used (per maven) -->
             <plugin>
@@ -1209,6 +1360,36 @@
                         <version>${build-tools.version}</version>
                     </dependency>
                 </dependencies>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                            <goal>cpd-check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.gaul</groupId>
@@ -1216,37 +1397,104 @@
                 <executions>
                     <execution>
                         <id>modernizer</id>
-                        <phase>verify</phase>
                         <goals>
                             <goal>modernizer</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <configuration>
+                    <configFile>${main.basedir}/eclipse-java-google-style.xml</configFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>format</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+            <plugin>
+                <groupId>net.revelc.code</groupId>
+                <artifactId>impsort-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>sort</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.openrewrite.maven</groupId>
+                <artifactId>rewrite-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.ekryd.sortpom</groupId>
+                <artifactId>sortpom-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>sort</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.hazendaz.maven</groupId>
+                <artifactId>whitespace-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>trim</goal>
+                        </goals>
+                        <phase>process-sources</phase>
+                    </execution>
+                </executions>
+            </plugin>
 
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh</artifactId>
-                <version>${wagon-ssh.version}</version>
-            </extension>
-        </extensions>
+            <!-- Sonatype Provided Plugins -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
     <reporting>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jdeps-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <configuration>
-                    <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
-                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -1266,9 +1514,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <configLocation>${checkstyle.configLocation}</configLocation>
-                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>checkstyle</report>
+                            <report>checkstyle-aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
@@ -1277,9 +1530,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
-                    <aggregate>true</aggregate>
-                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>aggregate-cpd</report>
+                            <report>aggregate-pmd</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -1293,29 +1551,21 @@
                     </reportSet>
                 </reportSets>
             </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
         </plugins>
     </reporting>
 
     <profiles>
-        <profile>
-            <id>nvd-check</id>
-            <reporting>
-                <plugins>
-                    <plugin>
-                        <groupId>org.owasp</groupId>
-                        <artifactId>dependency-check-maven</artifactId>
-                        <reportSets>
-                            <reportSet>
-                                <reports>
-                                    <report>aggregate</report>
-                                </reports>
-                            </reportSet>
-                        </reportSets>
-                    </plugin>
-                </plugins>
-            </reporting>
-        </profile>
-
         <profile>
             <id>release</id>
             <properties>
@@ -1329,10 +1579,10 @@
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
-                                <phase>verify</phase>
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <phase>verify</phase>
                             </execution>
                         </executions>
                     </plugin>
@@ -1374,36 +1624,25 @@
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>format</id>
-            <build>
-                <plugins>
+                    <!-- Skip license plugin during release as maven release is now shallow cloned -->
                     <plugin>
-                        <groupId>net.revelc.code.formatter</groupId>
-                        <artifactId>formatter-maven-plugin</artifactId>
+                        <groupId>com.mycila</groupId>
+                        <artifactId>license-maven-plugin</artifactId>
                         <configuration>
-                            <configFile>${main.basedir}/eclipse-java-google-style.xml</configFile>
+                            <skip>true</skip>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>format</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
+                    <!-- deploy site with maven-scm-publish-plugin -->
                     <plugin>
-                        <groupId>net.revelc.code</groupId>
-                        <artifactId>impsort-maven-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-scm-publish-plugin</artifactId>
                         <executions>
                             <execution>
+                                <id>scm-publish</id>
                                 <goals>
-                                    <goal>sort</goal>
+                                    <goal>publish-scm</goal>
                                 </goals>
+                                <phase>site-deploy</phase>
                             </execution>
                         </executions>
                     </plugin>
@@ -1412,41 +1651,23 @@
         </profile>
 
         <profile>
-            <id>error-prone</id>
+            <id>pre17</id>
             <activation>
-                <jdk>[1.8,12)</jdk>
+                <jdk>(,17)</jdk>
             </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <annotationProcessorPaths>
-                                    <path>
-                                        <groupId>com.google.errorprone</groupId>
-                                        <artifactId>error_prone_core</artifactId>
-                                        <version>${error-prone.version}</version>
-                                    </path>
-                                </annotationProcessorPaths>
-
-                                <compilerArgs>
-                                    <arg>-XDcompilePolicy=simple</arg>
-                                    <arg>-Xplugin:ErrorProne -Xep:Finally:OFF</arg>
-                                </compilerArgs>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
+            <properties>
+                <ecj.version>3.33.0</ecj.version>
+            </properties>
         </profile>
 
         <profile>
-            <id>jdk8</id>
+            <id>jdk17on</id>
             <activation>
-                <jdk>1.8</jdk>
+                <jdk>[17,)</jdk>
             </activation>
+            <properties>
+                <argLine>-javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/${byte-buddy.version}/byte-buddy-agent-${byte-buddy.version}.jar --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.logging/java.util.logging=ALL-UNNAMED</argLine>
+            </properties>
             <build>
                 <pluginManagement>
                     <plugins>
@@ -1456,108 +1677,22 @@
                             <configuration>
                                 <fork>true</fork>
                                 <compilerArgs combine.children="append">
-                                    <arg>-J-Xbootclasspath/p:${settings.localRepository}/com/google/errorprone/javac/${javac.version}/javac-${javac.version}.jar</arg>
+                                    <!-- Error Prone Needs -->
+                                    <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</compilerArg>
+                                    <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</compilerArg>
+                                    <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</compilerArg>
+                                    <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</compilerArg>
+                                    <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</compilerArg>
+                                    <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</compilerArg>
+                                    <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</compilerArg>
+                                    <compilerArg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</compilerArg>
+                                    <compilerArg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</compilerArg>
+                                    <compilerArg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</compilerArg>
                                 </compilerArgs>
                             </configuration>
                         </plugin>
                     </plugins>
                 </pluginManagement>
-            </build>
-        </profile>
-
-        <profile>
-            <id>jdk9on</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <properties>
-                <maven.compiler.release>${java.release.version}</maven.compiler.release>
-                <maven.compiler.testRelease>${java.test.release.version}</maven.compiler.testRelease>
-
-                <!-- Downgrade until jmockit fixes bug with jacoco 0.8.4+ support -->
-                <jacoco.plugin>0.8.3</jacoco.plugin>
-            </properties>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-jar-plugin</artifactId>
-                            <configuration>
-                                <archive>
-                                    <manifestEntries>
-                                        <X-Compile-Release-JDK>${maven.compiler.release}</X-Compile-Release-JDK>
-                                    </manifestEntries>
-                                </archive>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-javadoc-plugin</artifactId>
-                            <configuration>
-                                <additionalOptions>-html5</additionalOptions>
-                                <archive>
-                                    <manifestEntries>
-                                        <X-Compile-Release-JDK>${maven.compiler.release}</X-Compile-Release-JDK>
-                                    </manifestEntries>
-                                </archive>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-source-plugin</artifactId>
-                            <configuration>
-                                <archive>
-                                    <manifestEntries>
-                                        <X-Compile-Release-JDK>${maven.compiler.release}</X-Compile-Release-JDK>
-                                    </manifestEntries>
-                                </archive>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-site-plugin</artifactId>
-                            <configuration>
-                                <archive>
-                                    <manifestEntries>
-                                        <X-Compile-Release-JDK>${maven.compiler.release}</X-Compile-Release-JDK>
-                                    </manifestEntries>
-                                </archive>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-war-plugin</artifactId>
-                            <configuration>
-                                <archive>
-                                    <manifestEntries>
-                                        <X-Compile-Release-JDK>${maven.compiler.release}</X-Compile-Release-JDK>
-                                    </manifestEntries>
-                                </archive>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-        </profile>
-
-        <profile>
-            <id>sort</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>tidy-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>pom</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
             </build>
         </profile>
 
@@ -1568,25 +1703,50 @@
                     <name>m2e.version</name>
                 </property>
             </activation>
+            <properties>
+                <!-- Make m2e use java at test revision level -->
+                <maven.compiler.source>${java.test.version}</maven.compiler.source>
+                <maven.compiler.target>${java.test.release.version}</maven.compiler.target>
+                <maven.compiler.release>${java.test.release.version}</maven.compiler.release>
+            </properties>
             <build>
                 <pluginManagement>
                     <plugins>
-                        <!-- This plugin's configuration is used to store Eclipse m2e settings only. It
-                            has no influence on the Maven build itself. -->
+                        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                         <plugin>
                             <groupId>org.eclipse.m2e</groupId>
                             <artifactId>lifecycle-mapping</artifactId>
+                            <!-- Keep version here as fake version and maven report info has problems defining it in dependency management -->
                             <version>${lifecycle-mapping.plugin}</version>
                             <configuration>
                                 <lifecycleMappingMetadata>
                                     <pluginExecutions>
+                                        <!-- impsort m2e in plugin states to ignore, we will process -->
                                         <pluginExecution>
                                             <pluginExecutionFilter>
-                                                <groupId>com.mycila</groupId>
-                                                <artifactId>license-maven-plugin</artifactId>
-                                                <versionRange>[${license.plugin},)</versionRange>
+                                                <groupId>net.revelc.code</groupId>
+                                                <artifactId>impsort-maven-plugin</artifactId>
+                                                <versionRange>[${impsort.plugin},)</versionRange>
                                                 <goals>
-                                                    <goal>format</goal>
+                                                    <goal>sort</goal>
+                                                </goals>
+                                            </pluginExecutionFilter>
+                                            <action>
+                                                <execute>
+                                                    <runOnConfiguration>true</runOnConfiguration>
+                                                    <runOnIncremental>true</runOnIncremental>
+                                                </execute>
+                                            </action>
+                                        </pluginExecution>
+
+                                        <!-- rewrite maven plugin should be ignored in m2e. -->
+                                        <pluginExecution>
+                                            <pluginExecutionFilter>
+                                                <groupId>org.openrewrite.maven</groupId>
+                                                <artifactId>rewrite-maven-plugin</artifactId>
+                                                <versionRange>[${rewrite.plugin},)</versionRange>
+                                                <goals>
+                                                    <goal>run</goal>
                                                 </goals>
                                             </pluginExecutionFilter>
                                             <action>
@@ -1600,6 +1760,183 @@
                     </plugins>
                 </pluginManagement>
             </build>
+        </profile>
+
+        <profile>
+            <id>rewrite-common</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openrewrite.maven</groupId>
+                        <artifactId>rewrite-maven-plugin</artifactId>
+                        <configuration>
+                            <activeRecipes>
+                                <recipe>org.openrewrite.staticanalysis.CodeCleanup</recipe>
+                                <recipe>org.openrewrite.staticanalysis.CommonStaticAnalysis</recipe>
+                                <recipe>org.openrewrite.java.RemoveUnusedImports</recipe>
+                            </activeRecipes>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.openrewrite.recipe</groupId>
+                                <artifactId>rewrite-static-analysis</artifactId>
+                                <version>2.41.1</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>rewrite-java</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openrewrite.maven</groupId>
+                        <artifactId>rewrite-maven-plugin</artifactId>
+                        <configuration>
+                            <activeRecipes>
+                                <recipe>org.openrewrite.java.migrate.UpgradeToJava8</recipe>
+                                <recipe>org.openrewrite.java.RemoveUnusedImports</recipe>
+                            </activeRecipes>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.openrewrite.recipe</groupId>
+                                <artifactId>rewrite-migrate-java</artifactId>
+                                <version>3.42.1</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>rewrite-junit</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openrewrite.maven</groupId>
+                        <artifactId>rewrite-maven-plugin</artifactId>
+                        <configuration>
+                            <activeRecipes>
+                                <recipe>org.openrewrite.java.testing.junit5.JUnit5BestPractices</recipe>
+                                <recipe>org.openrewrite.java.RemoveUnusedImports</recipe>
+                            </activeRecipes>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.openrewrite.recipe</groupId>
+                                <artifactId>rewrite-testing-frameworks</artifactId>
+                                <version>3.44.0</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>rewrite-logging</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openrewrite.maven</groupId>
+                        <artifactId>rewrite-maven-plugin</artifactId>
+                        <configuration>
+                            <activeRecipes>
+                                <recipe>org.openrewrite.java.logging.slf4j.ParameterizedLogging</recipe>
+                                <recipe>org.openrewrite.java.RemoveUnusedImports</recipe>
+                            </activeRecipes>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.openrewrite.recipe</groupId>
+                                <artifactId>rewrite-logging-frameworks</artifactId>
+                                <version>3.32.0</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>rewrite-spring</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openrewrite.maven</groupId>
+                        <artifactId>rewrite-maven-plugin</artifactId>
+                        <configuration>
+                            <activeRecipes>
+                                <recipe>org.openrewrite.java.spring.framework.UpgradeSpringFramework_5_3</recipe>
+                                <recipe>org.openrewrite.java.spring.security5.UpgradeSpringSecurity_5_8</recipe>
+                                <recipe>org.openrewrite.java.RemoveUnusedImports</recipe>
+                            </activeRecipes>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>org.openrewrite.recipe</groupId>
+                                <artifactId>rewrite-spring</artifactId>
+                                <version>6.37.1</version>
+                            </dependency>
+                        </dependencies>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <phase>process-sources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>skip-openrewrite-jdk27</id>
+            <activation>
+                <jdk>[27,)</jdk>
+            </activation>
+            <properties>
+                <rewrite.skip>true</rewrite.skip>
+            </properties>
         </profile>
     </profiles>
 </project>

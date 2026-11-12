@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -20,7 +20,7 @@ import psiprobe.model.DataSourceInfo;
 public class TomcatJdbcPoolDatasourceAccessor implements DatasourceAccessor {
 
   @Override
-  public DataSourceInfo getInfo(Object resource) throws Exception {
+  public DataSourceInfo getInfo(Object resource) {
     DataSourceInfo dataSourceInfo = null;
     if (canMap(resource)) {
       DataSource source = (DataSource) resource;
@@ -37,13 +37,14 @@ public class TomcatJdbcPoolDatasourceAccessor implements DatasourceAccessor {
   }
 
   @Override
-  public boolean reset(Object resource) throws Exception {
+  public boolean reset(Object resource) {
     return false;
   }
 
   @Override
   public boolean canMap(Object resource) {
-    return "org.apache.tomcat.jdbc.pool.DataSource".equals(resource.getClass().getName())
+    return ("org.apache.tomcat.jdbc.pool.DataSource".equals(resource.getClass().getName())
+        || "org.apache.tomcat.jdbc.pool.XADataSource".equals(resource.getClass().getName()))
         && resource instanceof DataSource;
   }
 

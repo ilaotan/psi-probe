@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,13 +11,19 @@
 package psiprobe.model.certificates;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+/**
+ * SSL Host Configuration Information Class.
+ */
 public class SslHostConfigInfo implements Serializable {
 
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 8264467511525154728L;
 
+  /** The host name. */
   private String hostName;
 
   /** The trust store certs. */
@@ -260,7 +266,7 @@ public class SslHostConfigInfo implements Serializable {
    * @return the trust store certs
    */
   public List<Cert> getTrustStoreCerts() {
-    return trustStoreCerts;
+    return trustStoreCerts == null ? List.of() : new ArrayList<>(trustStoreCerts);
   }
 
   /**
@@ -268,8 +274,8 @@ public class SslHostConfigInfo implements Serializable {
    *
    * @param trustStoreCerts the new trust store certs
    */
-  public void setTrustStoreCerts(List<Cert> trustStoreCerts) {
-    this.trustStoreCerts = trustStoreCerts;
+  public void setTrustStoreCerts(Collection<Cert> trustStoreCerts) {
+    this.trustStoreCerts = trustStoreCerts == null ? List.of() : new ArrayList<>(trustStoreCerts);
   }
 
   /**
@@ -278,7 +284,7 @@ public class SslHostConfigInfo implements Serializable {
    * @return certificate infos
    */
   public List<CertificateInfo> getCertificateInfos() {
-    return certificateInfos;
+    return certificateInfos == null ? List.of() : new ArrayList<>(certificateInfos);
   }
 
   /**
@@ -286,8 +292,9 @@ public class SslHostConfigInfo implements Serializable {
    *
    * @param certificateInfos new certificate infos
    */
-  public void setCertificateInfos(List<CertificateInfo> certificateInfos) {
-    this.certificateInfos = certificateInfos;
+  public void setCertificateInfos(Collection<CertificateInfo> certificateInfos) {
+    this.certificateInfos =
+        certificateInfos == null ? List.of() : new ArrayList<>(certificateInfos);
   }
 
 }

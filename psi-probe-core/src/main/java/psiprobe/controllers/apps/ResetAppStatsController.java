@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,7 +10,7 @@
  */
 package psiprobe.controllers.apps;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.springframework.stereotype.Controller;
 
@@ -26,24 +26,6 @@ public class ResetAppStatsController extends AbstractNoSelfContextHandlerControl
   /** The stats collector. */
   @Inject
   private AppStatsCollectorBean statsCollector;
-
-  /**
-   * Gets the stats collector.
-   *
-   * @return the stats collector
-   */
-  public AppStatsCollectorBean getStatsCollector() {
-    return statsCollector;
-  }
-
-  /**
-   * Sets the stats collector.
-   *
-   * @param statsCollector the new stats collector
-   */
-  public void setStatsCollector(AppStatsCollectorBean statsCollector) {
-    this.statsCollector = statsCollector;
-  }
 
   @Override
   protected void executeAction(String contextName) throws Exception {

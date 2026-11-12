@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,11 +10,11 @@
  */
 package psiprobe.controllers.logs;
 
-import java.util.List;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -33,48 +33,12 @@ import psiprobe.tools.logging.LogDestination;
 public class ListLogsController extends ParameterizableViewController {
 
   /** The error view. */
+  @Value("logs_notsupported")
   private String errorView;
 
   /** The log resolver. */
   @Inject
   private LogResolverBean logResolver;
-
-  /**
-   * Gets the error view.
-   *
-   * @return the error view
-   */
-  public String getErrorView() {
-    return errorView;
-  }
-
-  /**
-   * Sets the error view.
-   *
-   * @param errorView the new error view
-   */
-  @Value("logs_notsupported")
-  public void setErrorView(String errorView) {
-    this.errorView = errorView;
-  }
-
-  /**
-   * Gets the log resolver.
-   *
-   * @return the log resolver
-   */
-  public LogResolverBean getLogResolver() {
-    return logResolver;
-  }
-
-  /**
-   * Sets the log resolver.
-   *
-   * @param logResolver the new log resolver
-   */
-  public void setLogResolver(LogResolverBean logResolver) {
-    this.logResolver = logResolver;
-  }
 
   @RequestMapping(path = {"/logs", "/list.htm"})
   @Override
@@ -89,7 +53,7 @@ public class ListLogsController extends ParameterizableViewController {
 
     boolean showAll = ServletRequestUtils.getBooleanParameter(request, "apps", false);
     List<LogDestination> uniqueList = logResolver.getLogDestinations(showAll);
-    if (uniqueList != null) {
+    if (!uniqueList.isEmpty()) {
       return new ModelAndView(getViewName()).addObject("logs", uniqueList);
     }
     return new ModelAndView(errorView);

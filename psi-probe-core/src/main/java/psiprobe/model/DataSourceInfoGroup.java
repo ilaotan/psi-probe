@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -33,6 +33,7 @@ public class DataSourceInfoGroup extends DataSourceInfo {
    * Instantiates a new data source info group.
    *
    * @param dataSourceInfo the data source info
+   *
    * @return the data source info group
    */
   public DataSourceInfoGroup builder(DataSourceInfo dataSourceInfo) {

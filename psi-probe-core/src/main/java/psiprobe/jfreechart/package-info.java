@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,12 +11,12 @@
 
 /**
  * Jfreechart dropped simulated 3D support in 1.5.0. Per authors of Jfreechart
- *
+ * <p>
  * "All the classes relating to pseudo-3D charts have been removed, as much better 3D charts are
  * offered by Orson Charts so we prefer not to maintain the pseudo-3D chart code within JFreeChart"
- *
+ * <p>
  * See https://github.com/jfree/jfreechart for more information.
- *
+ * <p>
  * For continued support of psi-probe and to remain on supported software, it was decided to port
  * this code here. This is for internal usage only and eventually psi-probe should follows 'authors'
  * advice for support.

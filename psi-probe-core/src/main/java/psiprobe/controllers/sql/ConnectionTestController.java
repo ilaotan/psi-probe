@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,17 +10,19 @@
  */
 package psiprobe.controllers.sql;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.apache.catalina.Context;
@@ -59,8 +61,8 @@ public class ConnectionTestController extends AbstractContextHandlerController {
     DataSource dataSource = null;
 
     try {
-      dataSource = getContainerWrapper().getResourceResolver().lookupDataSource(context,
-          resourceName, getContainerWrapper());
+      dataSource = containerWrapper.getResourceResolver().lookupDataSource(context, resourceName,
+          containerWrapper);
     } catch (NamingException e) {
       request.setAttribute("errorMessage", getMessageSourceAccessor().getMessage(
           "probe.src.dataSourceTest.resource.lookup.failure", new Object[] {resourceName}));
@@ -114,7 +116,7 @@ public class ConnectionTestController extends AbstractContextHandlerController {
    * @param name the name
    * @param value the value
    */
-  private void addDbMetaDataEntry(List<Map<String, String>> list, String name, String value) {
+  private void addDbMetaDataEntry(Collection<Map<String, String>> list, String name, String value) {
     Map<String, String> entry = new LinkedHashMap<>();
     entry.put("propertyName", getMessageSourceAccessor().getMessage(name));
     entry.put("propertyValue", value);

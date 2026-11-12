@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,32 +10,36 @@
  */
 package psiprobe.beans.accessors;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 
-import mockit.Mocked;
-import mockit.Tested;
+import java.sql.SQLException;
 
 import org.apache.openejb.resource.jdbc.managed.local.ManagedDataSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * The Class OpenEjbManagedDatasourceAccessorTest.
  */
+@ExtendWith(MockitoExtension.class)
 class OpenEjbManagedDatasourceAccessorTest {
 
   /** The accessor. */
-  @Tested
+  @InjectMocks
   OpenEjbManagedDatasourceAccessor accessor;
 
   /** The source. */
-  @Mocked
+  @Mock
   ManagedDataSource source;
 
   /** The bad source. */
-  ComboPooledDataSource badSource;
+  HikariDataSource badSource;
 
   /**
    * Before.
@@ -43,7 +47,7 @@ class OpenEjbManagedDatasourceAccessorTest {
   @BeforeEach
   void before() {
     accessor = new OpenEjbManagedDatasourceAccessor();
-    badSource = new ComboPooledDataSource();
+    badSource = new HikariDataSource();
   }
 
   /**
@@ -66,10 +70,10 @@ class OpenEjbManagedDatasourceAccessorTest {
   /**
    * Gets the info test.
    *
-   * @throws Exception the exception
+   * @throws SQLException the sql exception
    */
   @Test
-  void getInfoTest() throws Exception {
+  void getInfoTest() throws SQLException {
     accessor.getInfo(source);
   }
 

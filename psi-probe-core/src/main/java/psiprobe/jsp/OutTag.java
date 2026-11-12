@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,11 +10,11 @@
  */
 package psiprobe.jsp;
 
-import java.io.IOException;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.JspWriter;
+import jakarta.servlet.jsp.tagext.BodyTagSupport;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.BodyTagSupport;
+import java.io.IOException;
 
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -33,7 +33,7 @@ public class OutTag extends BodyTagSupport {
   private boolean ellipsisRight = true;
 
   /** The value. */
-  private Object value;
+  private transient Object value;
 
   /**
    * Gets the value.
@@ -109,6 +109,7 @@ public class OutTag extends BodyTagSupport {
    *
    * @param displayValue the display value
    * @param out the out
+   *
    * @throws JspException the jsp exception
    */
   private void print(String displayValue, JspWriter out) throws JspException {

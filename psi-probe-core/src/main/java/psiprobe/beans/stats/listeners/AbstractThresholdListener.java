@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -76,12 +76,10 @@ public abstract class AbstractThresholdListener extends AbstractStatsCollectionL
       } else {
         crossedAboveThreshold(sce);
       }
+    } else if (isPreviousValueAboveThreshold(sce)) {
+      crossedBelowThreshold(sce);
     } else {
-      if (isPreviousValueAboveThreshold(sce)) {
-        crossedBelowThreshold(sce);
-      } else {
-        remainedBelowThreshold(sce);
-      }
+      remainedBelowThreshold(sce);
     }
     setPreviousValue(name, value);
   }
@@ -96,6 +94,7 @@ public abstract class AbstractThresholdListener extends AbstractStatsCollectionL
    * Checks if is previous value above threshold.
    *
    * @param sce the sce
+   *
    * @return true, if is previous value above threshold
    */
   protected boolean isPreviousValueAboveThreshold(StatsCollectionEvent sce) {
@@ -109,6 +108,7 @@ public abstract class AbstractThresholdListener extends AbstractStatsCollectionL
    * Checks if is value above threshold.
    *
    * @param sce the sce
+   *
    * @return true, if is value above threshold
    */
   protected boolean isValueAboveThreshold(StatsCollectionEvent sce) {
@@ -122,6 +122,7 @@ public abstract class AbstractThresholdListener extends AbstractStatsCollectionL
    * Gets the threshold.
    *
    * @param name the name
+   *
    * @return the threshold
    */
   protected long getThreshold(String name) {
@@ -130,9 +131,11 @@ public abstract class AbstractThresholdListener extends AbstractStatsCollectionL
     }
     String threshold = getPropertyValue(name, "threshold");
     if (threshold == null && !isSeriesDisabled(name)) {
-      logger.info(
-          "Required property '{}' is not defined or inherited.  Disabling listener for '{}' series",
-          getPropertyKey(name, "threshold"), name);
+      if (logger.isInfoEnabled()) {
+        logger.info(
+            "Required property '{}' is not defined or inherited.  Disabling listener for '{}' series",
+            getPropertyKey(name, "threshold"), name);
+      }
       setSeriesDisabled(name, true);
       return DEFAULT_THRESHOLD;
     }
@@ -148,6 +151,7 @@ public abstract class AbstractThresholdListener extends AbstractStatsCollectionL
    * Gets the previous value.
    *
    * @param name the name
+   *
    * @return the previous value
    */
   protected long getPreviousValue(String name) {
@@ -170,6 +174,7 @@ public abstract class AbstractThresholdListener extends AbstractStatsCollectionL
    * Checks if is series disabled.
    *
    * @param name the name
+   *
    * @return true, if is series disabled
    */
   protected boolean isSeriesDisabled(String name) {

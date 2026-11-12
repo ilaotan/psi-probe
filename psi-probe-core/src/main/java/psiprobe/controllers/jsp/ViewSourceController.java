@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,12 +10,13 @@
  */
 package psiprobe.controllers.jsp;
 
-import java.io.InputStream;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
 
 import org.apache.catalina.Context;
 import org.apache.jasper.EmbeddedServletOptions;
@@ -53,11 +54,11 @@ public class ViewSourceController extends AbstractContextHandlerController {
   protected ModelAndView handleContext(String contextName, Context context,
       HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-    String jspName = ServletRequestUtils.getStringParameter(request, "source", null);
+    String jspName = ServletRequestUtils.getStringParameter(request, "source");
     boolean highlight = ServletRequestUtils.getBooleanParameter(request, "highlight", true);
-    Summary summary = (Summary) (request.getSession(false) != null
-        ? request.getSession(false).getAttribute(DisplayJspController.SUMMARY_ATTRIBUTE)
-        : null);
+    HttpSession session = request.getSession(false);
+    Summary summary = session == null ? null
+        : (Summary) session.getAttribute(DisplayJspController.SUMMARY_ATTRIBUTE);
 
     if (jspName != null && summary != null && contextName.equals(summary.getName())) {
 
@@ -65,21 +66,21 @@ public class ViewSourceController extends AbstractContextHandlerController {
 
       if (item != null) {
         // replace "\" with "/"
-        jspName = jspName.replaceAll("\\\\", "/");
+        jspName = jspName.replace('\\', '/');
 
         // remove cheeky "../" from the path to avoid exploits
         while (jspName.contains("../")) {
-          jspName = jspName.replaceAll("\\.\\./", "");
+          jspName = jspName.replace("../", "");
         }
 
-        if (getContainerWrapper().getTomcatContainer().resourceExists(jspName, context)) {
+        if (containerWrapper.getTomcatContainer().resourceExists(jspName, context)) {
           ServletContext sctx = context.getServletContext();
           ServletConfig scfg = (ServletConfig) context.findChild("jsp");
           Options opt = new EmbeddedServletOptions(scfg, sctx);
           String descriptorPageEncoding =
               opt.getJspConfig().findJspProperty(jspName).getPageEncoding();
 
-          if (descriptorPageEncoding != null && descriptorPageEncoding.length() > 0) {
+          if (descriptorPageEncoding != null && !descriptorPageEncoding.isEmpty()) {
             item.setEncoding(descriptorPageEncoding);
           } else {
 
@@ -88,12 +89,12 @@ public class ViewSourceController extends AbstractContextHandlerController {
              * time to read the actual content using the correct encoding
              */
             try (InputStream encodedStream =
-                getContainerWrapper().getTomcatContainer().getResourceStream(jspName, context)) {
+                containerWrapper.getTomcatContainer().getResourceStream(jspName, context)) {
               item.setEncoding(Utils.getJspEncoding(encodedStream));
             }
           }
           try (InputStream jspStream =
-              getContainerWrapper().getTomcatContainer().getResourceStream(jspName, context)) {
+              containerWrapper.getTomcatContainer().getResourceStream(jspName, context)) {
             if (highlight) {
               request.setAttribute("highlightedContent",
                   Utils.highlightStream(jspName, jspStream, "xhtml", item.getEncoding()));

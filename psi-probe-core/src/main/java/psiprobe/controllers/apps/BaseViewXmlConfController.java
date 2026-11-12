@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,13 +10,16 @@
  */
 package psiprobe.controllers.apps;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.File;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.nio.file.Path;
 
 import org.apache.catalina.Context;
 import org.slf4j.Logger;
@@ -98,11 +101,11 @@ public class BaseViewXmlConfController extends AbstractContextHandlerController 
     if (TARGET_WEB_XML.equals(displayTarget)) {
       ServletContext sctx = context.getServletContext();
       xmlPath = sctx.getRealPath("/WEB-INF/web.xml");
-      xmlFile = new File(xmlPath);
+      xmlFile = Path.of(xmlPath).toFile();
       mv.addObject("fileDesc",
           getMessageSourceAccessor().getMessage("probe.src.app.viewxmlconf.webxml.desc"));
     } else if (TARGET_CONTEXT_XML.equals(displayTarget)) {
-      xmlFile = getContainerWrapper().getTomcatContainer().getConfigFile(context);
+      xmlFile = containerWrapper.getTomcatContainer().getConfigFile(context);
       if (xmlFile != null) {
         xmlPath = xmlFile.getPath();
       } else {
@@ -121,9 +124,9 @@ public class BaseViewXmlConfController extends AbstractContextHandlerController 
       mv.addObject("fileName", xmlFile.getName());
       if (xmlFile.exists()) {
         try (InputStream fis = Files.newInputStream(xmlFile.toPath())) {
-          String encoding = System.getProperty("file.encoding");
+          String encoding = Charset.defaultCharset().displayName();
           mv.addObject("content", Utils.highlightStream(TARGET_WEB_XML, fis, "xml",
-              encoding == null ? "ISO-8859-1" : encoding));
+              encoding == null ? StandardCharsets.UTF_8.name() : encoding));
         }
       } else {
         logger.debug("File {} of {} application does not exists.", xmlPath, contextName);

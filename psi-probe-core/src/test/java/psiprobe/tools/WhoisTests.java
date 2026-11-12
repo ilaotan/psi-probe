@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -25,6 +25,16 @@ import psiprobe.tools.Whois.Response;
 class WhoisTests {
 
   /**
+   * Lookup null query test.
+   *
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  @Test
+  void nullQueryReturnsNullTest() throws IOException {
+    Assertions.assertNull(Whois.lookup("localhost", 43, null, 1));
+  }
+
+  /**
    * Test localhost.
    *
    * @throws IOException Signals that an I/O exception has occurred.
@@ -32,13 +42,13 @@ class WhoisTests {
   // TODO breaks with latest surefire versions
   @Disabled
   @Test
-  void testLocalhost() throws IOException {
+  void localhostTest() throws IOException {
     int a = 127;
     int b = 0;
     int c = 0;
     int d = 1;
     String dotted = a + "." + b + "." + c + "." + d;
-    byte[] bytes = new byte[] {(byte) a, (byte) b, (byte) c, (byte) d};
+    byte[] bytes = {(byte) a, (byte) b, (byte) c, (byte) d};
 
     Response response = Whois.lookup("whois.arin.net", 43, "n " + dotted, 5);
     Assertions.assertEquals("SPECIAL-IPV4-LOOPBACK-IANA-RESERVED",
@@ -55,13 +65,13 @@ class WhoisTests {
   // TODO breaks with latest surefire versions
   @Disabled
   @Test
-  void testGoogle() throws IOException {
+  void googleTest() throws IOException {
     int a = 74;
     int b = 125;
     int c = 45;
     int d = 100;
     String dotted = a + "." + b + "." + c + "." + d;
-    byte[] bytes = new byte[] {(byte) a, (byte) b, (byte) c, (byte) d};
+    byte[] bytes = {(byte) a, (byte) b, (byte) c, (byte) d};
 
     Response response = Whois.lookup("whois.arin.net", 43, "n " + dotted, 5);
     Assertions.assertEquals("GOOGLE", response.getData().get("NetName"));

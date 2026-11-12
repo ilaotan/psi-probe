@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -30,7 +30,7 @@ public class DataSourceTestInfo implements Serializable {
   private List<Map<String, String>> results;
 
   /** The query history. */
-  private LinkedList<String> queryHistory;
+  private final LinkedList<String> queryHistory;
 
   /** The max rows. */
   private int maxRows;

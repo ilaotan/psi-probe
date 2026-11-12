@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,12 +10,12 @@
  */
 package psiprobe.controllers;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
@@ -64,24 +64,6 @@ public class RenderChartController extends AbstractController {
   /** The stats collection. */
   @Inject
   private StatsCollection statsCollection;
-
-  /**
-   * Gets the stats collection.
-   *
-   * @return the stats collection
-   */
-  public StatsCollection getStatsCollection() {
-    return statsCollection;
-  }
-
-  /**
-   * Sets the stats collection.
-   *
-   * @param statsCollection the new stats collection
-   */
-  public void setStatsCollection(StatsCollection statsCollection) {
-    this.statsCollection = statsCollection;
-  }
 
   @RequestMapping(path = "/chart.png")
   @Override
@@ -135,18 +117,17 @@ public class RenderChartController extends AbstractController {
     boolean showLegend = ServletRequestUtils.getBooleanParameter(request, "l", true);
 
     // Series provider
-    String provider = ServletRequestUtils.getStringParameter(request, "p", null);
+    String provider = ServletRequestUtils.getStringParameter(request, "p");
 
     // Chart type
     String chartType = ServletRequestUtils.getStringParameter(request, "ct", "area");
-
 
     DefaultTableXYDataset ds = new DefaultTableXYDataset();
 
     if (provider != null) {
       Object series = getApplicationContext().getBean(provider);
-      if (series instanceof SeriesProvider) {
-        ((SeriesProvider) series).populate(ds, statsCollection, request);
+      if (series instanceof SeriesProvider seriesProvider) {
+        seriesProvider.populate(ds, statsCollection, request);
       } else {
         logger.error("SeriesProvider '{}' does not implement '{}'", provider, SeriesProvider.class);
       }

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -72,6 +72,7 @@ public class DisconnectedLogDestination implements LogDestination, Serializable 
    * Loads and returns disconnected log destination.
    *
    * @param destination the destination
+   *
    * @return the disconnected log destination
    */
   public DisconnectedLogDestination builder(LogDestination destination) {
@@ -154,7 +155,7 @@ public class DisconnectedLogDestination implements LogDestination, Serializable 
 
   @Override
   public String[] getValidLevels() {
-    return validLevels == null ? null : validLevels.clone();
+    return validLevels == null ? new String[0] : validLevels.clone();
   }
 
   @Override

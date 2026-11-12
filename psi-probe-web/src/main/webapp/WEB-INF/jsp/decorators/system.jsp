@@ -11,54 +11,53 @@
 
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="false" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 
 <div class="verticalMenu">
-	<div>
-		<p><spring:message code="probe.jsp.decorator.system.title"/></p>
-	</div>
-	<ul>
-		<li>
-			<a class="${systemTabOverview}" href="<c:url value='/sysinfo.htm'/>">
-				<spring:message code="probe.jsp.decorator.system.overview"/>
-			</a>
-		</li>
-		<li>
-			<a class="${systemTabMemory}" href="<c:url value='/memory.htm'/>">
-				<spring:message code="probe.jsp.decorator.system.memory"/>
-			</a>
-		</li>
-		<li>
-			<a class="${systemTabSysProps}" href="<c:url value='/sysprops.htm'/>">
-				<spring:message code="probe.jsp.decorator.system.props"/>
-			</a>
-		</li>
-		<li>
-			<a class="${systemTabOsInfo}" href="<c:url value='/adm/osinfo.htm'/>">
-				<spring:message code="probe.jsp.decorator.system.os"/>
-			</a>
-		</li>
-		<li>
-			<a class="${systemTabOshi}" href="<c:url value='/adm/oshi.htm'/>">
-				<spring:message code="probe.jsp.decorator.system.oshi"/>
-			</a>
-		</li>
-		<li>
-			<a class="${systemTabWrapper}" href="<c:url value='/wrapper.htm'/>">
-				<spring:message code="probe.jsp.decorator.system.wrapper"/>
-			</a>
-		</li>
-		<li>
-			<a class="${systemTabTrustStore}" href="<c:url value='/truststore.htm'/>">
-				<spring:message code="probe.jsp.decorator.system.truststore"/>
-			</a>
-		</li>
-	</ul>
+    <div>
+        <p><spring:message code="probe.jsp.decorator.system.title"/></p>
+    </div>
+    <ul>
+        <li>
+            <a class="${systemTabOverview}" href="<c:url value='/sysinfo.htm'/>">
+                <spring:message code="probe.jsp.decorator.system.overview"/>
+            </a>
+        </li>
+        <li>
+            <a class="${systemTabMemory}" href="<c:url value='/memory.htm'/>">
+                <spring:message code="probe.jsp.decorator.system.memory"/>
+            </a>
+        </li>
+        <li>
+            <a class="${systemTabSysProps}" href="<c:url value='/sysprops.htm'/>">
+                <spring:message code="probe.jsp.decorator.system.props"/>
+            </a>
+        </li>
+        <li>
+            <a class="${systemTabOsInfo}" href="<c:url value='/adm/osinfo.htm'/>">
+                <spring:message code="probe.jsp.decorator.system.os"/>
+            </a>
+        </li>
+        <li>
+            <a class="${systemTabOshi}" href="<c:url value='/adm/oshi.htm'/>">
+                <spring:message code="probe.jsp.decorator.system.oshi"/>
+            </a>
+        </li>
+        <li>
+            <a class="${systemTabWrapper}" href="<c:url value='/wrapper.htm'/>">
+                <spring:message code="probe.jsp.decorator.system.wrapper"/>
+            </a>
+        </li>
+        <li>
+            <a class="${systemTabTrustStore}" href="<c:url value='/truststore.htm'/>">
+                <spring:message code="probe.jsp.decorator.system.truststore"/>
+            </a>
+        </li>
+    </ul>
 </div>
 
 <div id="contentBody">
-	<decorator:body/>
+    <decorator:body/>
 </div>
-

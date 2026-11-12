@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,7 +10,7 @@
  */
 package psiprobe.beans.stats.collectors;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Value;
 
@@ -26,24 +26,6 @@ public class RuntimeStatsCollectorBean extends AbstractStatsCollectorBean {
   /** The runtime info accessor bean. */
   @Inject
   private RuntimeInfoAccessorBean runtimeInfoAccessorBean;
-
-  /**
-   * Gets the runtime info accessor bean.
-   *
-   * @return the runtime info accessor bean
-   */
-  public RuntimeInfoAccessorBean getRuntimeInfoAccessorBean() {
-    return runtimeInfoAccessorBean;
-  }
-
-  /**
-   * Sets the runtime info accessor bean.
-   *
-   * @param runtimeInfoAccessorBean the new runtime info accessor bean
-   */
-  public void setRuntimeInfoAccessorBean(RuntimeInfoAccessorBean runtimeInfoAccessorBean) {
-    this.runtimeInfoAccessorBean = runtimeInfoAccessorBean;
-  }
 
   @Override
   public void collect() throws Exception {
@@ -71,8 +53,9 @@ public class RuntimeStatsCollectorBean extends AbstractStatsCollectorBean {
    * @param period the period
    * @param span the span
    */
-  public void setMaxSeries(@Value("${psiprobe.beans.stats.collectors.runtime.period}") long period,
-      @Value("${psiprobe.beans.stats.collectors.runtime.span}") long span) {
+  public void setMaxSeries(
+      @Value("${psiprobe.beans.stats.collectors.runtime.period}") String period,
+      @Value("${psiprobe.beans.stats.collectors.runtime.span}") String span) {
     super.setMaxSeries((int) TimeExpression.dataPoints(period, span));
   }
 

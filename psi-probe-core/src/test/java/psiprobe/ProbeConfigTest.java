@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,9 +10,9 @@
  */
 package psiprobe;
 
-import java.util.List;
+import jakarta.inject.Inject;
 
-import javax.inject.Inject;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,6 +33,8 @@ class ProbeConfigTest {
   @Test
   void checkListenerTest() {
     Assertions.assertNotNull(datasourceMappers);
+    Assertions.assertTrue(
+        datasourceMappers.contains("psiprobe.beans.accessors.FlexyPoolDatasourceAccessor"));
   }
 
 }

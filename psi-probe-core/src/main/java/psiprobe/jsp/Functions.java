@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -26,10 +26,11 @@ public final class Functions {
    * Safe cookie name.
    *
    * @param cookieName the cookie name
+   *
    * @return the string
    */
   public static String safeCookieName(String cookieName) {
-    return cookieName.replaceAll("\"", "");
+    return cookieName.replace("\"", "");
   }
 
 }

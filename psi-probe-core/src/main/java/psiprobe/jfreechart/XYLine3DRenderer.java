@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -32,7 +32,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
  * Other names may be trademarks of their respective owners.]
  *
  * ---------------------
@@ -47,10 +47,10 @@
  * -------
  * 14-Jan-2005 : Added standard header (DG);
  * 01-May-2007 : Fixed equals() and serialization bugs (DG);
- * 15-Sep-2019 : Copied from original Jfreechart as code obsoleted and necessary for visuals in Psi Probe without extra rework (JWL);
+ * 15-Sep-2019 : Copied from original Jfreechart as code obsoleted and necessary for visuals
+ *               in Psi Probe without extra rework (JWL);
  *
  */
-
 package psiprobe.jfreechart;
 
 import java.awt.Color;
@@ -245,20 +245,31 @@ public class XYLine3DRenderer extends XYLineAndShapeRenderer implements Effect3D
     if (obj == this) {
       return true;
     }
-    if (!(obj instanceof XYLine3DRenderer)) {
+    if (!(obj instanceof XYLine3DRenderer that)) {
       return false;
     }
-    XYLine3DRenderer that = (XYLine3DRenderer) obj;
-    if (this.xOffset != that.xOffset) {
-      return false;
-    }
-    if (this.yOffset != that.yOffset) {
-      return false;
-    }
-    if (!PaintUtils.equal(this.wallPaint, that.wallPaint)) {
+    if (this.xOffset != that.xOffset || this.yOffset != that.yOffset
+        || !PaintUtils.equal(this.wallPaint, that.wallPaint)) {
       return false;
     }
     return super.equals(obj);
+  }
+
+  /**
+   * Hash code.
+   *
+   * @return the int
+   */
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    long temp;
+    temp = Double.doubleToLongBits(xOffset);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(yOffset);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    result = 31 * result + (wallPaint != null ? wallPaint.hashCode() : 0);
+    return result;
   }
 
   /**

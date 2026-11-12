@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -10,15 +10,12 @@
  */
 package psiprobe.jsp;
 
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.tagext.BodyContent;
+import jakarta.servlet.jsp.tagext.BodyTagSupport;
+
 import java.io.IOException;
 import java.text.MessageFormat;
-
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.BodyContent;
-import javax.servlet.jsp.tagext.BodyTagSupport;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The Class VisualScoreTag.
@@ -28,8 +25,6 @@ public class VisualScoreTag extends BodyTagSupport {
   /** The Constant serialVersionUID. */
   private static final long serialVersionUID = -5653846466205838602L;
 
-  /** The Constant logger. */
-  private static final Logger logger = LoggerFactory.getLogger(VisualScoreTag.class);
 
   /** The Constant WHITE_LEFT_BORDER. */
   private static final String WHITE_LEFT_BORDER = "a0";
@@ -93,8 +88,7 @@ public class VisualScoreTag extends BodyTagSupport {
 
       bc.getEnclosingWriter().print(buf);
     } catch (IOException e) {
-      logger.trace("", e);
-      throw new JspException("Error:IOException while writing to client" + e.getMessage());
+      throw new JspException("Exception while writing to client", e);
     }
 
     return SKIP_BODY;
@@ -104,6 +98,7 @@ public class VisualScoreTag extends BodyTagSupport {
    * Calculate suffix.
    *
    * @param body the body
+   *
    * @return the string buffer
    */
   String calculateSuffix(String body) {
@@ -129,7 +124,7 @@ public class VisualScoreTag extends BodyTagSupport {
         redPart > 0 ? Math.min((int) Math.floor(value2 / unitSize), partialBlocks - redPart) : 0;
     int blueWhole = (int) Math.max(0, Math.ceil(value2 / blockWidth) - (redPart > 0 ? 1 : 0));
     int bluePart2 =
-        (int) Math.floor((value2 - (blueWhole * blockWidth) - (bluePart1 * unitSize)) / unitSize);
+        (int) Math.floor((value2 - blueWhole * blockWidth - bluePart1 * unitSize) / unitSize);
 
     StringBuilder buf = new StringBuilder();
 
@@ -142,7 +137,7 @@ public class VisualScoreTag extends BodyTagSupport {
 
         format = BLUE_LEFT_BORDER;
       }
-      buf.append(MessageFormat.format(body, new Object[] {format}));
+      buf.append(MessageFormat.format(body, format));
     }
 
     // Full red blocks
@@ -189,7 +184,7 @@ public class VisualScoreTag extends BodyTagSupport {
           + blueWhole == fullBlocks) {
         format = BLUE_RIGHT_BORDER;
       }
-      buf.append(MessageFormat.format(body, new Object[] {format}));
+      buf.append(MessageFormat.format(body, format));
     }
 
     return buf.toString();

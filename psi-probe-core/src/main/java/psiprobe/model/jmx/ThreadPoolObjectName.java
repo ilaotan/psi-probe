@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -11,6 +11,7 @@
 package psiprobe.model.jmx;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.management.ObjectName;
@@ -54,7 +55,7 @@ public class ThreadPoolObjectName {
    * @return the request processor names
    */
   public List<ObjectName> getRequestProcessorNames() {
-    return requestProcessorNames;
+    return requestProcessorNames == null ? List.of() : new ArrayList<>(requestProcessorNames);
   }
 
   /**
@@ -80,8 +81,9 @@ public class ThreadPoolObjectName {
    *
    * @param requestProcessorNames the new request processor names
    */
-  public void setRequestProcessorNames(List<ObjectName> requestProcessorNames) {
-    this.requestProcessorNames = requestProcessorNames;
+  public void setRequestProcessorNames(Collection<ObjectName> requestProcessorNames) {
+    this.requestProcessorNames =
+        requestProcessorNames == null ? List.of() : new ArrayList<>(requestProcessorNames);
   }
 
 }

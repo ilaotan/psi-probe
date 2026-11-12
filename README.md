@@ -1,41 +1,43 @@
 # PSI Probe
 
-[![Build Status](https://travis-ci.org/psi-probe/psi-probe.svg?branch=master)](https://travis-ci.org/psi-probe/psi-probe)
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/11611/badge.svg)](https://scan.coverity.com/projects/11611)
-[![Coverage Status](https://coveralls.io/repos/github/psi-probe/psi-probe/badge.svg?branch=master)](https://coveralls.io/github/psi-probe/psi-probe?branch=master)
-[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=psi-probe/psi-probe)](https://dependabot.com)
-[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.github.psi-probe/psi-probe-web/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.psi-probe/psi-probe-web)
-[![releases](https://github-release-version.herokuapp.com/github/psi-probe/psi-probe/release.svg?style=flat)](https://github.com/psi-probe/psi-probe/releases/download/psi-probe-3.5.1/probe.war)
+[![Java CI](https://github.com/psi-probe/psi-probe/workflows/Java%20CI/badge.svg)](https://github.com/psi-probe/psi-probe/actions?query=workflow%3A%22Java+CI%22)
+[![Coverity](https://scan.coverity.com/projects/28366/badge.svg)](https://scan.coverity.com/projects/28366)
+[![Coveralls](https://coveralls.io/repos/github/psi-probe/psi-probe/badge.svg?branch=master)](https://coveralls.io/github/psi-probe/psi-probe?branch=master)
+[![Known Vulnerabilities](https://snyk.io/test/github/psi-probe/psi-probe/badge.svg)](https://snyk.io/test/github/psi-probe/psi-probe)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.psi-probe/psi-probe-web.svg)](https://central.sonatype.com/artifact/com.github.psi-probe/psi-probe-web)
+[![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://renovatebot.com/)
 [![GPLv2 License](https://img.shields.io/badge/license-GPLv2-green.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 [![Project Stats](https://www.openhub.net/p/psi-probe/widgets/project_thin_badge.gif)](https://www.openhub.net/p/psi-probe)
-[![Github All Releases](https://img.shields.io/github/downloads/psi-probe/psi-probe/total.svg)]()
+[![Reproducible Builds](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/com/github/psi-probe/badge.json)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/com/github/psi-probe/README.md)
 
 ![psi-probe](src/site/resources/images/psi-probe-banner.jpg)
 
 ## Sites ##
 
 * [site](https://psi-probe.github.io/psi-probe/)
-* [sonarqube](https://sonarqube.com/dashboard/index?id=com.github.psi-probe:psi-probe)
+* [sonarqube](https://sonarcloud.io/project/overview?id=psi-probe_psi-probe)
 
 ## Contributing ##
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for info on working on PSI Probe and sending patches.
 
-## Latest Release via Github Releases ##
+## Latest Release ##
 
-Please download latest probe.war from [here](https://github.com/psi-probe/psi-probe/releases/download/psi-probe-3.5.1/probe.war)
+Official PSI Probe release artifacts are published to Maven Central.
 
-## Latest Release via Maven Central ##
+Please download the latest psi-probe-web.war release from:
+[Maven Central](https://central.sonatype.com/artifact/com.github.psi-probe/psi-probe-web).
 
-Please download latest psi-probe-web.war release from [here](https://oss.sonatype.org/content/repositories/releases/com/github/psi-probe/psi-probe-web/)
+GitHub Releases are used for release notes and source code history. Official binary distributions are published to Maven Central.
 
-You can rename 'psi-probe-web.war' to the traditional 'probe.war' or other name as you see fit.
+You can rename 'psi-probe-web.war' to the traditional 'probe.war' or any other name as desired.
 
-## Latest Snapshot via Maven Central ##
+## Version Selection ##
 
-Please download latest psi-probe-web.war snapshots from [here](https://oss.sonatype.org/content/repositories/snapshots/com/github/psi-probe/psi-probe-web/)
+* PSI Probe 4.x supports Tomcat 9 (javax namespace).
+* PSI Probe 5.x supports Tomcat 10.1 and Tomcat 11 (jakarta namespace).
 
-You can rename 'psi-probe-web.war' to the traditional 'probe.war' or other name as you see fit.
+Be sure to select the PSI Probe release series that matches your Tomcat version.
 
 ## Building from Source ##
 
@@ -49,9 +51,9 @@ You can rename 'psi-probe-web.war' to the traditional 'probe.war' or other name 
 
     This will create directory called `psi-probe`. Subsequent steps will refer to this as "your PSI Probe base directory."
 
-2.  Minimum JDK version required to build and run is JDK8.
+2.  Minimum JDK version required to build is JDK 21 and run is JDK 17.
 
-3.  **Download and install Maven 3.**
+3.  **Download and install Maven 3.9.16 or better
 
     You may download it from the [Apache Maven website](https://maven.apache.org/download.cgi).
 
@@ -65,31 +67,51 @@ You can rename 'psi-probe-web.war' to the traditional 'probe.war' or other name 
 
 ## Supported Tomcat Versions
 
-Generally supported versions for third party tomcat providers align with their support but earlier versions may still work.  Currently all tomcat in the series is supported but will soon begin to drop support for earlier versions due to vulnerability related issues.  It is advisable in every case to use only supported tomcat releases per specific vendor.
-
-* Tomcat 7.0 Series
-
-    - Tomcat 7.0.0 to 7.0.106
-    - TomEE 1.7.5 (Based on Tomcat 7.0.81)
-    - NonStop(tm) Servlets For JavaServer Pages(tm) v7.0 (Based on Tomcat 7.0.10)
-    - Pivotal tc 3.2.4 through 3.2.19 release (Based on Tomcat 7.0.72 through 7.0.99)
-
-* Tomcat 8.5 Series
-
-    - Tomcat 8.5.0 to 8.5.59
-    - TomEE 7.0.6 / 7.1.1 (Based on Tomcat 8.5.41)
-    - NonStop(tm) Servlets For JavaServer Pages(tm) v8.5 (Based on Tomcat 8.5.9)
-    - Pivotal tc 3.2.4 through 3.2.19 release (Based on Tomcat 8.5.9 through 8.5.50)
+Generally supported versions for third party tomcat providers align with their support but earlier versions may still work.  It is advisable in every case to use only supported tomcat releases per specific vendor.  Our support will only be against non CVE releases.
 
 * Tomcat 9.0 Series
 
-    - Tomcat 9.0.0 to 9.0.39
-    - TomEE 8.0.0 (Based on Tomcat 9.0.22)
-    - Pivotal tc 4.0.0 through 4.0.10 release (Based on Tomcat 9.0.0 to 9.0.30)
+    - Requires java 11 or better
+    - Use psi probe 4.x series for javax namespace
+    - Spring is no longer receiving updates so vulnerabilities with spring will not be addressed.  If you have a subscription to spring, manually patch the jars.
+    - Tomcat 9.0.72 to 9.0.118
+    - TomEE 8.0.16 (Based on Tomcat 9.0.82).  TomEE 8.0 ended support on December 31st 2023
+    - NonStop(tm) never supported 9.0 as they changed direction but seem to have come back now for 10.1
+    - Vmware Tanzu tc 4.1.44 release (Based on Tomcat 9.0.102)
+    - Vmware Tanzu tc 5.0.23 release (Based on Tomcat 9.0.104)
 
-* Tomcat 10.0 Series (pending)
+* Tomcat 10.1 Series
 
-    - Tomcat 10.0.0.M3 to 10.0.0.M9
+    - Requires java 17 or better
+    - Use psi probe 5.x series for jakarta namespace
+    - Tomcat 10.1.6 to 10.1.55
+    - TomEE 10.0.0 to 10.0.1 (Based on Tomcat 10.1.39).
+    - NonStop(tm) Servlets For JavaServer Pages(tm) v10.1 (Based on Tomcat 10.1.7)
+    - Vmware Tanzu tc 10.1.40.A release (Based on Tomcat 10.1.40)
+
+* Tomcat 11.0 Series
+
+    - Requires java 17 or better
+    - Use psi probe 5.x series for jakarta namespace
+    - Tomcat 11.0.0.M3 to 11.0.22
+    - TomEE - no support yet for tomcat 11.0
+    - NonStop(tm) Servlets For JavaServer Pages(tm) - no support yet for tomcat 11.0
+    - Vmware Tanzu tc 11.0.6.A release (Based on Tomcat 11.0.6)
+
+## Precondition
+
+PSI Probe uses deep reflection to access data. Take care your tomcat configuration considers this.
+You can do this by extending the JDK_JAVA_OPTIONS variable:
+
+        ...
+        --add-opens=java.base/java.lang=ALL-UNNAMED \
+        --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
+        --add-opens=java.base/java.io=ALL-UNNAMED \
+        --add-opens=java.base/java.util=ALL-UNNAMED \
+        --add-opens=java.base/java.util.concurrent=ALL-UNNAMED \
+        --add-opens=java.base/sun.util.locale=ALL-UNNAMED \
+        --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED \
+        ...
 
 ## User Groups
 

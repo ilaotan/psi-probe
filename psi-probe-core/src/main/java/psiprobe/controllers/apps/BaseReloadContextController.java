@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed under the GPL License. You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -26,7 +26,7 @@ public class BaseReloadContextController extends AbstractNoSelfContextHandlerCon
 
   @Override
   protected void executeAction(String contextName) throws Exception {
-    Context context = getContainerWrapper().getTomcatContainer().findContext(contextName);
+    Context context = containerWrapper.getTomcatContainer().findContext(contextName);
     if (context != null) {
       context.reload();
 
